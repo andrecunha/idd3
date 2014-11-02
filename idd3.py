@@ -126,7 +126,7 @@ class Engine(object):
         """
         self.props.append(prop)
 
-    def analyze(self, relations, index, context=[]):
+    def analyze(self, relations, index=0, context=[]):
         """Analyzes a sentence, using this instance's ruleset set.
 
         :relations: the relations in a sentence.

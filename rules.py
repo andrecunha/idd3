@@ -57,7 +57,7 @@ class DetRuleset(Ruleset):
 
     def extract(self, relations, index, context, engine):
         # TODO: check for cases like 'some', 'any', 'all', etc.
-        if relations[index].word in ('the', 'a', 'an'):
+        if relations[index].word.lower() in ('the', 'a', 'an'):
             return relations[index].word
         else:
             print('DET: complete DT rules!')

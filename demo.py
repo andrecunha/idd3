@@ -3,45 +3,30 @@ from __future__ import print_function, unicode_literals, division
 import pprint
 from idd3 import Relation, Engine
 import rules
+import nltk
+from sys import argv
 
 
 def demo():
-    sent = [{'address': 0,
-             'deps': [3],
-             'rel': 'TOP',
-             'tag': 'TOP',
-             'word': None},
-            {'address': 1,
-             'deps': [],
-             'head': 2,
-             'rel': 'det',
-             'tag': 'DT',
-             'word': 'the'},
-            {'address': 2,
-             'deps': [1],
-             'head': 3,
-             'rel': 'nsubj',
-             'tag': 'NN',
-             'word': 'cat'},
-            {'address': 3,
-             'deps': [2],
-             'head': 0,
-             'rel': 'null',
-             'tag': 'VBD',
-             'word': 'ran'}]
+    graphs = nltk.parse.dependencygraph.DependencyGraph.load(argv[1])
+    up_to_index = int(argv[2])
 
-    relations = []
-    for word in sent:
-        relations.append(Relation(**word))
+    engine = Engine(rules.all_rulesets)
 
-    pprint.pprint(relations)
+    for i in range(up_to_index):
+        relations = []
+        for relation in graphs[i].nodelist:
+            relations.append(Relation(**relation))
 
-    rulesets = rules.all_rulesets
-    engine = Engine(rulesets)
-    engine.analyze(relations, 0)
+        pprint.pprint(relations)
 
-    print(engine.props)
+        engine.analyze(relations)
+
+        pprint.pprint(engine.props)
 
 
 if __name__ == '__main__':
-    demo()
+    if len(argv) != 3:
+        print('Usage: python', argv[0], '<conll file>', '<up to index>')
+    else:
+        demo()
