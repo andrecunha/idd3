@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 from __future__ import print_function, unicode_literals, division
-import rules
-import pprint
 
 
 class Relation(object):
@@ -65,14 +63,6 @@ class Relation(object):
 
 class Ruleset(object):
     """A ruleset is responsible for processing relations of a certain label."""
-
-    def __init__(self, rel):
-        """Form a ruleset.
-
-        :rel: the label of the relation this ruleset handles.
-        """
-        self.rel = rel
-        pass
 
     def applies(self, rel):
         """Check whether this ruleset applies to a particular relation.
@@ -152,45 +142,3 @@ class Engine(object):
 
         return self._rulesets_dict[relations[index].rel]\
             .extract(relations, index, context, self)
-
-
-def demo():
-    sent = [{'address': 0,
-             'deps': [3],
-             'rel': 'TOP',
-             'tag': 'TOP',
-             'word': None},
-            {'address': 1,
-             'deps': [],
-             'head': 2,
-             'rel': 'det',
-             'tag': 'DT',
-             'word': 'the'},
-            {'address': 2,
-             'deps': [1],
-             'head': 3,
-             'rel': 'nsubj',
-             'tag': 'NN',
-             'word': 'cat'},
-            {'address': 3,
-             'deps': [2],
-             'head': 0,
-             'rel': 'null',
-             'tag': 'VBD',
-             'word': 'ran'}]
-
-    relations = []
-    for word in sent:
-        relations.append(Relation(**word))
-
-    pprint.pprint(relations)
-
-    rulesets = rules.all_rulesets
-    engine = Engine(rulesets)
-    engine.analyze(relations, 0)
-
-    print(engine.props)
-
-
-if __name__ == '__main__':
-    demo()

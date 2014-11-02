@@ -6,8 +6,7 @@ from idd3 import Relation, Ruleset
 class TopRuleset(Ruleset):
     """A dummy ruleset that starts the analysis process."""
 
-    def __init__(self):
-        Ruleset.__init__(self, 'TOP')
+    rel = 'TOP'
 
     def extract(self, relations, index, context, engine):
         return engine.analyze(relations, relations[index].deps[0])
@@ -16,8 +15,7 @@ class TopRuleset(Ruleset):
 class RootRuleset(Ruleset):
     """A ruleset that processes the 'ROOT' relation."""
 
-    def __init__(self):
-        Ruleset.__init__(self, 'null')
+    rel = 'null'
 
     def extract(self, relations, index, context, engine):
         # TODO: handle other VB tags.
@@ -40,8 +38,7 @@ class RootRuleset(Ruleset):
 class NsubjRuleset(Ruleset):
     """A ruleset that processes the 'nsubj' relation."""
 
-    def __init__(self):
-        Ruleset.__init__(self, 'nsubj')
+    rel = 'nsubj'
 
     def extract(self, relations, index, context, engine):
         det_index = Relation.get_child_with_dep('det', relations, index)
@@ -56,8 +53,7 @@ class NsubjRuleset(Ruleset):
 class DetRuleset(Ruleset):
     """A ruleset that processes the 'det' relation."""
 
-    def __init__(self):
-        Ruleset.__init__(self, 'det')
+    rel = 'det'
 
     def extract(self, relations, index, context, engine):
         # TODO: check for cases like 'some', 'any', 'all', etc.
