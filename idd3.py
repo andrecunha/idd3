@@ -30,6 +30,25 @@ class Relation(object):
         self.tag = kwargs['tag']
         self.word = kwargs['word']
 
+    @staticmethod
+    def get_child_with_dep(rel, relations, index):
+        """Check whether the corresponding word has a child in the tree
+            connected to it through a relation of a certain label, returning
+            the index of the other relation if it exists, and None otherwise.
+
+        :rel: the label of the potential child relation.
+        :relations: all the relations of the sentence.
+        :index: index of the current relation.
+        :returns: the index of a relation connected to this one through the
+            'dep' label if it exists, and None otherwise.
+
+        """
+        for child_index in relations[index].deps:
+            if relations[child_index].rel == rel\
+                    and relations[child_index].head == index:
+                return child_index
+        return None
+
     def __repr__(self):
         keys = sorted(self.__dict__)
 
@@ -45,7 +64,7 @@ class Relation(object):
 
 
 class Ruleset(object):
-    """A ruleset is responsible for processing edges of a certain label."""
+    """A ruleset is responsible for processing relations of a certain label."""
 
     def __init__(self, rel):
         """Form a ruleset.
@@ -122,6 +141,7 @@ class Engine(object):
 
         :relations: the relations in a sentence.
         :index: the index of the relation to be analyzed.
+        :context: the path from the TOP relation to the current one.
         :returns: the return value of the corresponding ruleset's extract
             method.
         """
@@ -168,6 +188,8 @@ def demo():
     rulesets = rules.all_rulesets
     engine = Engine(rulesets)
     engine.analyze(relations, 0)
+
+    print(engine.props)
 
 
 if __name__ == '__main__':
