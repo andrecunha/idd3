@@ -23,8 +23,8 @@ class NounPhraseRuleset(Ruleset):
         else:
             nn = engine.analyze(relations, nn_index, context + [index])
 
-        return_value = [elem for elem in [det, nn, relations[index].word]
-                        if elem is not None]
+        return_value = [word for word in [det, nn, relations[index].word]
+                        if word is not None]
         return ' '.join(return_value)
 
 
@@ -71,11 +71,11 @@ class RootRuleset(Ruleset):
             # Process phrasal verb particle.
             prt_index = Relation.get_child_with_dep('prt', relations, index)
             if prt_index is None:
-                prt = ''
+                prt = None
             else:
                 prt = engine.analyze(relations, prt_index, context + [index])
-
-            verb = relations[index].word + ((' ' + prt) if prt != '' else '')
+            verb = ' '.join([word for word in [relations[index].word, prt]
+                             if word is not None])
 
             # Process direct object.
             dobj_index = Relation.get_child_with_dep('dobj', relations, index)
@@ -112,7 +112,7 @@ class PrtRuleset(AtomicRuleset):
 
 
 class NnRuleset(AtomicRuleset):
-    """A ruleset that processes the 'prt' relation."""
+    """A ruleset that processes the 'nn' relation."""
 
     rel = 'nn'
 
@@ -127,13 +127,13 @@ class NsubjRuleset(NounPhraseRuleset):
 
 
 class DobjRuleset(NounPhraseRuleset):
-    """A ruleset that processes the 'nsubj' relation."""
+    """A ruleset that processes the 'dobj' relation."""
 
     rel = 'dobj'
 
 
 class PobjRuleset(NounPhraseRuleset):
-    """A ruleset that processes the 'nsubj' relation."""
+    """A ruleset that processes the 'pobj' relation."""
 
     rel = 'pobj'
 
