@@ -58,7 +58,7 @@ class RootRuleset(Ruleset):
 
     def extract(self, relations, index, context, engine):
         # TODO: handle other VB tags.
-        if relations[index].tag in ('VBZ', 'VBD'):
+        if relations[index].tag in ('VBZ', 'VBD', 'VBN'):
             # Process subject.
 
             # TODO: handle clausal subjects.
@@ -68,13 +68,20 @@ class RootRuleset(Ruleset):
             else:
                 subj = engine.analyze(relations, subj_index, context + [index])
 
+            # Process auxiliaries.
+            aux_index = Relation.get_child_with_dep('aux', relations, index)
+            if aux_index is None:
+                aux = None
+            else:
+                aux = engine.analyze(relations, aux_index, context + [index])
+
             # Process phrasal verb particle.
             prt_index = Relation.get_child_with_dep('prt', relations, index)
             if prt_index is None:
                 prt = None
             else:
                 prt = engine.analyze(relations, prt_index, context + [index])
-            verb = ' '.join([word for word in [relations[index].word, prt]
+            verb = ' '.join([word for word in [aux, relations[index].word, prt]
                              if word is not None])
 
             # Process direct object.
@@ -115,6 +122,12 @@ class NnRuleset(AtomicRuleset):
     """A ruleset that processes the 'nn' relation."""
 
     rel = 'nn'
+
+
+class AuxRuleset(AtomicRuleset):
+    """A ruleset that processes the 'aux' relation."""
+
+    rel = 'aux'
 
 
 # Noun-Phrase rulesets.
@@ -172,6 +185,7 @@ all_rulesets = [TopRuleset(),
                 RootRuleset(),
                 PrtRuleset(),
                 NnRuleset(),
+                AuxRuleset(),
                 NsubjRuleset(),
                 DobjRuleset(),
                 PobjRuleset(),
