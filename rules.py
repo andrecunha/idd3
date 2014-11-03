@@ -9,7 +9,7 @@ from idd3 import Relation, Ruleset
 class NounPhraseRuleset(Ruleset):
     """A base class for NP-like dependency substructures."""
 
-    def extract(self, relations, index, context, engine):
+    def extract(self, relations, index, context, engine, info={}):
         det_index = Relation.get_child_with_dep('det', relations, index)
         if det_index is None:
             det = None
@@ -28,43 +28,22 @@ class NounPhraseRuleset(Ruleset):
         return ' '.join(return_value)
 
 
-class AtomicRuleset(Ruleset):
-    """A base ruleset for atomic relations, that just return the associated
-    word."""
+class VerbPhraseRuleset(Ruleset):
+    """A base class for VP-like dependency substructures."""
 
-    def extract(self, relations, index, context, engine):
-        return relations[index].word
-
-
-# Derived classes.
-
-
-class TopRuleset(Ruleset):
-    """A dummy ruleset that starts the analysis process."""
-
-    rel = 'TOP'
-
-    def extract(self, relations, index, context, engine):
-        return engine.analyze(relations, relations[index].deps[0])
-
-
-# Verb-Phrase rulesets.
-
-
-class RootRuleset(Ruleset):
-    """A ruleset that processes the 'ROOT' relation."""
-
-    rel = 'null'
-
-    def extract(self, relations, index, context, engine):
+    def extract(self, relations, index, context, engine, info={}):
         # TODO: handle other VB tags.
-        if relations[index].tag in ('VBZ', 'VBD', 'VBN'):
+        if relations[index].tag in ('VBZ', 'VBD', 'VBN', 'VB'):
             # Process subject.
 
             # TODO: handle clausal subjects.
             subj_index = Relation.get_child_with_dep('nsubj', relations, index)
             if subj_index is None:
-                subj = 'NO_NSUBJ'
+                print(info)
+                if relations[index].rel == 'xcomp':
+                    subj = '(%s)' % info['subj']
+                else:
+                    subj = 'NO_NSUBJ'
             else:
                 subj = engine.analyze(relations, subj_index, context + [index])
 
@@ -91,6 +70,12 @@ class RootRuleset(Ruleset):
             else:
                 dobj = engine.analyze(relations, dobj_index, context + [index])
 
+            # Process clausal complements.
+            xcomp_index = Relation.get_child_with_dep('xcomp', relations, index)
+            if xcomp_index is not None:
+                engine.analyze(relations, xcomp_index, context + [index],
+                               {'subj': subj})
+
             # Process indirect object.
 
             # prep + pobj
@@ -111,7 +96,42 @@ class RootRuleset(Ruleset):
 
             return relations[index].word
         else:
-            print('ROOT: cannot handle', relations[index].tag, 'yet.')
+            print('VP: cannot handle', relations[index].tag, 'yet.')
+
+
+class AtomicRuleset(Ruleset):
+    """A base ruleset for atomic relations, that just return the associated
+    word."""
+
+    def extract(self, relations, index, context, engine, info={}):
+        return relations[index].word
+
+
+# Derived classes.
+
+
+class TopRuleset(Ruleset):
+    """A dummy ruleset that starts the analysis process."""
+
+    rel = 'TOP'
+
+    def extract(self, relations, index, context, engine, info={}):
+        return engine.analyze(relations, relations[index].deps[0])
+
+
+# Verb-Phrase rulesets.
+
+
+class RootRuleset(VerbPhraseRuleset):
+    """A ruleset that processes the 'ROOT' relation."""
+
+    rel = 'null'
+
+
+class XcompRuleset(VerbPhraseRuleset):
+    """A ruleset that processes the 'xcomp' relation."""
+
+    rel = 'xcomp'
 
 
 # Atomic rulesets.
@@ -161,7 +181,7 @@ class IobjRuleset(NounPhraseRuleset):
 
     rel = 'iobj'
 
-    def extract(self, relations, index, context, engine):
+    def extract(self, relations, index, context, engine, info={}):
         value = NounPhraseRuleset.extract(self, relations, index, context,
                                           engine)
         engine.emit(('(to) ' + value,))
@@ -175,7 +195,7 @@ class DetRuleset(Ruleset):
 
     rel = 'det'
 
-    def extract(self, relations, index, context, engine):
+    def extract(self, relations, index, context, engine, info={}):
         # TODO: check for cases like 'some', 'any', 'all', etc.
         if relations[index].word.lower() in ('the', 'a', 'an'):
             return relations[index].word.lower()
@@ -189,7 +209,7 @@ class PrepRuleset(Ruleset):
 
     rel = 'prep'
 
-    def extract(self, relations, index, context, engine):
+    def extract(self, relations, index, context, engine, info={}):
         pobj_index = Relation.get_child_with_dep('pobj', relations, index)
         if pobj_index is None:
             print('PREP: prep without pobj!')
@@ -200,6 +220,7 @@ class PrepRuleset(Ruleset):
 
 all_rulesets = [TopRuleset(),
                 RootRuleset(),
+                XcompRuleset(),
                 PrtRuleset(),
                 NnRuleset(),
                 AuxRuleset(),

@@ -73,7 +73,7 @@ class Ruleset(object):
         """
         return rel == self.rel
 
-    def extract(self, relations, index, context, engine):
+    def extract(self, relations, index, context, engine, info={}):
         """Extract the corresponding propositions from a relation.
 
         :relations: the list of relations in a sentence.
@@ -81,6 +81,7 @@ class Ruleset(object):
         :context: a list of indices representing the path from the TOP node
             to the current one.
         :engine: the engine that is running the analysis process.
+        :info: a dictionary containing already parsed contextual information.
         :returns: a string representation that can be embedded in other
             propositions.
 
@@ -126,12 +127,13 @@ class Engine(object):
         """
         self.props.append(prop)
 
-    def analyze(self, relations, index=0, context=[]):
+    def analyze(self, relations, index=0, context=[], info={}):
         """Analyzes a sentence, using this instance's ruleset set.
 
         :relations: the relations in a sentence.
         :index: the index of the relation to be analyzed.
         :context: the path from the TOP relation to the current one.
+        :info: a dictionary containing already parsed contextual information.
         :returns: the return value of the corresponding ruleset's extract
             method.
         """
@@ -142,8 +144,8 @@ class Engine(object):
                 relation.processed = False
             self._build_rulesets_dict(relations)
 
-        value= self._rulesets_dict[relations[index].rel]\
-            .extract(relations, index, context, self)
+        value = self._rulesets_dict[relations[index].rel]\
+            .extract(relations, index, context, self, info)
 
         relations[index].processed = True
 
