@@ -138,7 +138,13 @@ class Engine(object):
         # Clear results from previous executions and prepare for starting.
         if relations[index].rel == 'TOP':
             self.props = []
+            for relation in relations:
+                relation.processed = False
             self._build_rulesets_dict(relations)
 
-        return self._rulesets_dict[relations[index].rel]\
+        value= self._rulesets_dict[relations[index].rel]\
             .extract(relations, index, context, self)
+
+        relations[index].processed = True
+
+        return value
