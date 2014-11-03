@@ -3,87 +3,6 @@
 3	ran	_	VBD	VBD	_	0	null	_	_
 4	.	_	.	.	_	3	punct	_	_
 
-1	I	_	PRP	PRP	_	2	nsubj	_	_
-2	grew	_	VBD	VBD	_	0	null	_	_
-3	up	_	RP	RP	_	2	prt	_	_
-4	in	_	IN	IN	_	2	prep	_	_
-5	San	_	NNP	NNP	_	6	nn	_	_
-6	Jose	_	NNP	NNP	_	4	pobj	_	_
-7	.	_	.	.	_	2	punct	_	_
-
-1	I	_	PRP	PRP	_	2	nsubj	_	_
-2	had	_	VBD	VBD	_	0	null	_	_
-3	a	_	DT	DT	_	4	det	_	_
-4	sister	_	NN	NN	_	2	dobj	_	_
-5	and	_	CC	CC	_	2	cc	_	_
-6	3	_	CD	CD	_	7	num	_	_
-7	brothers	_	NNS	NNS	_	2	conj	_	_
-8	so	_	IN	IN	_	12	mark	_	_
-9	we	_	PRP	PRP	_	12	nsubj	_	_
-10	were	_	VBD	VBD	_	12	cop	_	_
-11	always	_	RB	RB	_	12	advmod	_	_
-12	busy	_	JJ	JJ	_	7	advcl	_	_
-13	.	_	.	.	_	2	punct	_	_
-
-1	We	_	PRP	PRP	_	2	nsubj	_	_
-2	had	_	VBD	VBD	_	0	null	_	_
-3	a	_	DT	DT	_	4	det	_	_
-4	lot	_	NN	NN	_	2	dobj	_	_
-5	of	_	IN	IN	_	4	prep	_	_
-6	friends	_	NNS	NNS	_	5	pobj	_	_
-7	in	_	IN	IN	_	2	prep	_	_
-8	the	_	DT	DT	_	9	det	_	_
-9	neighborhood	_	NN	NN	_	7	pobj	_	_
-10	.	_	.	.	_	2	punct	_	_
-
-1	We	_	PRP	PRP	_	2	nsubj	_	_
-2	swam	_	VBD	VBD	_	0	null	_	_
-3	a	_	DT	DT	_	4	det	_	_
-4	lot	_	NN	NN	_	2	dobj	_	_
-5	in	_	IN	IN	_	4	prep	_	_
-6	the	_	DT	DT	_	7	det	_	_
-7	canals	_	NNS	NNS	_	5	pobj	_	_
-8	.	_	.	.	_	2	punct	_	_
-
-1	We	_	PRP	PRP	_	4	nsubj	_	_
-2	were	_	VBD	VBD	_	4	cop	_	_
-3	n't	_	RB	RB	_	4	neg	_	_
-4	afraid	_	JJ	JJ	_	0	null	_	_
-5	to	_	TO	TO	_	6	aux	_	_
-6	walk	_	VB	VB	_	4	xcomp	_	_
-7	at	_	IN	IN	_	6	prep	_	_
-8	night	_	NN	NN	_	7	pobj	_	_
-9	.	_	.	.	_	4	punct	_	_
-
-1	We	_	PRP	PRP	_	2	nsubj	_	_
-2	stayed	_	VBD	VBD	_	0	null	_	_
-3	out	_	RP	RP	_	2	prt	_	_
-4	at	_	IN	IN	_	2	prep	_	_
-5	night	_	NN	NN	_	4	pobj	_	_
-6	in	_	IN	IN	_	2	prep	_	_
-7	our	_	PRP$	PRP$	_	8	poss	_	_
-8	yard	_	NN	NN	_	6	pobj	_	_
-9	and	_	CC	CC	_	2	cc	_	_
-10	visited	_	VBD	VBD	_	2	conj	_	_
-11	with	_	IN	IN	_	10	prep	_	_
-12	neighbors	_	NNS	NNS	_	11	pobj	_	_
-13	.	_	.	.	_	2	punct	_	_
-
-1	And	_	CC	CC	_	7	cc	_	_
-2	my	_	PRP$	PRP$	_	3	poss	_	_
-3	mom	_	NN	NN	_	7	nsubj	_	_
-4	and	_	CC	CC	_	3	cc	_	_
-5	dad	_	NN	NN	_	3	conj	_	_
-6	always	_	RB	RB	_	7	advmod	_	_
-7	had	_	VBD	VBD	_	0	null	_	_
-8	get-togethers	_	NNS	NNS	_	7	dobj	_	_
-9	.	_	.	.	_	7	punct	_	_
-
-1	The	_	DT	DT	_	2	det	_	_
-2	cat	_	NN	NN	_	3	nsubj	_	_
-3	ran	_	VBD	VBD	_	0	null	_	_
-4	.	_	.	.	_	3	punct	_	_
-
 1	The	_	DT	DT	_	2	det	_	_
 2	cat	_	NN	NN	_	3	nsubj	_	_
 3	ate	_	VBD	VBD	_	0	null	_	_
@@ -96,6 +15,16 @@
 4	eaten	_	VBN	VBN	_	0	null	_	_
 5	food	_	NN	NN	_	4	dobj	_	_
 6	.	_	.	.	_	4	punct	_	_
+
+1	The	_	DT	DT	_	2	det	_	_
+2	cat	_	NN	NN	_	3	nsubj	_	_
+3	gave	_	VBD	VBD	_	0	null	_	_
+4	the	_	DT	DT	_	5	det	_	_
+5	milk	_	NN	NN	_	3	dobj	_	_
+6	to	_	TO	TO	_	3	prep	_	_
+7	the	_	DT	DT	_	8	det	_	_
+8	kitten	_	NN	NN	_	6	pobj	_	_
+9	.	_	.	.	_	3	punct	_	_
 
 1	The	_	DT	DT	_	2	det	_	_
 2	cat	_	NN	NN	_	3	nsubj	_	_
@@ -1444,3 +1373,78 @@
 45	Azie	_	NNP	NNP	_	33	tmod	_	_
 46	.	_	.	.	_	27	punct	_	_
 
+1	I	_	PRP	PRP	_	2	nsubj	_	_
+2	grew	_	VBD	VBD	_	0	null	_	_
+3	up	_	RP	RP	_	2	prt	_	_
+4	in	_	IN	IN	_	2	prep	_	_
+5	San	_	NNP	NNP	_	6	nn	_	_
+6	Jose	_	NNP	NNP	_	4	pobj	_	_
+7	.	_	.	.	_	2	punct	_	_
+
+1	I	_	PRP	PRP	_	2	nsubj	_	_
+2	had	_	VBD	VBD	_	0	null	_	_
+3	a	_	DT	DT	_	4	det	_	_
+4	sister	_	NN	NN	_	2	dobj	_	_
+5	and	_	CC	CC	_	2	cc	_	_
+6	3	_	CD	CD	_	7	num	_	_
+7	brothers	_	NNS	NNS	_	2	conj	_	_
+8	so	_	IN	IN	_	12	mark	_	_
+9	we	_	PRP	PRP	_	12	nsubj	_	_
+10	were	_	VBD	VBD	_	12	cop	_	_
+11	always	_	RB	RB	_	12	advmod	_	_
+12	busy	_	JJ	JJ	_	7	advcl	_	_
+13	.	_	.	.	_	2	punct	_	_
+
+1	We	_	PRP	PRP	_	2	nsubj	_	_
+2	had	_	VBD	VBD	_	0	null	_	_
+3	a	_	DT	DT	_	4	det	_	_
+4	lot	_	NN	NN	_	2	dobj	_	_
+5	of	_	IN	IN	_	4	prep	_	_
+6	friends	_	NNS	NNS	_	5	pobj	_	_
+7	in	_	IN	IN	_	2	prep	_	_
+8	the	_	DT	DT	_	9	det	_	_
+9	neighborhood	_	NN	NN	_	7	pobj	_	_
+10	.	_	.	.	_	2	punct	_	_
+
+1	We	_	PRP	PRP	_	2	nsubj	_	_
+2	swam	_	VBD	VBD	_	0	null	_	_
+3	a	_	DT	DT	_	4	det	_	_
+4	lot	_	NN	NN	_	2	dobj	_	_
+5	in	_	IN	IN	_	4	prep	_	_
+6	the	_	DT	DT	_	7	det	_	_
+7	canals	_	NNS	NNS	_	5	pobj	_	_
+8	.	_	.	.	_	2	punct	_	_
+
+1	We	_	PRP	PRP	_	4	nsubj	_	_
+2	were	_	VBD	VBD	_	4	cop	_	_
+3	n't	_	RB	RB	_	4	neg	_	_
+4	afraid	_	JJ	JJ	_	0	null	_	_
+5	to	_	TO	TO	_	6	aux	_	_
+6	walk	_	VB	VB	_	4	xcomp	_	_
+7	at	_	IN	IN	_	6	prep	_	_
+8	night	_	NN	NN	_	7	pobj	_	_
+9	.	_	.	.	_	4	punct	_	_
+
+1	We	_	PRP	PRP	_	2	nsubj	_	_
+2	stayed	_	VBD	VBD	_	0	null	_	_
+3	out	_	RP	RP	_	2	prt	_	_
+4	at	_	IN	IN	_	2	prep	_	_
+5	night	_	NN	NN	_	4	pobj	_	_
+6	in	_	IN	IN	_	2	prep	_	_
+7	our	_	PRP$	PRP$	_	8	poss	_	_
+8	yard	_	NN	NN	_	6	pobj	_	_
+9	and	_	CC	CC	_	2	cc	_	_
+10	visited	_	VBD	VBD	_	2	conj	_	_
+11	with	_	IN	IN	_	10	prep	_	_
+12	neighbors	_	NNS	NNS	_	11	pobj	_	_
+13	.	_	.	.	_	2	punct	_	_
+
+1	And	_	CC	CC	_	7	cc	_	_
+2	my	_	PRP$	PRP$	_	3	poss	_	_
+3	mom	_	NN	NN	_	7	nsubj	_	_
+4	and	_	CC	CC	_	3	cc	_	_
+5	dad	_	NN	NN	_	3	conj	_	_
+6	always	_	RB	RB	_	7	advmod	_	_
+7	had	_	VBD	VBD	_	0	null	_	_
+8	get-togethers	_	NNS	NNS	_	7	dobj	_	_
+9	.	_	.	.	_	7	punct	_	_
