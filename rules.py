@@ -98,6 +98,11 @@ class RootRuleset(Ruleset):
             if prep_index is not None:
                 engine.analyze(relations, prep_index, context + [index])
 
+            # iobj
+            iobj_index = Relation.get_child_with_dep('iobj', relations, index)
+            if iobj_index is not None:
+                engine.analyze(relations, iobj_index, context + [index])
+
             # Emit proposition.
             if dobj is None:
                 engine.emit((verb, subj))
@@ -151,6 +156,17 @@ class PobjRuleset(NounPhraseRuleset):
     rel = 'pobj'
 
 
+class IobjRuleset(NounPhraseRuleset):
+    """A ruleset that processes the 'iobj' relation."""
+
+    rel = 'iobj'
+
+    def extract(self, relations, index, context, engine):
+        value = NounPhraseRuleset.extract(self, relations, index, context,
+                                          engine)
+        engine.emit(('(to) ' + value,))
+
+
 # Uncategorized rulesets.
 
 
@@ -181,6 +197,7 @@ class PrepRuleset(Ruleset):
             pobj = engine.analyze(relations, pobj_index, context + [index])
             engine.emit((relations[index].word + ' ' + pobj,))
 
+
 all_rulesets = [TopRuleset(),
                 RootRuleset(),
                 PrtRuleset(),
@@ -189,5 +206,6 @@ all_rulesets = [TopRuleset(),
                 NsubjRuleset(),
                 DobjRuleset(),
                 PobjRuleset(),
+                IobjRuleset(),
                 DetRuleset(),
                 PrepRuleset()]
