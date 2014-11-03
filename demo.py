@@ -6,6 +6,12 @@ import rules
 import nltk
 from sys import argv
 
+try:
+    from termcolor import colored
+except ImportError:
+    def colored(string, color, attrs):
+        return string
+
 
 def demo():
     graphs = nltk.parse.dependencygraph.DependencyGraph.load(argv[1])
@@ -18,11 +24,17 @@ def demo():
         for relation in graphs[i].nodelist:
             relations.append(Relation(**relation))
 
+        print(colored('Sentence %d:' % (i + 1), 'white', attrs=['bold']))
         pprint.pprint(relations)
 
+        print(colored('Propositions:', 'white', attrs=['bold']))
         engine.analyze(relations)
-
         pprint.pprint(engine.props)
+
+        print(colored('Unprocessed relations:', 'white', attrs=['bold']))
+        for relation in relations:
+            if not relation.processed:
+                print(relation)
 
 
 if __name__ == '__main__':
