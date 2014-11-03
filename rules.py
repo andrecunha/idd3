@@ -31,62 +31,147 @@ class NounPhraseRuleset(Ruleset):
 class VerbPhraseRuleset(Ruleset):
     """A base class for VP-like dependency substructures."""
 
+    @staticmethod
+    def process_subject(relations, index, context, engine, info):
+        """TODO: Docstring for process_subject.
+
+        :relations: TODO
+        :index: TODO
+        :context: TODO
+        :engine: TODO
+        :info: TODO
+        :returns: TODO
+
+        """
+        # TODO: handle clausal subjects.
+        subj_index = Relation.get_child_with_dep('nsubj', relations, index)
+        if subj_index is None:
+            if relations[index].rel == 'xcomp':
+                subj = '(%s)' % info['subj']
+            else:
+                subj = 'NO_NSUBJ'
+        else:
+            subj = engine.analyze(relations, subj_index, context + [index])
+
+        return subj
+
+    @staticmethod
+    def process_auxiliaries(relations, index, context, engine, info):
+        """TODO: Docstring for process_subject.
+
+        :relations: TODO
+        :index: TODO
+        :context: TODO
+        :engine: TODO
+        :info: TODO
+        :returns: TODO
+
+        """
+        aux_index = Relation.get_child_with_dep('aux', relations, index)
+        if aux_index is None:
+            aux = None
+        else:
+            aux = engine.analyze(relations, aux_index, context + [index])
+
+        return aux
+
+    @staticmethod
+    def process_particles(relations, index, context, engine, info):
+        """TODO: Docstring for process_subject.
+
+        :relations: TODO
+        :index: TODO
+        :context: TODO
+        :engine: TODO
+        :info: TODO
+        :returns: TODO
+
+        """
+        prt_index = Relation.get_child_with_dep('prt', relations, index)
+        if prt_index is None:
+            prt = None
+        else:
+            prt = engine.analyze(relations, prt_index, context + [index])
+
+        return prt
+
+    @staticmethod
+    def process_dobj(relations, index, context, engine, info):
+        """todo: docstring for process_subject.
+
+        :relations: todo
+        :index: todo
+        :context: todo
+        :engine: todo
+        :info: todo
+        :returns: todo
+
+        """
+        dobj_index = Relation.get_child_with_dep('dobj', relations, index)
+        if dobj_index is None:
+            dobj = None
+        else:
+            dobj = engine.analyze(relations, dobj_index, context + [index])
+
+        return dobj
+
+    @staticmethod
+    def process_xcomp(relations, index, context, engine, info):
+        """todo: docstring for process_subject.
+
+        :relations: todo
+        :index: todo
+        :context: todo
+        :engine: todo
+        :info: todo
+        :returns: todo
+
+        """
+        xcomp_index = Relation.get_child_with_dep('xcomp', relations, index)
+        if xcomp_index is not None:
+            engine.analyze(relations, xcomp_index, context + [index], info)
+
+    @staticmethod
+    def process_iobj(relations, index, context, engine, info):
+        """todo: docstring for process_subject.
+
+        :relations: todo
+        :index: todo
+        :context: todo
+        :engine: todo
+        :info: todo
+        :returns: todo
+
+        """
+        # prep + pobj
+        prep_index = Relation.get_child_with_dep('prep', relations, index)
+        if prep_index is not None:
+            engine.analyze(relations, prep_index, context + [index])
+
+        # iobj
+        iobj_index = Relation.get_child_with_dep('iobj', relations, index)
+        if iobj_index is not None:
+            engine.analyze(relations, iobj_index, context + [index])
+
     def extract(self, relations, index, context, engine, info={}):
         # TODO: handle other VB tags.
         if relations[index].tag in ('VBZ', 'VBD', 'VBN', 'VB'):
-            # Process subject.
+            subj = self.process_subject(relations, index, context, engine, info)
 
-            # TODO: handle clausal subjects.
-            subj_index = Relation.get_child_with_dep('nsubj', relations, index)
-            if subj_index is None:
-                print(info)
-                if relations[index].rel == 'xcomp':
-                    subj = '(%s)' % info['subj']
-                else:
-                    subj = 'NO_NSUBJ'
-            else:
-                subj = engine.analyze(relations, subj_index, context + [index])
+            aux = self.process_auxiliaries(relations, index, context, engine,
+                                           info)
 
-            # Process auxiliaries.
-            aux_index = Relation.get_child_with_dep('aux', relations, index)
-            if aux_index is None:
-                aux = None
-            else:
-                aux = engine.analyze(relations, aux_index, context + [index])
-
-            # Process phrasal verb particle.
-            prt_index = Relation.get_child_with_dep('prt', relations, index)
-            if prt_index is None:
-                prt = None
-            else:
-                prt = engine.analyze(relations, prt_index, context + [index])
+            prt = self.process_particles(relations, index, context, engine,
+                                         info)
             verb = ' '.join([word for word in [aux, relations[index].word, prt]
                              if word is not None])
 
-            # Process direct object.
-            dobj_index = Relation.get_child_with_dep('dobj', relations, index)
-            if dobj_index is None:
-                dobj = None
-            else:
-                dobj = engine.analyze(relations, dobj_index, context + [index])
+            dobj = self.process_dobj(relations, index, context, engine, info)
 
-            # Process clausal complements.
-            xcomp_index = Relation.get_child_with_dep('xcomp', relations, index)
-            if xcomp_index is not None:
-                engine.analyze(relations, xcomp_index, context + [index],
+            self.process_xcomp(relations, index, context, engine,
                                {'subj': subj})
 
-            # Process indirect object.
-
-            # prep + pobj
-            prep_index = Relation.get_child_with_dep('prep', relations, index)
-            if prep_index is not None:
-                engine.analyze(relations, prep_index, context + [index])
-
-            # iobj
-            iobj_index = Relation.get_child_with_dep('iobj', relations, index)
-            if iobj_index is not None:
-                engine.analyze(relations, iobj_index, context + [index])
+            self.process_iobj(relations, index, context, engine, info)
 
             # Emit proposition.
             if dobj is None:
@@ -95,6 +180,9 @@ class VerbPhraseRuleset(Ruleset):
                 engine.emit((verb, subj, dobj))
 
             return relations[index].word
+        elif relations[index].tag in ('NN'):
+            print('### JUST TEST !!! ###')
+            engine.emit((relations[index].word,))
         else:
             print('VP: cannot handle', relations[index].tag, 'yet.')
 
