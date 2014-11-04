@@ -31,7 +31,7 @@ class NounPhraseRuleset(Ruleset):
 
         return_value = [word for word in [det, poss, nn, relations[index].word]
                         if word is not None]
-        return ' '.join(return_value)
+        return [' '.join(return_value)]
 
 
 class VerbPhraseRuleset(Ruleset):
@@ -53,9 +53,9 @@ class VerbPhraseRuleset(Ruleset):
         subj_index = Relation.get_children_with_dep('nsubj', relations, index)
         if subj_index == []:
             if relations[index].rel == 'xcomp':
-                subj = '(%s)' % info['subj']
+                subj = ['(%s)' % info['subj']]
             else:
-                subj = 'NO_NSUBJ'
+                subj = ['NO_NSUBJ']
         else:
             subj = engine.analyze(relations, subj_index[0], context + [index])
 
@@ -116,7 +116,7 @@ class VerbPhraseRuleset(Ruleset):
         """
         dobj_index = Relation.get_children_with_dep('dobj', relations, index)
         if dobj_index == []:
-            dobj = None
+            dobj = []
         else:
             dobj = engine.analyze(relations, dobj_index[0], context + [index])
 
@@ -179,7 +179,8 @@ class VerbPhraseRuleset(Ruleset):
     def extract(self, relations, index, context, engine, info={}):
         # TODO: handle other VB tags.
         if relations[index].tag in ('VBZ', 'VBD', 'VBN', 'VB'):
-            subj = self.process_subject(relations, index, context, engine, info)
+            subjs = self.process_subject(relations, index, context, engine,
+                                         info)
 
             aux = self.process_auxiliaries(relations, index, context, engine,
                                            info)
@@ -189,21 +190,24 @@ class VerbPhraseRuleset(Ruleset):
             verb = ' '.join([word for word in [aux, relations[index].word, prt]
                              if word is not None])
 
-            dobj = self.process_dobj(relations, index, context, engine, info)
+            dobjs = self.process_dobj(relations, index, context, engine, info)
 
             self.process_xcomp(relations, index, context, engine,
-                               {'subj': subj})
+                               {'subj': subjs[0]})  # TODO: change this.
 
             self.process_ccomp(relations, index, context, engine,
-                               {'subj': subj})
+                               {'subj': subjs[0]})  # TODO: change this.
 
             self.process_iobj(relations, index, context, engine, info)
 
-            # Emit proposition.
-            if dobj is None:
-                engine.emit((verb, subj))
-            else:
-                engine.emit((verb, subj, dobj))
+            # Emit propositions.
+            for subj in subjs:
+                if len(dobjs) > 0:
+                    for dobj in dobjs:
+                        proposition = tuple([w for w in [verb, subj, dobj]])
+                        engine.emit(proposition)
+                else:
+                    engine.emit((verb, subj))
 
             return relations[index].word
         elif relations[index].tag in ('NN'):
@@ -308,9 +312,10 @@ class IobjRuleset(NounPhraseRuleset):
     rel = 'iobj'
 
     def extract(self, relations, index, context, engine, info={}):
-        value = NounPhraseRuleset.extract(self, relations, index, context,
-                                          engine)
-        engine.emit(('(to) ' + value,))
+        values = NounPhraseRuleset.extract(self, relations, index, context,
+                                           engine)
+        for value in values:
+            engine.emit(('(to) ' + value,))
 
 
 # Uncategorized rulesets.
@@ -340,8 +345,9 @@ class PrepRuleset(Ruleset):
         if pobj_index == []:
             print('PREP: prep without pobj!')
         else:
-            pobj = engine.analyze(relations, pobj_index[0], context + [index])
-            engine.emit((relations[index].word + ' ' + pobj,))
+            pobjs = engine.analyze(relations, pobj_index[0], context + [index])
+            for pobj in pobjs:
+                engine.emit((relations[index].word + ' ' + pobj,))
 
 
 all_rulesets = [TopRuleset(),
