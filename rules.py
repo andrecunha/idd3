@@ -132,6 +132,22 @@ class VerbPhraseRuleset(Ruleset):
             engine.analyze(relations, xcomp_index, context + [index], info)
 
     @staticmethod
+    def process_ccomp(relations, index, context, engine, info):
+        """todo: docstring for process_subject.
+
+        :relations: todo
+        :index: todo
+        :context: todo
+        :engine: todo
+        :info: todo
+        :returns: todo
+
+        """
+        ccomp_index = Relation.get_child_with_dep('ccomp', relations, index)
+        if ccomp_index is not None:
+            engine.analyze(relations, ccomp_index, context + [index], info)
+
+    @staticmethod
     def process_iobj(relations, index, context, engine, info):
         """todo: docstring for process_subject.
 
@@ -169,6 +185,9 @@ class VerbPhraseRuleset(Ruleset):
             dobj = self.process_dobj(relations, index, context, engine, info)
 
             self.process_xcomp(relations, index, context, engine,
+                               {'subj': subj})
+
+            self.process_ccomp(relations, index, context, engine,
                                {'subj': subj})
 
             self.process_iobj(relations, index, context, engine, info)
@@ -220,6 +239,12 @@ class XcompRuleset(VerbPhraseRuleset):
     """A ruleset that processes the 'xcomp' relation."""
 
     rel = 'xcomp'
+
+
+class CcompRuleset(VerbPhraseRuleset):
+    """A ruleset that processes the 'ccomp' relation."""
+
+    rel = 'ccomp'
 
 
 # Atomic rulesets.
@@ -309,6 +334,7 @@ class PrepRuleset(Ruleset):
 all_rulesets = [TopRuleset(),
                 RootRuleset(),
                 XcompRuleset(),
+                CcompRuleset(),
                 PrtRuleset(),
                 NnRuleset(),
                 AuxRuleset(),
