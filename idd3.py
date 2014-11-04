@@ -29,23 +29,23 @@ class Relation(object):
         self.word = kwargs['word']
 
     @staticmethod
-    def get_child_with_dep(rel, relations, index):
-        """Check whether the corresponding word has a child in the tree
+    def get_children_with_dep(rel, relations, index):
+        """Check whether the corresponding word has children in the tree
             connected to it through a relation of a certain label, returning
-            the index of the other relation if it exists, and None otherwise.
+            the indices of the other relations if they exist, and an empty list
+            otherwise.
 
         :rel: the label of the potential child relation.
         :relations: all the relations of the sentence.
         :index: index of the current relation.
-        :returns: the index of a relation connected to this one through the
-            'dep' label if it exists, and None otherwise.
+        :returns: a list containing the indices of a relation connected to this
+            one through the 'dep' label if they exist, and an empty list
+            otherwise.
 
         """
-        for child_index in relations[index].deps:
-            if relations[child_index].rel == rel\
-                    and relations[child_index].head == index:
-                return child_index
-        return None
+        return [child_index for child_index in relations[index].deps
+                if relations[child_index].rel == rel
+                and relations[child_index].head == index]
 
     def __repr__(self):
         keys = sorted(self.__dict__)

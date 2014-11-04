@@ -10,24 +10,24 @@ class NounPhraseRuleset(Ruleset):
     """A base class for NP-like dependency substructures."""
 
     def extract(self, relations, index, context, engine, info={}):
-        det_index = Relation.get_child_with_dep('det', relations, index)
-        if det_index is None:
+        det_index = Relation.get_children_with_dep('det', relations, index)
+        if det_index == []:
             det = None
         else:
-            det = engine.analyze(relations, det_index, context + [index])
+            det = engine.analyze(relations, det_index[0], context + [index])
 
-        poss_index = Relation.get_child_with_dep('poss', relations, index)
-        if poss_index is None:
+        poss_index = Relation.get_children_with_dep('poss', relations, index)
+        if poss_index == []:
             poss = None
         else:
-            poss = engine.analyze(relations, poss_index, context + [index])
+            poss = engine.analyze(relations, poss_index[0], context + [index])
 
         # TODO: multiple nn.
-        nn_index = Relation.get_child_with_dep('nn', relations, index)
-        if nn_index is None:
+        nn_index = Relation.get_children_with_dep('nn', relations, index)
+        if nn_index == []:
             nn = None
         else:
-            nn = engine.analyze(relations, nn_index, context + [index])
+            nn = engine.analyze(relations, nn_index[0], context + [index])
 
         return_value = [word for word in [det, poss, nn, relations[index].word]
                         if word is not None]
@@ -50,14 +50,14 @@ class VerbPhraseRuleset(Ruleset):
 
         """
         # TODO: handle clausal subjects.
-        subj_index = Relation.get_child_with_dep('nsubj', relations, index)
-        if subj_index is None:
+        subj_index = Relation.get_children_with_dep('nsubj', relations, index)
+        if subj_index == []:
             if relations[index].rel == 'xcomp':
                 subj = '(%s)' % info['subj']
             else:
                 subj = 'NO_NSUBJ'
         else:
-            subj = engine.analyze(relations, subj_index, context + [index])
+            subj = engine.analyze(relations, subj_index[0], context + [index])
 
         return subj
 
@@ -73,11 +73,12 @@ class VerbPhraseRuleset(Ruleset):
         :returns: TODO
 
         """
-        aux_index = Relation.get_child_with_dep('aux', relations, index)
-        if aux_index is None:
+        # TODO: add support for multiple auxiliaries.
+        aux_index = Relation.get_children_with_dep('aux', relations, index)
+        if aux_index == []:
             aux = None
         else:
-            aux = engine.analyze(relations, aux_index, context + [index])
+            aux = engine.analyze(relations, aux_index[0], context + [index])
 
         return aux
 
@@ -93,11 +94,11 @@ class VerbPhraseRuleset(Ruleset):
         :returns: TODO
 
         """
-        prt_index = Relation.get_child_with_dep('prt', relations, index)
-        if prt_index is None:
+        prt_index = Relation.get_children_with_dep('prt', relations, index)
+        if prt_index == []:
             prt = None
         else:
-            prt = engine.analyze(relations, prt_index, context + [index])
+            prt = engine.analyze(relations, prt_index[0], context + [index])
 
         return prt
 
@@ -113,11 +114,11 @@ class VerbPhraseRuleset(Ruleset):
         :returns: todo
 
         """
-        dobj_index = Relation.get_child_with_dep('dobj', relations, index)
-        if dobj_index is None:
+        dobj_index = Relation.get_children_with_dep('dobj', relations, index)
+        if dobj_index == []:
             dobj = None
         else:
-            dobj = engine.analyze(relations, dobj_index, context + [index])
+            dobj = engine.analyze(relations, dobj_index[0], context + [index])
 
         return dobj
 
@@ -133,9 +134,9 @@ class VerbPhraseRuleset(Ruleset):
         :returns: todo
 
         """
-        xcomp_index = Relation.get_child_with_dep('xcomp', relations, index)
-        if xcomp_index is not None:
-            engine.analyze(relations, xcomp_index, context + [index], info)
+        xcomp_index = Relation.get_children_with_dep('xcomp', relations, index)
+        if xcomp_index != []:
+            engine.analyze(relations, xcomp_index[0], context + [index], info)
 
     @staticmethod
     def process_ccomp(relations, index, context, engine, info):
@@ -149,9 +150,9 @@ class VerbPhraseRuleset(Ruleset):
         :returns: todo
 
         """
-        ccomp_index = Relation.get_child_with_dep('ccomp', relations, index)
-        if ccomp_index is not None:
-            engine.analyze(relations, ccomp_index, context + [index], info)
+        ccomp_index = Relation.get_children_with_dep('ccomp', relations, index)
+        if ccomp_index != []:
+            engine.analyze(relations, ccomp_index[0], context + [index], info)
 
     @staticmethod
     def process_iobj(relations, index, context, engine, info):
@@ -166,14 +167,14 @@ class VerbPhraseRuleset(Ruleset):
 
         """
         # prep + pobj
-        prep_index = Relation.get_child_with_dep('prep', relations, index)
-        if prep_index is not None:
-            engine.analyze(relations, prep_index, context + [index])
+        prep_index = Relation.get_children_with_dep('prep', relations, index)
+        if prep_index != []:
+            engine.analyze(relations, prep_index[0], context + [index])
 
         # iobj
-        iobj_index = Relation.get_child_with_dep('iobj', relations, index)
-        if iobj_index is not None:
-            engine.analyze(relations, iobj_index, context + [index])
+        iobj_index = Relation.get_children_with_dep('iobj', relations, index)
+        if iobj_index != []:
+            engine.analyze(relations, iobj_index[0], context + [index])
 
     def extract(self, relations, index, context, engine, info={}):
         # TODO: handle other VB tags.
@@ -335,11 +336,11 @@ class PrepRuleset(Ruleset):
     rel = 'prep'
 
     def extract(self, relations, index, context, engine, info={}):
-        pobj_index = Relation.get_child_with_dep('pobj', relations, index)
-        if pobj_index is None:
+        pobj_index = Relation.get_children_with_dep('pobj', relations, index)
+        if pobj_index == []:
             print('PREP: prep without pobj!')
         else:
-            pobj = engine.analyze(relations, pobj_index, context + [index])
+            pobj = engine.analyze(relations, pobj_index[0], context + [index])
             engine.emit((relations[index].word + ' ' + pobj,))
 
 
