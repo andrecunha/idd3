@@ -31,6 +31,7 @@ class NounPhraseRuleset(Ruleset):
 
         cc_index = Relation.get_children_with_dep('cc', relations, index)
         if cc_index != []:
+            engine.analyze(relations, cc_index[0], context + [index])
             conj_index = Relation.get_children_with_dep('conj', relations,
                                                         index)
             conjs = [engine.analyze(relations, i, context + [index])
