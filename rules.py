@@ -193,9 +193,26 @@ class VerbPhraseRuleset(Ruleset):
         if iobj_index != []:
             engine.analyze(relations, iobj_index[0], context + [index])
 
+    @staticmethod
+    def process_advmods(relations, index, context, engine, info):
+        """todo: docstring for process_advmods.
+
+        :relations: todo
+        :index: todo
+        :context: todo
+        :engine: todo
+        :info: todo
+        :returns: todo
+
+        """
+        advmod_indices = Relation.get_children_with_dep('advmod', relations,
+                                                        index)
+        for i in advmod_indices:
+            engine.analyze(relations, i, context + [index])
+
     def extract(self, relations, index, context, engine, info={}):
         # TODO: handle other VB tags.
-        if relations[index].tag in ('VBZ', 'VBD', 'VBN', 'VB'):
+        if relations[index].tag in ('VBZ', 'VBD', 'VBN', 'VB', 'VBG'):
             subjs = self.process_subject(relations, index, context, engine,
                                          info)
 
@@ -216,6 +233,8 @@ class VerbPhraseRuleset(Ruleset):
                                {'subj': subjs[0]})  # TODO: change this.
 
             self.process_iobj(relations, index, context, engine, info)
+
+            self.process_advmods(relations, index, context, engine, info)
 
             # Emit propositions.
             for subj in subjs:
@@ -308,6 +327,16 @@ class CcRuleset(AtomicRuleset):
     rel = 'cc'
 
 
+class AdvmodRuleset(AtomicRuleset):
+    """A ruleset that processes the 'advmod' relation."""
+
+    rel = 'advmod'
+
+    def extract(self, relations, index, context, engine, info={}):
+        value = AtomicRuleset.extract(self, relations, index, context, engine)
+        engine.emit((value, ))
+
+
 # Noun-Phrase rulesets.
 
 
@@ -388,6 +417,7 @@ all_rulesets = [TopRuleset(),
                 AuxRuleset(),
                 PossRuleset(),
                 CcRuleset(),
+                AdvmodRuleset(),
                 NsubjRuleset(),
                 DobjRuleset(),
                 PobjRuleset(),
