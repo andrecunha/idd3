@@ -29,9 +29,25 @@ class NounPhraseRuleset(Ruleset):
         else:
             nn = engine.analyze(relations, nn_index[0], context + [index])
 
-        return_value = [word for word in [det, poss, nn, relations[index].word]
-                        if word is not None]
-        return [' '.join(return_value)]
+        cc_index = Relation.get_children_with_dep('cc', relations, index)
+        if cc_index != []:
+            conj_index = Relation.get_children_with_dep('conj', relations,
+                                                        index)
+            conjs = [engine.analyze(relations, i, context + [index])
+                     for i in conj_index]
+            conjs = [c[0] for c in conjs]  # TODO: check if this makes sense.
+
+        else:
+            conjs = []
+        conjs = [relations[index].word] + conjs
+
+        return_list = []
+        for conj in conjs:
+            return_value = [word for word in [det, poss, nn, conj]
+                            if word is not None]
+            return_list.append(' '.join(return_value))
+
+        return return_list
 
 
 class VerbPhraseRuleset(Ruleset):
@@ -285,6 +301,12 @@ class PossRuleset(AtomicRuleset):
     rel = 'poss'
 
 
+class CcRuleset(AtomicRuleset):
+    """A ruleset that processes the 'cc' relation."""
+
+    rel = 'cc'
+
+
 # Noun-Phrase rulesets.
 
 
@@ -316,6 +338,12 @@ class IobjRuleset(NounPhraseRuleset):
                                            engine)
         for value in values:
             engine.emit(('(to) ' + value,))
+
+
+class ConjRuleset(NounPhraseRuleset):
+    """A ruleset that processes the 'conj' relation."""
+
+    rel = 'conj'
 
 
 # Uncategorized rulesets.
@@ -358,9 +386,11 @@ all_rulesets = [TopRuleset(),
                 NnRuleset(),
                 AuxRuleset(),
                 PossRuleset(),
+                CcRuleset(),
                 NsubjRuleset(),
                 DobjRuleset(),
                 PobjRuleset(),
                 IobjRuleset(),
+                ConjRuleset(),
                 DetRuleset(),
                 PrepRuleset()]
