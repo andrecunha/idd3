@@ -16,6 +16,12 @@ class NounPhraseRuleset(Ruleset):
         else:
             det = engine.analyze(relations, det_index, context + [index])
 
+        poss_index = Relation.get_child_with_dep('poss', relations, index)
+        if poss_index is None:
+            poss = None
+        else:
+            poss = engine.analyze(relations, poss_index, context + [index])
+
         # TODO: multiple nn.
         nn_index = Relation.get_child_with_dep('nn', relations, index)
         if nn_index is None:
@@ -23,7 +29,7 @@ class NounPhraseRuleset(Ruleset):
         else:
             nn = engine.analyze(relations, nn_index, context + [index])
 
-        return_value = [word for word in [det, nn, relations[index].word]
+        return_value = [word for word in [det, poss, nn, relations[index].word]
                         if word is not None]
         return ' '.join(return_value)
 
@@ -268,6 +274,12 @@ class AuxRuleset(AtomicRuleset):
     rel = 'aux'
 
 
+class PossRuleset(AtomicRuleset):
+    """A ruleset that processes the 'poss' relation."""
+
+    rel = 'poss'
+
+
 # Noun-Phrase rulesets.
 
 
@@ -338,6 +350,7 @@ all_rulesets = [TopRuleset(),
                 PrtRuleset(),
                 NnRuleset(),
                 AuxRuleset(),
+                PossRuleset(),
                 NsubjRuleset(),
                 DobjRuleset(),
                 PobjRuleset(),

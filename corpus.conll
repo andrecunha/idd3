@@ -52,7 +52,7 @@
 1	So	_	IN	IN	_	3	dep	_	_
 2	I	_	PRP	PRP	_	3	nsubj	_	_
 3	helped	_	VBD	VBD	_	0	null	_	_
-4	raise	_	VB	VB	_	3	ccomp	_	_
+4	raise	_	VB	VB	_	3	xcomp	_	_
 5	my	_	PRP$	PRP$	_	6	poss	_	_
 6	brothers	_	NNS	NNS	_	4	dobj	_	_
 7	and	_	CC	CC	_	6	cc	_	_
@@ -61,9 +61,9 @@
 1	I	_	PRP	PRP	_	3	nsubj	_	_
 2	did	_	VBD	VBD	_	3	aux	_	_
 3	go	_	VB	VB	_	0	null	_	_
-4	see	_	NN	NN	_	3	dobj	_	_
+4	see	_	VB	VB	_	3	xcomp	_	_
 5	the	_	DT	DT	_	6	det	_	_
-6	movie	_	NN	NN	_	4	dep	_	_
+6	movie	_	NN	NN	_	4	dobj	_	_
 7	.	_	.	.	_	3	punct	_	_
 
 1	She	_	PRP	PRP	_	3	nsubj	_	_
