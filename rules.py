@@ -153,7 +153,8 @@ class VerbPhraseRuleset(Ruleset):
         """
         xcomp_index = Relation.get_children_with_dep('xcomp', relations, index)
         if xcomp_index != []:
-            engine.analyze(relations, xcomp_index[0], context + [index], info)
+            return engine.analyze(relations, xcomp_index[0], context + [index],
+                                  info)
 
     @staticmethod
     def process_ccomp(relations, index, context, engine, info):
@@ -211,6 +212,12 @@ class VerbPhraseRuleset(Ruleset):
             engine.analyze(relations, i, context + [index])
 
     def extract(self, relations, index, context, engine, info={}):
+        # Return statuses: 0 - nothing to do; 1 - xcomp is dobj
+
+        if relations[index].tag == 'VBG' and relations[index].deps == []:
+            # Chand - 3.2.4 - isolated gerund as object (acting like a noun)
+            return (1, relations[index].word)
+
         # TODO: handle other VB tags.
         if relations[index].tag in ('VBZ', 'VBD', 'VBN', 'VB', 'VBG'):
             subjs = self.process_subject(relations, index, context, engine,
@@ -226,8 +233,11 @@ class VerbPhraseRuleset(Ruleset):
 
             dobjs = self.process_dobj(relations, index, context, engine, info)
 
-            self.process_xcomp(relations, index, context, engine,
-                               {'subj': subjs[0]})  # TODO: change this.
+            xcomp = self.process_xcomp(relations, index, context, engine,
+                                       {'subj': subjs[0]})  # TODO: change this.
+            if xcomp is not None and xcomp[0] == 1:
+                # Chand - 3.2.4 - isolated gerund as object (acting like a noun)
+                dobjs = [xcomp[1]]
 
             self.process_ccomp(relations, index, context, engine,
                                {'subj': subjs[0]})  # TODO: change this.
@@ -245,7 +255,7 @@ class VerbPhraseRuleset(Ruleset):
                 else:
                     engine.emit((verb, subj))
 
-            return relations[index].word
+            return (0, relations[index].word)
         elif relations[index].tag in ('NN'):
             print('### JUST TEST !!! ###')
             engine.emit((relations[index].word,))
