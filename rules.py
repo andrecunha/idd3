@@ -212,12 +212,6 @@ class VerbPhraseRuleset(Ruleset):
             engine.analyze(relations, i, context + [index])
 
     def extract(self, relations, index, context, engine, info={}):
-        # Return statuses: 0 - nothing to do; 1 - xcomp is dobj
-
-        if relations[index].tag == 'VBG' and relations[index].deps == []:
-            # Chand - 3.2.4 - isolated gerund as object (acting like a noun)
-            return (1, relations[index].word)
-
         # TODO: handle other VB tags.
         if relations[index].tag in ('VBZ', 'VBD', 'VBN', 'VB', 'VBG'):
             subjs = self.process_subject(relations, index, context, engine,
@@ -235,9 +229,8 @@ class VerbPhraseRuleset(Ruleset):
 
             xcomp = self.process_xcomp(relations, index, context, engine,
                                        {'subj': subjs[0]})  # TODO: change this.
-            if xcomp is not None and xcomp[0] == 1:
-                # Chand - 3.2.4 - isolated gerund as object (acting like a noun)
-                dobjs = [xcomp[1]]
+            if xcomp is not None:
+                dobjs = [xcomp]
 
             self.process_ccomp(relations, index, context, engine,
                                {'subj': subjs[0]})  # TODO: change this.
@@ -247,15 +240,17 @@ class VerbPhraseRuleset(Ruleset):
             self.process_advmods(relations, index, context, engine, info)
 
             # Emit propositions.
-            for subj in subjs:
-                if len(dobjs) > 0:
-                    for dobj in dobjs:
-                        proposition = tuple([w for w in [verb, subj, dobj]])
-                        engine.emit(proposition)
-                else:
-                    engine.emit((verb, subj))
-
-            return (0, relations[index].word)
+            if relations[index].tag != 'VBG' or relations[index].rel == 'null':
+                for subj in subjs:
+                    if len(dobjs) > 0:
+                        for dobj in dobjs:
+                            proposition = tuple([w for w in [verb, subj, dobj]])
+                            engine.emit(proposition)
+                    else:
+                        engine.emit((verb, subj))
+                return None
+            else:
+                return relations[index].word
         elif relations[index].tag in ('NN'):
             print('### JUST TEST !!! ###')
             engine.emit((relations[index].word,))
@@ -280,7 +275,7 @@ class TopRuleset(Ruleset):
     rel = 'TOP'
 
     def extract(self, relations, index, context, engine, info={}):
-        return engine.analyze(relations, relations[index].deps[0])
+        return engine.analyze(relations, relations[index].deps[0], [index])
 
 
 # Verb-Phrase rulesets.
@@ -425,8 +420,8 @@ class PrepRuleset(Ruleset):
         if pcomp_index != []:
             pcomp = engine.analyze(relations, pcomp_index[0],
                                    context + [index])
-            if pcomp is not None and pcomp[0] == 1:
-                engine.emit((relations[index].word + ' ' + pcomp[1],))
+            if pcomp is not None:
+                engine.emit((relations[index].word + ' ' + pcomp,))
             # TODO: check the 'else' condition.
 
 
