@@ -304,6 +304,12 @@ class CcompRuleset(VerbPhraseRuleset):
     rel = 'ccomp'
 
 
+class PcompRuleset(VerbPhraseRuleset):
+    """A ruleset that processes the 'pcomp' relation."""
+
+    rel = 'pcomp'
+
+
 # Atomic rulesets.
 
 
@@ -410,18 +416,25 @@ class PrepRuleset(Ruleset):
 
     def extract(self, relations, index, context, engine, info={}):
         pobj_index = Relation.get_children_with_dep('pobj', relations, index)
-        if pobj_index == []:
-            print('PREP: prep without pobj!')
-        else:
+        if pobj_index != []:
             pobjs = engine.analyze(relations, pobj_index[0], context + [index])
             for pobj in pobjs:
                 engine.emit((relations[index].word + ' ' + pobj,))
+
+        pcomp_index = Relation.get_children_with_dep('pcomp', relations, index)
+        if pcomp_index != []:
+            pcomp = engine.analyze(relations, pcomp_index[0],
+                                   context + [index])
+            if pcomp is not None and pcomp[0] == 1:
+                engine.emit((relations[index].word + ' ' + pcomp[1],))
+            # TODO: check the 'else' condition.
 
 
 all_rulesets = [TopRuleset(),
                 RootRuleset(),
                 XcompRuleset(),
                 CcompRuleset(),
+                PcompRuleset(),
                 PrtRuleset(),
                 NnRuleset(),
                 AuxRuleset(),
