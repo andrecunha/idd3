@@ -6,51 +6,6 @@ from idd3 import Relation, Ruleset
 # Base classes.
 
 
-class NounPhraseRuleset(Ruleset):
-    """A base class for NP-like dependency substructures."""
-
-    def extract(self, relations, index, context, engine, info={}):
-        det_index = Relation.get_children_with_dep('det', relations, index)
-        if det_index == []:
-            det = None
-        else:
-            det = engine.analyze(relations, det_index[0], context + [index])
-
-        poss_index = Relation.get_children_with_dep('poss', relations, index)
-        if poss_index == []:
-            poss = None
-        else:
-            poss = engine.analyze(relations, poss_index[0], context + [index])
-
-        # TODO: multiple nn.
-        nn_index = Relation.get_children_with_dep('nn', relations, index)
-        if nn_index == []:
-            nn = None
-        else:
-            nn = engine.analyze(relations, nn_index[0], context + [index])
-
-        cc_index = Relation.get_children_with_dep('cc', relations, index)
-        if cc_index != []:
-            engine.analyze(relations, cc_index[0], context + [index])
-            conj_index = Relation.get_children_with_dep('conj', relations,
-                                                        index)
-            conjs = [engine.analyze(relations, i, context + [index])
-                     for i in conj_index]
-            conjs = [c[0] for c in conjs]  # TODO: check if this makes sense.
-
-        else:
-            conjs = []
-        conjs = [relations[index].word] + conjs
-
-        return_list = []
-        for conj in conjs:
-            return_value = [word for word in [det, poss, nn, conj]
-                            if word is not None]
-            return_list.append(' '.join(return_value))
-
-        return return_list
-
-
 class VerbPhraseRuleset(Ruleset):
     """A base class for VP-like dependency substructures."""
 
@@ -132,41 +87,24 @@ class VerbPhraseRuleset(Ruleset):
         return prt
 
     @staticmethod
-    def process_dobj(relations, index, context, engine, info):
-        """todo: docstring for process_subject.
-
-        :relations: todo
-        :index: todo
-        :context: todo
-        :engine: todo
-        :info: todo
-        :returns: todo
-
-        """
+    def process_comps(relations, index, context, engine, info):
         dobj_index = Relation.get_children_with_dep('dobj', relations, index)
-        if dobj_index == []:
-            dobj = []
-        else:
-            dobj = engine.analyze(relations, dobj_index[0], context + [index])
-
-        return dobj
-
-    @staticmethod
-    def process_xcomp(relations, index, context, engine, info):
-        """todo: docstring for process_subject.
-
-        :relations: todo
-        :index: todo
-        :context: todo
-        :engine: todo
-        :info: todo
-        :returns: todo
-
-        """
         xcomp_index = Relation.get_children_with_dep('xcomp', relations, index)
-        if xcomp_index != []:
-            return engine.analyze(relations, xcomp_index[0], context + [index],
-                                  info)
+        acomp_index = Relation.get_children_with_dep('acomp', relations, index)
+
+        comps_indices = sorted(dobj_index + xcomp_index + acomp_index)
+        _comps = [engine.analyze(relations, i, context + [index], info)
+                  for i in comps_indices]
+
+        comps = []
+        for comp in _comps:
+            if type(comp) is list:
+                comps.extend(comp)
+            else:
+                if comp is not None:
+                    comps.append(comp)
+
+        return comps
 
     @staticmethod
     def process_ccomp(relations, index, context, engine, info):
@@ -258,20 +196,16 @@ class VerbPhraseRuleset(Ruleset):
                                       info)
 
             auxs = self.process_auxs(relations, index, context, engine,
-                                            info)
+                                     info)
 
             prt = self.process_prt(relations, index, context, engine,
-                                         info)
+                                   info)
             verb = ' '.join([word for word
                              in auxs + [relations[index].word, prt]
                              if word is not None])
 
-            dobjs = self.process_dobj(relations, index, context, engine, info)
-
-            xcomp = self.process_xcomp(relations, index, context, engine,
+            comps = self.process_comps(relations, index, context, engine,
                                        {'subj': subjs[0]})  # TODO: change this.
-            if xcomp is not None:
-                dobjs = [xcomp]
 
             self.process_ccomp(relations, index, context, engine,
                                {'subj': subjs[0]})  # TODO: change this.
@@ -283,16 +217,16 @@ class VerbPhraseRuleset(Ruleset):
             # Emit propositions.
             if relations[index].rel in ('xcomp', 'ccomp', 'pcomp', 'csubj'):
                 if relations[index].tag == 'VBG':
-                    if dobjs != []:
-                        self.emit_propositions(verb, subjs, dobjs, engine,
+                    if comps != []:
+                        self.emit_propositions(verb, subjs, comps, engine,
                                                relations[index])
                     return relations[index].word
                 else:
-                    self.emit_propositions(verb, subjs, dobjs, engine,
+                    self.emit_propositions(verb, subjs, comps, engine,
                                            relations[index])
                     return None
             else:
-                self.emit_propositions(verb, subjs, dobjs, engine,
+                self.emit_propositions(verb, subjs, comps, engine,
                                        relations[index])
                 return None
         elif relations[index].tag in ('NN'):
@@ -317,6 +251,59 @@ class AtomicEmittingRuleset(Ruleset):
 
     def extract(self, relations, index, context, engine, info={}):
         engine.emit((relations[index].word,))
+
+
+class NounPhraseRuleset(Ruleset):
+    """A base class for NP-like dependency substructures."""
+
+    def extract(self, relations, index, context, engine, info={}):
+        det_index = Relation.get_children_with_dep('det', relations, index)
+        if det_index == []:
+            det = None
+        else:
+            det = engine.analyze(relations, det_index[0], context + [index])
+
+        poss_index = Relation.get_children_with_dep('poss', relations, index)
+        if poss_index == []:
+            poss = None
+        else:
+            poss = engine.analyze(relations, poss_index[0], context + [index])
+
+        # TODO: multiple nn.
+        nn_index = Relation.get_children_with_dep('nn', relations, index)
+        if nn_index == []:
+            nn = None
+        else:
+            nn = engine.analyze(relations, nn_index[0], context + [index])
+
+        cc_index = Relation.get_children_with_dep('cc', relations, index)
+        if cc_index != []:
+            engine.analyze(relations, cc_index[0], context + [index])
+            conj_index = Relation.get_children_with_dep('conj', relations,
+                                                        index)
+            conjs = [engine.analyze(relations, i, context + [index])
+                     for i in conj_index]
+            conjs = [c[0] for c in conjs]  # TODO: check if this makes sense.
+
+        else:
+            conjs = []
+        conjs = [relations[index].word] + conjs
+
+        return_list = []
+        for conj in conjs:
+            return_value = [word for word in [det, poss, nn, conj]
+                            if word is not None]
+            return_list.append(' '.join(return_value))
+
+        return return_list
+
+
+class AdjectivalPhraseRuleset(Ruleset):
+    """A base class for AdjP-like dependency substructures."""
+
+    def extract(self, relations, index, context, engine, info={}):
+        # TODO: complete.
+        return relations[index].word
 
 
 # Derived classes.
@@ -463,6 +450,15 @@ class ConjRuleset(NounPhraseRuleset):
     rel = 'conj'
 
 
+# Adjectival-Phrase rulesets
+
+
+class AcompRuleset(AdjectivalPhraseRuleset):
+    """A ruleset that processes the 'acomp' relation."""
+
+    rel = 'acomp'
+
+
 # Uncategorized rulesets.
 
 
@@ -502,24 +498,31 @@ class PrepRuleset(Ruleset):
 
 
 all_rulesets = [TopRuleset(),
+                # Verb-Phrase rulesets.
                 RootRuleset(),
                 XcompRuleset(),
                 CcompRuleset(),
                 PcompRuleset(),
                 CsubjRuleset(),
+                # Atomic rulesets.
                 PrtRuleset(),
                 NnRuleset(),
                 AuxRuleset(),
                 AuxpassRuleset(),
                 PossRuleset(),
                 CcRuleset(),
+                # Atomic emitting rulesets.
                 AdvmodRuleset(),
                 NegRuleset(),
+                # Noun-Phrase rulesets.
                 NsubjRuleset(),
                 NsubjpassRuleset(),
                 DobjRuleset(),
                 PobjRuleset(),
                 IobjRuleset(),
                 ConjRuleset(),
+                # Adjectival-Phrase rulesets
+                AcompRuleset(),
+                # Uncategorized rulesets.
                 DetRuleset(),
                 PrepRuleset()]
