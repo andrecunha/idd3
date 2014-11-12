@@ -55,7 +55,7 @@ class VerbPhraseRuleset(Ruleset):
     """A base class for VP-like dependency substructures."""
 
     @staticmethod
-    def process_subject(relations, index, context, engine, info):
+    def process_subj(relations, index, context, engine, info):
         """TODO: Docstring for process_subject.
 
         :relations: TODO
@@ -66,15 +66,18 @@ class VerbPhraseRuleset(Ruleset):
         :returns: TODO
 
         """
-        # TODO: handle clausal subjects.
         subj_index = Relation.get_children_with_dep('nsubj', relations, index)
         if subj_index == []:
             if relations[index].rel == 'xcomp':
                 subj = ['(%s)' % info['subj']]
             else:
-                subj = ['NO_NSUBJ']
+                subj = ['NO_NSUBJ']  # TODO: remove.
         else:
             subj = engine.analyze(relations, subj_index[0], context + [index])
+
+        subj_index = Relation.get_children_with_dep('csubj', relations, index)
+        if subj_index != []:
+            subj = [engine.analyze(relations, subj_index[0], context + [index])]
 
         return subj
 
@@ -211,11 +214,33 @@ class VerbPhraseRuleset(Ruleset):
         for i in advmod_indices:
             engine.analyze(relations, i, context + [index])
 
+    def emit_propositions(self, verb, subjs, dobjs, engine, relation):
+        """TODO: Docstring for emit_propositions.
+
+        :verb: TODO
+        :subjs: TODO
+        :dobjs: TODO
+        :returns: TODO
+
+        """
+        if relation.tag == 'VBG' and relation.rel != 'null':
+            for dobj in dobjs:
+                proposition = tuple([w for w in [verb, dobj]])
+                engine.emit(proposition)
+        else:
+            for subj in subjs:
+                if len(dobjs) > 0:
+                    for dobj in dobjs:
+                        proposition = tuple([w for w in [verb, subj, dobj]])
+                        engine.emit(proposition)
+                else:
+                    engine.emit((verb, subj))
+
     def extract(self, relations, index, context, engine, info={}):
         # TODO: handle other VB tags.
         if relations[index].tag in ('VBZ', 'VBD', 'VBN', 'VB', 'VBG'):
-            subjs = self.process_subject(relations, index, context, engine,
-                                         info)
+            subjs = self.process_subj(relations, index, context, engine,
+                                      info)
 
             aux = self.process_auxiliaries(relations, index, context, engine,
                                            info)
@@ -240,17 +265,26 @@ class VerbPhraseRuleset(Ruleset):
             self.process_advmods(relations, index, context, engine, info)
 
             # Emit propositions.
-            if relations[index].tag != 'VBG' or relations[index].rel == 'null':
-                for subj in subjs:
-                    if len(dobjs) > 0:
-                        for dobj in dobjs:
-                            proposition = tuple([w for w in [verb, subj, dobj]])
-                            engine.emit(proposition)
-                    else:
-                        engine.emit((verb, subj))
-                return None
+            if relations[index].rel in ('xcomp', 'ccomp', 'pcomp', 'csubj'):
+                if relations[index].tag == 'VBG':
+                    if dobjs != []:
+                        self.emit_propositions(verb, subjs, dobjs, engine,
+                                               relations[index])
+                    return relations[index].word
+                else:
+                    self.emit_propositions(verb, subjs, dobjs, engine,
+                                           relations[index])
+                    return None
             else:
-                return relations[index].word
+                self.emit_propositions(verb, subjs, dobjs, engine,
+                                       relations[index])
+                return None
+#             if relations[index].tag != 'VBG' or \
+#    relations[index].rel == 'null':
+#                 # emit propositions
+#                 return None
+#             else:
+#                 return relations[index].word
         elif relations[index].tag in ('NN'):
             print('### JUST TEST !!! ###')
             engine.emit((relations[index].word,))
@@ -303,6 +337,12 @@ class PcompRuleset(VerbPhraseRuleset):
     """A ruleset that processes the 'pcomp' relation."""
 
     rel = 'pcomp'
+
+
+class CsubjRuleset(VerbPhraseRuleset):
+    """A ruleset that processes the 'csubj' relation."""
+
+    rel = 'csubj'
 
 
 # Atomic rulesets.
@@ -430,6 +470,7 @@ all_rulesets = [TopRuleset(),
                 XcompRuleset(),
                 CcompRuleset(),
                 PcompRuleset(),
+                CsubjRuleset(),
                 PrtRuleset(),
                 NnRuleset(),
                 AuxRuleset(),
