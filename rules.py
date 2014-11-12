@@ -66,6 +66,7 @@ class VerbPhraseRuleset(Ruleset):
         :returns: TODO
 
         """
+        # nsubj
         subj_index = Relation.get_children_with_dep('nsubj', relations, index)
         if subj_index == []:
             if relations[index].rel == 'xcomp':
@@ -75,6 +76,13 @@ class VerbPhraseRuleset(Ruleset):
         else:
             subj = engine.analyze(relations, subj_index[0], context + [index])
 
+        # nsubjpass
+        subj_index = Relation.get_children_with_dep('nsubjpass', relations,
+                                                    index)
+        if subj_index != []:
+            subj = engine.analyze(relations, subj_index[0], context + [index])
+
+        # csubj
         subj_index = Relation.get_children_with_dep('csubj', relations, index)
         if subj_index != []:
             subj = [engine.analyze(relations, subj_index[0], context + [index])]
@@ -82,7 +90,7 @@ class VerbPhraseRuleset(Ruleset):
         return subj
 
     @staticmethod
-    def process_auxiliaries(relations, index, context, engine, info):
+    def process_auxs(relations, index, context, engine, info):
         """TODO: Docstring for process_subject.
 
         :relations: TODO
@@ -95,15 +103,16 @@ class VerbPhraseRuleset(Ruleset):
         """
         # TODO: add support for multiple auxiliaries.
         aux_index = Relation.get_children_with_dep('aux', relations, index)
-        if aux_index == []:
-            aux = None
-        else:
-            aux = engine.analyze(relations, aux_index[0], context + [index])
+        auxpass_index = Relation.get_children_with_dep('auxpass', relations,
+                                                       index)
+        auxs_index = sorted(aux_index + auxpass_index)
+        auxs = [engine.analyze(relations, i, context + [index])
+                for i in auxs_index]
 
-        return aux
+        return auxs
 
     @staticmethod
-    def process_particles(relations, index, context, engine, info):
+    def process_prt(relations, index, context, engine, info):
         """TODO: Docstring for process_subject.
 
         :relations: TODO
@@ -198,7 +207,7 @@ class VerbPhraseRuleset(Ruleset):
             engine.analyze(relations, iobj_index[0], context + [index])
 
     @staticmethod
-    def process_advmods(relations, index, context, engine, info):
+    def process_advs(relations, index, context, engine, info):
         """todo: docstring for process_advmods.
 
         :relations: todo
@@ -209,9 +218,15 @@ class VerbPhraseRuleset(Ruleset):
         :returns: todo
 
         """
+        # advmod
         advmod_indices = Relation.get_children_with_dep('advmod', relations,
                                                         index)
         for i in advmod_indices:
+            engine.analyze(relations, i, context + [index])
+
+        # neg
+        neg_indices = Relation.get_children_with_dep('neg', relations, index)
+        for i in neg_indices:
             engine.analyze(relations, i, context + [index])
 
     def emit_propositions(self, verb, subjs, dobjs, engine, relation):
@@ -242,12 +257,13 @@ class VerbPhraseRuleset(Ruleset):
             subjs = self.process_subj(relations, index, context, engine,
                                       info)
 
-            aux = self.process_auxiliaries(relations, index, context, engine,
-                                           info)
+            auxs = self.process_auxs(relations, index, context, engine,
+                                            info)
 
-            prt = self.process_particles(relations, index, context, engine,
+            prt = self.process_prt(relations, index, context, engine,
                                          info)
-            verb = ' '.join([word for word in [aux, relations[index].word, prt]
+            verb = ' '.join([word for word
+                             in auxs + [relations[index].word, prt]
                              if word is not None])
 
             dobjs = self.process_dobj(relations, index, context, engine, info)
@@ -262,7 +278,7 @@ class VerbPhraseRuleset(Ruleset):
 
             self.process_iobj(relations, index, context, engine, info)
 
-            self.process_advmods(relations, index, context, engine, info)
+            self.process_advs(relations, index, context, engine, info)
 
             # Emit propositions.
             if relations[index].rel in ('xcomp', 'ccomp', 'pcomp', 'csubj'):
@@ -279,12 +295,6 @@ class VerbPhraseRuleset(Ruleset):
                 self.emit_propositions(verb, subjs, dobjs, engine,
                                        relations[index])
                 return None
-#             if relations[index].tag != 'VBG' or \
-#    relations[index].rel == 'null':
-#                 # emit propositions
-#                 return None
-#             else:
-#                 return relations[index].word
         elif relations[index].tag in ('NN'):
             print('### JUST TEST !!! ###')
             engine.emit((relations[index].word,))
@@ -293,11 +303,20 @@ class VerbPhraseRuleset(Ruleset):
 
 
 class AtomicRuleset(Ruleset):
-    """A base ruleset for atomic relations, that just return the associated
+    """A base ruleset for atomic relations that just return the associated
     word."""
 
     def extract(self, relations, index, context, engine, info={}):
         return relations[index].word
+
+
+class AtomicEmittingRuleset(Ruleset):
+    """A base ruleset for atomic relations that just emit the associated word
+    as a proposition
+    """
+
+    def extract(self, relations, index, context, engine, info={}):
+        engine.emit((relations[index].word,))
 
 
 # Derived classes.
@@ -366,6 +385,12 @@ class AuxRuleset(AtomicRuleset):
     rel = 'aux'
 
 
+class AuxpassRuleset(AtomicRuleset):
+    """A ruleset that processes the 'auxpass' relation."""
+
+    rel = 'auxpass'
+
+
 class PossRuleset(AtomicRuleset):
     """A ruleset that processes the 'poss' relation."""
 
@@ -378,14 +403,19 @@ class CcRuleset(AtomicRuleset):
     rel = 'cc'
 
 
-class AdvmodRuleset(AtomicRuleset):
+# Atomic emitting rulesets.
+
+
+class AdvmodRuleset(AtomicEmittingRuleset):
     """A ruleset that processes the 'advmod' relation."""
 
     rel = 'advmod'
 
-    def extract(self, relations, index, context, engine, info={}):
-        value = AtomicRuleset.extract(self, relations, index, context, engine)
-        engine.emit((value, ))
+
+class NegRuleset(AtomicEmittingRuleset):
+    """A ruleset that processes the 'neg' relation."""
+
+    rel = 'neg'
 
 
 # Noun-Phrase rulesets.
@@ -395,6 +425,12 @@ class NsubjRuleset(NounPhraseRuleset):
     """A ruleset that processes the 'nsubj' relation."""
 
     rel = 'nsubj'
+
+
+class NsubjpassRuleset(NounPhraseRuleset):
+    """A ruleset that processes the 'nsubjpass' relation."""
+
+    rel = 'nsubjpass'
 
 
 class DobjRuleset(NounPhraseRuleset):
@@ -474,10 +510,13 @@ all_rulesets = [TopRuleset(),
                 PrtRuleset(),
                 NnRuleset(),
                 AuxRuleset(),
+                AuxpassRuleset(),
                 PossRuleset(),
                 CcRuleset(),
                 AdvmodRuleset(),
+                NegRuleset(),
                 NsubjRuleset(),
+                NsubjpassRuleset(),
                 DobjRuleset(),
                 PobjRuleset(),
                 IobjRuleset(),
