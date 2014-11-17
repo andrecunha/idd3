@@ -56,4 +56,4 @@ target/
 .ropeproject
 *~
 *.swp
-*.txt
+TODO.txt
