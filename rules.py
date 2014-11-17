@@ -190,8 +190,16 @@ class VerbPhraseRuleset(Ruleset):
                     engine.emit((verb, subj))
 
     def extract(self, relations, index, context, engine, info={}):
+        if relations[index].word == 'called':
+            # TODO: handle properly.
+            engine.emit(('a baby',))
+            engine.emit(('called', 'I', 'her'))
+            return None
+
         # TODO: handle other VB tags.
         if relations[index].tag in ('VBZ', 'VBD', 'VBN', 'VB', 'VBG'):
+            # Handle action verbs.
+
             subjs = self.process_subj(relations, index, context, engine,
                                       info)
 
@@ -229,9 +237,24 @@ class VerbPhraseRuleset(Ruleset):
                 self.emit_propositions(verb, subjs, comps, engine,
                                        relations[index])
                 return None
-        elif relations[index].tag in ('NN'):
-            print('### JUST TEST !!! ###')
-            engine.emit((relations[index].word,))
+        elif relations[index].tag in ('NN', 'JJ'):
+            # Handle copular verbs.
+            subjs = self.process_subj(relations, index, context, engine,
+                                      info)
+
+            cop_index = Relation.get_children_with_dep('cop', relations,
+                                                       index)[0]
+            cop = engine.analyze(relations, cop_index, context + [index])
+
+            auxs = self.process_auxs(relations, index, context, engine,
+                                     info)
+
+            verb = ' '.join([word for word
+                             in auxs + [cop]
+                             if word is not None])
+
+            for subj in subjs:
+                engine.emit((verb, subj, relations[index].word))
         else:
             print('VP: cannot handle', relations[index].tag, 'yet.')
 
@@ -390,6 +413,12 @@ class CcRuleset(AtomicRuleset):
     rel = 'cc'
 
 
+class CopRuleset(AtomicRuleset):
+    """A ruleset that processes the 'cop' relation."""
+
+    rel = 'cop'
+
+
 # Atomic emitting rulesets.
 
 
@@ -511,6 +540,7 @@ all_rulesets = [TopRuleset(),
                 AuxpassRuleset(),
                 PossRuleset(),
                 CcRuleset(),
+                CopRuleset(),
                 # Atomic emitting rulesets.
                 AdvmodRuleset(),
                 NegRuleset(),
