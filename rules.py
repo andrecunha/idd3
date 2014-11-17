@@ -167,6 +167,24 @@ class VerbPhraseRuleset(Ruleset):
         for i in neg_indices:
             engine.analyze(relations, i, context + [index])
 
+    @staticmethod
+    def process_ignorables(relations, index, context, engine, info):
+        """todo: docstring for process_ignorables.
+
+        :relations: todo
+        :index: todo
+        :context: todo
+        :engine: todo
+        :info: todo
+        :returns: todo
+
+        """
+        # complm
+        complm_indices = Relation.get_children_with_dep('complm', relations,
+                                                        index)
+        for i in complm_indices:
+            engine.analyze(relations, i, context + [index])
+
     def emit_propositions(self, verb, subjs, dobjs, engine, relation):
         """TODO: Docstring for emit_propositions.
 
@@ -197,7 +215,7 @@ class VerbPhraseRuleset(Ruleset):
             return None
 
         # TODO: handle other VB tags.
-        if relations[index].tag in ('VBZ', 'VBD', 'VBN', 'VB', 'VBG'):
+        if relations[index].tag in ('VBZ', 'VBD', 'VBN', 'VB', 'VBG', 'VBP'):
             # Handle action verbs.
 
             subjs = self.process_subj(relations, index, context, engine,
@@ -221,6 +239,8 @@ class VerbPhraseRuleset(Ruleset):
             self.process_iobj(relations, index, context, engine, info)
 
             self.process_advs(relations, index, context, engine, info)
+
+            self.process_ignorables(relations, index, context, engine, info)
 
             # Emit propositions.
             if relations[index].rel in ('xcomp', 'ccomp', 'pcomp', 'csubj'):
@@ -252,6 +272,8 @@ class VerbPhraseRuleset(Ruleset):
             verb = ' '.join([word for word
                              in auxs + [cop]
                              if word is not None])
+
+            self.process_ignorables(relations, index, context, engine, info)
 
             for subj in subjs:
                 engine.emit((verb, subj, relations[index].word))
@@ -419,6 +441,12 @@ class CopRuleset(AtomicRuleset):
     rel = 'cop'
 
 
+class ComplmRuleset(AtomicRuleset):
+    """A ruleset that processes the 'complm' relation."""
+
+    rel = 'complm'
+
+
 # Atomic emitting rulesets.
 
 
@@ -541,6 +569,7 @@ all_rulesets = [TopRuleset(),
                 PossRuleset(),
                 CcRuleset(),
                 CopRuleset(),
+                ComplmRuleset(),
                 # Atomic emitting rulesets.
                 AdvmodRuleset(),
                 NegRuleset(),

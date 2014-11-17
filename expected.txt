@@ -23,3 +23,5 @@
 [('used to go', 'I')]
 [('is', 'the cat', 'fluffy')]
 [('would have been', 'the cat', 'fluffy')]
+[('is', 'the cat', 'fluffy'), ('think', 'I')]
+[('is', 'the cat', 'fluffy'), ('think', 'I')]
