@@ -61,6 +61,17 @@ class Relation(object):
         return string
 
 
+class Transformation(object):
+    """Transforms a given dependency tree to facilitate its processing."""
+
+    def transform(self, relations):
+        """Apply the corresponding transformation in place.
+
+        :relations: the list of relations in a sentence.
+        """
+        raise "Don't instantiate Transformation. Use a subclass instead."
+
+
 class Ruleset(object):
     """A ruleset is responsible for processing relations of a certain label."""
 
@@ -93,12 +104,15 @@ class Engine(object):
     """An engine is responsible for running the analysis process, by calling the
         right rulesets and collecting the emitted propositions."""
 
-    def __init__(self, rulesets):
+    def __init__(self, rulesets, transformations=[]):
         """Form an engine.
 
         :rulesets: a list of the rulesets to be used.
+        :transformations: a list of transformations to be applied to the
+            sentences prior to processing.
         """
         self.rulesets = rulesets
+        self.transformations = transformations
 
     def _build_rulesets_dict(self, relations):
         """Creates a dictionary associating relation labels to their
@@ -137,8 +151,12 @@ class Engine(object):
         :returns: the return value of the corresponding ruleset's extract
             method.
         """
-        # Clear results from previous executions and prepare for starting.
+        # Clear results from previous executions, apply transformations,
+        #   and prepare for starting.
         if relations[index].rel == 'TOP':
+            for transformation in self.transformations:
+                transformation.transform(relations)
+
             self.props = []
             for relation in relations:
                 relation.processed = False

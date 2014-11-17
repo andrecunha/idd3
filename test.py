@@ -2,6 +2,7 @@
 from __future__ import print_function, unicode_literals, division
 from idd3 import Relation, Engine
 import rules
+import transform
 import nltk
 
 
@@ -13,7 +14,7 @@ def test():
 
     graphs = nltk.parse.dependencygraph.DependencyGraph.load('corpus.conll')
 
-    engine = Engine(rules.all_rulesets)
+    engine = Engine(rules.all_rulesets, transform.all_transformations)
 
     for i in range(up_to_index):
         relations = []
