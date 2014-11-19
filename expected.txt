@@ -25,3 +25,5 @@
 [('would have been', 'the cat', 'fluffy')]
 [('is', 'the cat', 'fluffy'), ('think', 'I')]
 [('is', 'the cat', 'fluffy'), ('think', 'I')]
+[('the cat', 'fluffy'), ('was purring', 'the cat')]
+[('is', 'the cat', 'fluffy')]

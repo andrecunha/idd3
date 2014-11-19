@@ -301,6 +301,27 @@ class AtomicEmittingRuleset(Ruleset):
 class NounPhraseRuleset(Ruleset):
     """A base class for NP-like dependency substructures."""
 
+    @staticmethod
+    def process_modifiers(relations, index, context, engine, info):
+        """TODO: Docstring for process_modifiers.
+
+        :relations: TODO
+        :index: TODO
+        :context: TODO
+        :engine: TODO
+        :info: TODO
+        :returns: TODO
+
+        """
+        # amod
+        amod_indices = Relation.get_children_with_dep('amod', relations, index)
+        if amod_indices != []:
+            amod = engine.analyze(relations, amod_indices[0], context + [index])
+        else:
+            amod = []
+
+        return amod
+
     def extract(self, relations, index, context, engine, info={}):
         det_index = Relation.get_children_with_dep('det', relations, index)
         if det_index == []:
@@ -340,6 +361,13 @@ class NounPhraseRuleset(Ruleset):
                             if word is not None]
             return_list.append(' '.join(return_value))
 
+        amods = self.process_modifiers(relations, index, context, engine, info)
+
+        # Emit propositions for modifiers
+        for amod in amods:
+            for noun in return_list:
+                engine.emit((noun, amod))
+
         return return_list
 
 
@@ -347,8 +375,8 @@ class AdjectivalPhraseRuleset(Ruleset):
     """A base class for AdjP-like dependency substructures."""
 
     def extract(self, relations, index, context, engine, info={}):
-        # TODO: complete.
-        return relations[index].word
+        # TODO: complete. Add cc/conj handling.
+        return [relations[index].word]
 
 
 # Derived classes.
@@ -516,6 +544,12 @@ class AcompRuleset(AdjectivalPhraseRuleset):
     rel = 'acomp'
 
 
+class AmodRuleset(AdjectivalPhraseRuleset):
+    """A ruleset that processes the 'amod' relation."""
+
+    rel = 'amod'
+
+
 # Uncategorized rulesets.
 
 
@@ -582,6 +616,7 @@ all_rulesets = [TopRuleset(),
                 ConjRuleset(),
                 # Adjectival-Phrase rulesets
                 AcompRuleset(),
+                AmodRuleset(),
                 # Uncategorized rulesets.
                 DetRuleset(),
                 PrepRuleset()]
