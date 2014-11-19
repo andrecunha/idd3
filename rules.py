@@ -302,8 +302,8 @@ class NounPhraseRuleset(Ruleset):
     """A base class for NP-like dependency substructures."""
 
     @staticmethod
-    def process_modifiers(relations, index, context, engine, info):
-        """TODO: Docstring for process_modifiers.
+    def process_amods(relations, index, context, engine, info):
+        """TODO: Docstring for process_amods.
 
         :relations: TODO
         :index: TODO
@@ -323,18 +323,21 @@ class NounPhraseRuleset(Ruleset):
         return amod
 
     def extract(self, relations, index, context, engine, info={}):
+        # Determiners
         det_index = Relation.get_children_with_dep('det', relations, index)
         if det_index == []:
             det = None
         else:
             det = engine.analyze(relations, det_index[0], context + [index])
 
+        # Possessives
         poss_index = Relation.get_children_with_dep('poss', relations, index)
         if poss_index == []:
             poss = None
         else:
             poss = engine.analyze(relations, poss_index[0], context + [index])
 
+        # Noun modifiers
         # TODO: multiple nn.
         nn_index = Relation.get_children_with_dep('nn', relations, index)
         if nn_index == []:
@@ -342,6 +345,7 @@ class NounPhraseRuleset(Ruleset):
         else:
             nn = engine.analyze(relations, nn_index[0], context + [index])
 
+        # Composite NP with conjunction
         cc_index = Relation.get_children_with_dep('cc', relations, index)
         if cc_index != []:
             engine.analyze(relations, cc_index[0], context + [index])
@@ -355,15 +359,24 @@ class NounPhraseRuleset(Ruleset):
             conjs = []
         conjs = [relations[index].word] + conjs
 
+        # ADJP modifiers
+        amods = NounPhraseRuleset.process_amods(relations, index, context,
+                                                engine, info)
+
+        # VP modifiers
+        prep_index = Relation.get_children_with_dep('prep', relations, index)
+        if prep_index != []:
+            engine.analyze(relations, prep_index[0], context + [index])
+
+        # Emit propositions for modifiers
+
+        # TODO: properly handle distribution of possessives.
         return_list = []
         for conj in conjs:
             return_value = [word for word in [det, poss, nn, conj]
                             if word is not None]
             return_list.append(' '.join(return_value))
 
-        amods = self.process_modifiers(relations, index, context, engine, info)
-
-        # Emit propositions for modifiers
         for amod in amods:
             for noun in return_list:
                 engine.emit((noun, amod))
@@ -451,12 +464,6 @@ class AuxpassRuleset(AtomicRuleset):
     rel = 'auxpass'
 
 
-class PossRuleset(AtomicRuleset):
-    """A ruleset that processes the 'poss' relation."""
-
-    rel = 'poss'
-
-
 class CcRuleset(AtomicRuleset):
     """A ruleset that processes the 'cc' relation."""
 
@@ -473,6 +480,12 @@ class ComplmRuleset(AtomicRuleset):
     """A ruleset that processes the 'complm' relation."""
 
     rel = 'complm'
+
+
+class PossessiveRuleset(AtomicRuleset):
+    """A ruleset that processes the 'possessive' relation."""
+
+    rel = 'possessive'
 
 
 # Atomic emitting rulesets.
@@ -588,6 +601,31 @@ class PrepRuleset(Ruleset):
             # TODO: check the 'else' condition.
 
 
+class PossRuleset(Ruleset):
+    """A ruleset that processes the 'poss' relation."""
+
+    rel = 'poss'
+
+    def extract(self, relations, index, context, engine, info={}):
+        if relations[index].tag == 'PRP$':
+            return relations[index].word
+        elif relations[index].tag in ('NN', 'NNS', 'NNP'):
+            this = NounPhraseRuleset.extract(self, relations, index, context,
+                                             engine, info)
+            possessive_index = Relation.get_children_with_dep('possessive',
+                                                              relations,
+                                                              index)[0]
+            engine.analyze(relations, possessive_index, context + [index])
+
+            referent = relations[context[-1]].word
+            for item in this:
+                engine.emit((referent, item + "'s"))
+
+            # TODO: handle multiple items.
+            return None
+        else:
+            print('WARNING: poss cannot handle', relations[index].tag, 'yet')
+
 all_rulesets = [TopRuleset(),
                 # Verb-Phrase rulesets.
                 RootRuleset(),
@@ -600,10 +638,10 @@ all_rulesets = [TopRuleset(),
                 NnRuleset(),
                 AuxRuleset(),
                 AuxpassRuleset(),
-                PossRuleset(),
                 CcRuleset(),
                 CopRuleset(),
                 ComplmRuleset(),
+                PossessiveRuleset(),
                 # Atomic emitting rulesets.
                 AdvmodRuleset(),
                 NegRuleset(),
@@ -619,4 +657,5 @@ all_rulesets = [TopRuleset(),
                 AmodRuleset(),
                 # Uncategorized rulesets.
                 DetRuleset(),
-                PrepRuleset()]
+                PrepRuleset(),
+                PossRuleset()]
