@@ -24,6 +24,10 @@ def delete_indices(relations, indices):
                 if dep > index:
                     rel.deps[i] -= 1
 
+            if rel.head is not None:
+                if rel.head > index:
+                    rel.head -= 1
+
     for i, rel in enumerate(relations):
         rel.address = i
 
@@ -32,7 +36,24 @@ class JoinMultiWordExpressions(Transformation):
     """Joins multi-word expressions in a single node. """
 
     def transform(self, relations):
-        pass
+        mwes = {}
+
+        for relation in relations:
+            if relation.rel == 'mwe':
+                if relation.head not in mwes:
+                    mwes[relation.head] = [relation.address]
+                else:
+                    mwes[relation.head].append(relation.address)
+
+        for head, deps in mwes.items():
+            new_word = ' '.join([relations[i].word
+                                 for i in sorted(deps + [head])])
+            relations[head].word = new_word
+
+            delete_indices(relations, deps)
+
+        print('######################')
+        import pprint; pprint.pprint(relations)
 
 
 class JoinPhrasalModifiers(Transformation):
@@ -78,4 +99,5 @@ class JoinPhrasalModifiers(Transformation):
                     relations[index].deps = sorted(relations[index].deps)
 
 
-all_transformations = [JoinPhrasalModifiers(), ]
+all_transformations = [JoinPhrasalModifiers(),
+                       JoinMultiWordExpressions()]
