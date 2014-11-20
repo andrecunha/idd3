@@ -36,3 +36,5 @@
 [('3', 'like'), ('years', '3'), ('for years',), ('there',), ('worked', 'I')]
 [('100', 'less than'), ('people', '100'), ('had', 'Our community', 'people')]
 [('in LA',), ('2 or 3', 'about'), ('years', '2 or 3'), ('for years',), ('were', 'We')]
+[('sisters', '4'), ('have', 'I', 'sisters')]
+[('flowers', 'some'), ('eats', 'the cat', 'flowers')]

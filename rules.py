@@ -587,8 +587,9 @@ class DetRuleset(Ruleset):
         if relations[index].word.lower() in ('the', 'a', 'an'):
             return relations[index].word.lower()
         else:
-            print('DET: complete DT rules!')
-            return ''
+            # TODO: maybe get the subject from info.
+            engine.emit((relations[context[-1]].word, relations[index].word))
+            return None
 
 
 class PrepRuleset(Ruleset):
