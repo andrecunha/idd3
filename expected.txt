@@ -34,3 +34,4 @@
 [('house', "John's"), ('is', 'house', 'big')]
 [('of John',), ('is', 'the house', 'big')]
 [('3', 'like'), ('years', '3'), ('for years',), ('there',), ('worked', 'I')]
+[('100', 'less than'), ('people', '100'), ('had', 'Our community', 'people')]

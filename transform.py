@@ -32,6 +32,17 @@ def delete_indices(relations, indices):
         rel.address = i
 
 
+class RemovePunctuation(Transformation):
+    """Removes punct relations."""
+
+    def transform(self, relations):
+        indices_to_remove = []
+        for i, relation in enumerate(relations):
+            if relation.rel == 'punct':
+                indices_to_remove.append(i)
+        delete_indices(relations, indices_to_remove)
+
+
 class JoinMultiWordExpressions(Transformation):
     """Joins multi-word expressions in a single node. """
 
@@ -51,9 +62,6 @@ class JoinMultiWordExpressions(Transformation):
             relations[head].word = new_word
 
             delete_indices(relations, deps)
-
-        print('######################')
-        import pprint; pprint.pprint(relations)
 
 
 class JoinPhrasalModifiers(Transformation):
@@ -99,5 +107,6 @@ class JoinPhrasalModifiers(Transformation):
                     relations[index].deps = sorted(relations[index].deps)
 
 
-all_transformations = [JoinPhrasalModifiers(),
+all_transformations = [RemovePunctuation(),
+                       JoinPhrasalModifiers(),
                        JoinMultiWordExpressions()]
