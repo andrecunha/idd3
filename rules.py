@@ -135,9 +135,9 @@ class VerbPhraseRuleset(Ruleset):
 
         """
         # prep + pobj
-        prep_index = Relation.get_children_with_dep('prep', relations, index)
-        if prep_index != []:
-            engine.analyze(relations, prep_index[0], context + [index])
+        prep_indices = Relation.get_children_with_dep('prep', relations, index)
+        for prep_index in prep_indices:
+            engine.analyze(relations, prep_index, context + [index])
 
         # iobj
         iobj_index = Relation.get_children_with_dep('iobj', relations, index)
