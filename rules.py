@@ -644,23 +644,35 @@ class NumRuleset(Ruleset):
     rel = 'num'
 
     def extract(self, relations, index, context, engine, info={}):
-        # TODO: handle cc/conj.
         number_indices = Relation.get_children_with_dep('possessive',
                                                         relations, index)
+        cc_indices = Relation.get_children_with_dep('cc',
+                                                    relations, index)
+        conj_indices = Relation.get_children_with_dep('conj',
+                                                      relations, index)
 
-        numbers = []
-        for n in number_indices:
-            number = engine.analyze(relations, n, context + [index])
-            numbers.append(number)
-        numbers.append(relations[index].word)
+        indices = sorted([index] + number_indices + cc_indices + conj_indices)
 
-        this_number = ' '.join(numbers)
+        words = []
+        for n in indices:
+            if n != index:
+                word = engine.analyze(relations, n, context + [index])
+            else:
+                word = relations[index].word
+
+            if type(word) is str:
+                words.append(word)
+            elif type(word) is list:
+                words += word
+
+        this_number = ' '.join(words)
 
         # Process quantmods
         quantmod_indices = Relation.get_children_with_dep('quantmod',
                                                           relations, index)
         for q in quantmod_indices:
-            engine.analyze(relations, q, context + [index])
+            engine.analyze(relations, q, context + [index],
+                           {'num': this_number})
 
         return this_number
 
@@ -670,8 +682,8 @@ class QuantmodRuleset(Ruleset):
 
     rel = 'quantmod'
 
-    def extract(self, relations, index, context, engine, info={}):
-        engine.emit((relations[context[-1]].word, relations[index].word))
+    def extract(self, relations, index, context, engine, info):
+        engine.emit((info['num'], relations[index].word))
 
 
 all_rulesets = [TopRuleset(),
