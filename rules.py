@@ -302,7 +302,7 @@ class NounPhraseRuleset(Ruleset):
     """A base class for NP-like dependency substructures."""
 
     @staticmethod
-    def process_amods(relations, index, context, engine, info):
+    def process_modifiers(relations, index, context, engine, info):
         """TODO: Docstring for process_amods.
 
         :relations: TODO
@@ -320,7 +320,14 @@ class NounPhraseRuleset(Ruleset):
         else:
             amod = []
 
-        return amod
+        # num
+        num_indices = Relation.get_children_with_dep('num', relations, index)
+        if num_indices != []:
+            num = [engine.analyze(relations, num_indices[0], context + [index])]
+        else:
+            num = []
+
+        return sorted(amod + num)
 
     def extract(self, relations, index, context, engine, info={}):
         # Determiners
@@ -360,8 +367,8 @@ class NounPhraseRuleset(Ruleset):
         conjs = [relations[index].word] + conjs
 
         # ADJP modifiers
-        amods = NounPhraseRuleset.process_amods(relations, index, context,
-                                                engine, info)
+        amods = NounPhraseRuleset.process_modifiers(relations, index, context,
+                                                    engine, info)
 
         # VP modifiers
         prep_index = Relation.get_children_with_dep('prep', relations, index)
@@ -486,6 +493,12 @@ class PossessiveRuleset(AtomicRuleset):
     """A ruleset that processes the 'possessive' relation."""
 
     rel = 'possessive'
+
+
+class NumberRuleset(AtomicRuleset):
+    """A ruleset that processes the 'number' relation."""
+
+    rel = 'number'
 
 
 # Atomic emitting rulesets.
@@ -626,6 +639,42 @@ class PossRuleset(Ruleset):
         else:
             print('WARNING: poss cannot handle', relations[index].tag, 'yet')
 
+
+class NumRuleset(Ruleset):
+    """A ruleset that processes the 'num' relation."""
+
+    rel = 'num'
+
+    def extract(self, relations, index, context, engine, info={}):
+        number_indices = Relation.get_children_with_dep('possessive',
+                                                        relations, index)
+
+        numbers = []
+        for n in number_indices:
+            number = engine.analyze(relations, n, context + [index])
+            numbers.append(number)
+        numbers.append(relations[index].word)
+
+        this_number = ' '.join(numbers)
+
+        # Process quantmods
+        quantmod_indices = Relation.get_children_with_dep('quantmod',
+                                                          relations, index)
+        for q in quantmod_indices:
+            engine.analyze(relations, q, context + [index])
+
+        return this_number
+
+
+class QuantmodRuleset(Ruleset):
+    """A ruleset that processes the 'quantmod' relation."""
+
+    rel = 'quantmod'
+
+    def extract(self, relations, index, context, engine, info={}):
+        engine.emit((relations[context[-1]].word, relations[index].word))
+
+
 all_rulesets = [TopRuleset(),
                 # Verb-Phrase rulesets.
                 RootRuleset(),
@@ -642,6 +691,7 @@ all_rulesets = [TopRuleset(),
                 CopRuleset(),
                 ComplmRuleset(),
                 PossessiveRuleset(),
+                NumberRuleset(),
                 # Atomic emitting rulesets.
                 AdvmodRuleset(),
                 NegRuleset(),
@@ -658,4 +708,6 @@ all_rulesets = [TopRuleset(),
                 # Uncategorized rulesets.
                 DetRuleset(),
                 PrepRuleset(),
-                PossRuleset()]
+                PossRuleset(),
+                QuantmodRuleset(),
+                NumRuleset()]

@@ -33,3 +33,4 @@
 [('to his house',), ('went', 'We')]
 [('house', "John's"), ('is', 'house', 'big')]
 [('of John',), ('is', 'the house', 'big')]
+[('3', 'like'), ('years', '3'), ('for years',), ('there',), ('worked', 'I')]
