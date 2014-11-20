@@ -313,21 +313,19 @@ class NounPhraseRuleset(Ruleset):
         :returns: TODO
 
         """
-        # amod
         amod_indices = Relation.get_children_with_dep('amod', relations, index)
-        if amod_indices != []:
-            amod = engine.analyze(relations, amod_indices[0], context + [index])
-        else:
-            amod = []
-
-        # num
         num_indices = Relation.get_children_with_dep('num', relations, index)
-        if num_indices != []:
-            num = [engine.analyze(relations, num_indices[0], context + [index])]
-        else:
-            num = []
 
-        return sorted(amod + num)
+        mods_indices = sorted(amod_indices + num_indices)
+        mods = []
+        for m in mods_indices:
+            mod = engine.analyze(relations, m, context + [index])
+            if type(mod) is str:
+                mods.append(mod)
+            elif type(mod) is list:
+                mods += mod
+
+        return mods
 
     def extract(self, relations, index, context, engine, info={}):
         # Determiners
@@ -367,7 +365,7 @@ class NounPhraseRuleset(Ruleset):
         conjs = [relations[index].word] + conjs
 
         # ADJP modifiers
-        amods = NounPhraseRuleset.process_modifiers(relations, index, context,
+        mods = NounPhraseRuleset.process_modifiers(relations, index, context,
                                                     engine, info)
 
         # VP modifiers
@@ -384,7 +382,7 @@ class NounPhraseRuleset(Ruleset):
                             if word is not None]
             return_list.append(' '.join(return_value))
 
-        for amod in amods:
+        for amod in mods:
             for noun in return_list:
                 engine.emit((noun, amod))
 
