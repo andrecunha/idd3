@@ -254,21 +254,10 @@
 7	years	_	NNS	NNS	_	4	pobj	_	_
 8	.	_	.	.	_	2	punct	_	_
 
-1	We	_	PRP	PRP	_	2	nsubj	_	_
-2	were	_	VBD	VBD	_	0	null	_	_
-3	in	_	IN	IN	_	2	prep	_	_
-4	LA	_	NNP	NNP	_	3	pobj	_	_
-5	for	_	IN	IN	_	7	mark	_	_
-6	I	_	PRP	PRP	_	7	nsubj	_	_
-7	think	_	VBP	VBP	_	2	advcl	_	_
-8	3	_	CD	CD	_	9	num	_	_
-9	years	_	NNS	NNS	_	7	dobj	_	_
-10	.	_	.	.	_	2	punct	_	_
-
 1	Our	_	PRP$	PRP$	_	2	poss	_	_
 2	community	_	NN	NN	_	3	nsubj	_	_
 3	had	_	VBD	VBD	_	0	null	_	_
-4	less	_	JJR	JJR	_	5	dep	_	_
+4	less	_	JJR	JJR	_	5	mwe	_	_
 5	than	_	IN	IN	_	6	quantmod	_	_
 6	100	_	CD	CD	_	7	num	_	_
 7	people	_	NNS	NNS	_	3	dobj	_	_
@@ -1462,3 +1451,14 @@
 6	the	_	DT	DT	_	7	det	_	_
 7	country	_	NN	NN	_	5	pobj	_	_
 8	.	_	.	.	_	3	punct	_	_
+
+1	We	_	PRP	PRP	_	2	nsubj	_	_
+2	were	_	VBD	VBD	_	0	null	_	_
+3	in	_	IN	IN	_	2	prep	_	_
+4	LA	_	NNP	NNP	_	3	pobj	_	_
+5	for	_	IN	IN	_	7	mark	_	_
+6	I	_	PRP	PRP	_	7	nsubj	_	_
+7	think	_	VBP	VBP	_	2	advcl	_	_
+8	3	_	CD	CD	_	9	num	_	_
+9	years	_	NNS	NNS	_	7	dobj	_	_
+10	.	_	.	.	_	2	punct	_	_

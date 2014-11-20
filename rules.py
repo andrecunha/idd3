@@ -366,7 +366,7 @@ class NounPhraseRuleset(Ruleset):
 
         # ADJP modifiers
         mods = NounPhraseRuleset.process_modifiers(relations, index, context,
-                                                    engine, info)
+                                                   engine, info)
 
         # VP modifiers
         prep_index = Relation.get_children_with_dep('prep', relations, index)
@@ -644,6 +644,7 @@ class NumRuleset(Ruleset):
     rel = 'num'
 
     def extract(self, relations, index, context, engine, info={}):
+        # TODO: handle cc/conj.
         number_indices = Relation.get_children_with_dep('possessive',
                                                         relations, index)
 

@@ -3,6 +3,38 @@ from __future__ import print_function, unicode_literals, division
 from idd3 import Relation, Transformation
 
 
+def delete_indices(relations, indices):
+    """Removes relations in place. This function does NOT change the head of
+        eventual relations that point to a removed relation; these head updates
+        have to be done elsewhere.
+
+    :relations: the list of relations in a utterance.
+    :indices: the indices of the relations to remove.
+
+    """
+    indices = sorted(indices, reverse=True)
+
+    for index in indices:
+        del relations[index]
+
+        for rel in relations:
+            rel.deps = [dep for dep in rel.deps if dep != index]
+
+            for i, dep in enumerate(rel.deps):
+                if dep > index:
+                    rel.deps[i] -= 1
+
+    for i, rel in enumerate(relations):
+        rel.address = i
+
+
+class JoinMultiWordExpressions(Transformation):
+    """Joins multi-word expressions in a single node. """
+
+    def transform(self, relations):
+        pass
+
+
 class JoinPhrasalModifiers(Transformation):
     """Joins phrasal modal and aspectual markers (e.g., "have to", "ought to",
         "used to", etc) to the main verb of a sentence. """
@@ -14,9 +46,14 @@ class JoinPhrasalModifiers(Transformation):
             if relation.rel in ('null', 'xcomp')\
                     and relation.tag in ('VBZ', 'VBD', 'VBP')\
                     and relation.word in self.verb_forms:
-                xcomp_index = Relation.get_children_with_dep('xcomp',
-                                                             relations,
-                                                             index)[0]
+                xcomp_indices = Relation.get_children_with_dep('xcomp',
+                                                               relations,
+                                                               index)
+                if xcomp_indices == []:
+                    return
+                else:
+                    xcomp_index = xcomp_indices[0]
+
                 if relations[xcomp_index].tag == 'VB':
                     aux_indices = Relation.get_children_with_dep('aux',
                                                                  relations,
@@ -28,31 +65,17 @@ class JoinPhrasalModifiers(Transformation):
                     relations[index].word += ' to ' + \
                         relations[xcomp_index].word
 
-                    # Remove 'to' and xcomp head.
-                    indices_to_remove = sorted([to_index, xcomp_index],
-                                               reverse=True)
-                    for i in indices_to_remove:
-                        del relations[i]
-
-                    for i, rel in enumerate(relations):
-                        rel.address = i
+                    # Remove 'aux' and 'xcomp' relations.
+                    delete_indices(relations, [to_index, xcomp_index])
 
                     # Change head of relations pointing to xcomp to point to
-                    #   the main verb. Remove xcomp head from main verb's deps.
+                    #   the main verb.
                     for i, rel in enumerate(relations):
                         if rel.head == xcomp_index:
                             rel.head = index
                             relations[index].deps.append(i)
 
-                    relations[index].deps.remove(xcomp_index)
-
                     relations[index].deps = sorted(relations[index].deps)
 
-                    # Update indices in deps.
-                    for rel in relations:
-                        for i, dep in enumerate(rel.deps):
-                            if dep > xcomp_index:
-                                rel.deps[i] -= 2
 
-
-all_transformations = [JoinPhrasalModifiers(),]
+all_transformations = [JoinPhrasalModifiers(), ]
