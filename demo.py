@@ -16,30 +16,29 @@ except ImportError:
 
 def demo():
     graphs = nltk.parse.dependencygraph.DependencyGraph.load(argv[1])
-    up_to_index = int(argv[2])
+    index = int(argv[2]) - 1
 
     engine = Engine(rules.all_rulesets, transform.all_transformations)
 
-    for i in range(up_to_index):
-        relations = []
-        for relation in graphs[i].nodelist:
-            relations.append(Relation(**relation))
+    relations = []
+    for relation in graphs[index].nodelist:
+        relations.append(Relation(**relation))
 
-        print(colored('Sentence %d:' % (i + 1), 'white', attrs=['bold']))
-        pprint.pprint(relations)
+    print(colored('Sentence %d:' % (index + 1), 'white', attrs=['bold']))
+    pprint.pprint(relations)
 
-        print(colored('Propositions:', 'white', attrs=['bold']))
-        engine.analyze(relations)
-        pprint.pprint(engine.props)
+    print(colored('Propositions:', 'white', attrs=['bold']))
+    engine.analyze(relations)
+    pprint.pprint(engine.props)
 
-        print(colored('Unprocessed relations:', 'white', attrs=['bold']))
-        for relation in relations:
-            if not relation.processed:
-                print(relation)
+    print(colored('Unprocessed relations:', 'white', attrs=['bold']))
+    for relation in relations:
+        if not relation.processed:
+            print(relation)
 
 
 if __name__ == '__main__':
     if len(argv) != 3:
-        print('Usage: python', argv[0], '<conll file>', '<up to index>')
+        print('Usage: python', argv[0], '<conll file>', '<index>')
     else:
         demo()

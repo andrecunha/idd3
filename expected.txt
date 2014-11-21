@@ -38,3 +38,4 @@
 [('in LA',), ('2 or 3', 'about'), ('years', '2 or 3'), ('for years',), ('were', 'We')]
 [('sisters', '4'), ('have', 'I', 'sisters')]
 [('flowers', 'some'), ('eats', 'the cat', 'flowers')]
+[('eats', 'the cat', 'the flowers')]
