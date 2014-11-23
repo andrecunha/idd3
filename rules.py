@@ -257,8 +257,35 @@ class VerbPhraseRuleset(Ruleset):
                 self.emit_propositions(verb, subjs, comps, engine,
                                        relations[index])
                 return None
-        elif relations[index].tag in ('NN', 'JJ'):
-            # Handle copular verbs.
+        elif relations[index].tag in ('NN', 'NNS', 'NNP', 'NNPS', 'CD'):
+            # Handle copular verbs with NP complements.
+            subjs = self.process_subj(relations, index, context, engine,
+                                      info)
+
+            cop_index = Relation.get_children_with_dep('cop', relations,
+                                                       index)[0]
+            cop = engine.analyze(relations, cop_index, context + [index])
+
+            auxs = self.process_auxs(relations, index, context, engine,
+                                     info)
+
+            verb = ' '.join([word for word
+                             in auxs + [cop]
+                             if word is not None])
+
+            self.process_ignorables(relations, index, context, engine, info)
+
+            this = NounPhraseRuleset.extract(self, relations, index, context,
+                                             engine, info)
+            # TODO: handle cc/conj and preconj.
+            complms = this['return_list']
+
+            for subj in subjs:
+                for compl in complms:
+                    # engine.emit((verb, subj, relations[index].word))
+                    engine.emit((verb, subj, compl))
+        elif relations[index].tag in ('JJ'):
+            # Handle copular verbs with ADJP complements.
             subjs = self.process_subj(relations, index, context, engine,
                                       info)
 
@@ -301,20 +328,24 @@ class AtomicEmittingRuleset(Ruleset):
 class NounPhraseRuleset(Ruleset):
     """A base class for NP-like dependency substructures."""
 
-    @staticmethod
-    def process_modifiers(relations, index, context, engine, info):
-        """TODO: Docstring for process_amods.
-
-        :relations: TODO
-        :index: TODO
-        :context: TODO
-        :engine: TODO
-        :info: TODO
-        :returns: TODO
-
-        """
+    def extract(self, relations, index, context, engine, info={}):
+        # ADJP modifiers
         amod_indices = Relation.get_children_with_dep('amod', relations, index)
         num_indices = Relation.get_children_with_dep('num', relations, index)
+
+        if amod_indices != [] and num_indices != []:
+            # If we have both numbers and adjectives, I assume it's a time/age/
+            #   height construction, like '3 feet tall'.
+            num = engine.analyze(relations, num_indices[0], context + [index])
+            adj = engine.analyze(relations, amod_indices[0], context + [index])
+
+            this = relations[index].word + ' ' + adj[0]
+
+            engine.emit((num, this))
+
+            return {'return_list': [this],
+                    'preconj': None,
+                    'ids_for_preconj': []}
 
         mods_indices = sorted(amod_indices + num_indices)
         mods = []
@@ -325,9 +356,6 @@ class NounPhraseRuleset(Ruleset):
             elif type(mod) is list:
                 mods += mod
 
-        return mods
-
-    def extract(self, relations, index, context, engine, info={}):
         # Determiners
         det_index = Relation.get_children_with_dep('det', relations, index)
         if det_index == []:
@@ -360,10 +388,6 @@ class NounPhraseRuleset(Ruleset):
         else:
             conjs = []
         conjs = [relations[index].word] + conjs
-
-        # ADJP modifiers
-        mods = NounPhraseRuleset.process_modifiers(relations, index, context,
-                                                   engine, info)
 
         # VP modifiers
         prep_index = Relation.get_children_with_dep('prep', relations, index)
@@ -730,7 +754,7 @@ class NumRuleset(Ruleset):
     rel = 'num'
 
     def extract(self, relations, index, context, engine, info={}):
-        number_indices = Relation.get_children_with_dep('possessive',
+        number_indices = Relation.get_children_with_dep('number',
                                                         relations, index)
         cc_indices = Relation.get_children_with_dep('cc',
                                                     relations, index)
