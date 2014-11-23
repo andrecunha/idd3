@@ -328,24 +328,9 @@ class AtomicEmittingRuleset(Ruleset):
 class NounPhraseRuleset(Ruleset):
     """A base class for NP-like dependency substructures."""
 
-    def extract(self, relations, index, context, engine, info={}):
-        # ADJP modifiers
+    def process_modifiers(self, relations, index, context, engine, info={}):
         amod_indices = Relation.get_children_with_dep('amod', relations, index)
         num_indices = Relation.get_children_with_dep('num', relations, index)
-
-        if amod_indices != [] and num_indices != []:
-            # If we have both numbers and adjectives, I assume it's a time/age/
-            #   height construction, like '3 feet tall'.
-            num = engine.analyze(relations, num_indices[0], context + [index])
-            adj = engine.analyze(relations, amod_indices[0], context + [index])
-
-            this = relations[index].word + ' ' + adj[0]
-
-            engine.emit((this, num))
-
-            return {'return_list': [this],
-                    'preconj': None,
-                    'ids_for_preconj': []}
 
         mods_indices = sorted(amod_indices + num_indices)
         mods = []
@@ -356,6 +341,10 @@ class NounPhraseRuleset(Ruleset):
             elif type(mod) is list:
                 mods += mod
 
+        return mods
+
+
+    def extract(self, relations, index, context, engine, info={}):
         # Determiners
         det_index = Relation.get_children_with_dep('det', relations, index)
         if det_index == []:
@@ -393,6 +382,10 @@ class NounPhraseRuleset(Ruleset):
         prep_index = Relation.get_children_with_dep('prep', relations, index)
         if prep_index != []:
             engine.analyze(relations, prep_index[0], context + [index])
+
+        # ADJP modifiers
+        mods = NounPhraseRuleset.process_modifiers(self, relations, index,
+                                                   context, engine, info)
 
         # Emit propositions for modifiers
 
