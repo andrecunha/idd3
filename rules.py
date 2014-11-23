@@ -7,6 +7,7 @@ from idd3 import Relation, Ruleset
 
 
 class VerbPhraseRuleset(Ruleset):
+
     """A base class for VP-like dependency substructures."""
 
     @staticmethod
@@ -98,7 +99,7 @@ class VerbPhraseRuleset(Ruleset):
 
         comps = []
         for comp in _comps:
-            if type(comp) is list:
+            if isinstance(comp, list):
                 comps.extend(comp)
             else:
                 if comp is not None:
@@ -309,6 +310,7 @@ class VerbPhraseRuleset(Ruleset):
 
 
 class AtomicRuleset(Ruleset):
+
     """A base ruleset for atomic relations that just return the associated
     word."""
 
@@ -317,6 +319,7 @@ class AtomicRuleset(Ruleset):
 
 
 class AtomicEmittingRuleset(Ruleset):
+
     """A base ruleset for atomic relations that just emit the associated word
     as a proposition
     """
@@ -326,9 +329,11 @@ class AtomicEmittingRuleset(Ruleset):
 
 
 class NounPhraseRuleset(Ruleset):
+
     """A base class for NP-like dependency substructures."""
 
-    def process_modifiers(self, relations, index, context, engine, info={}):
+    @staticmethod
+    def process_modifiers(relations, index, context, engine, info={}):
         amod_indices = Relation.get_children_with_dep('amod', relations, index)
         num_indices = Relation.get_children_with_dep('num', relations, index)
 
@@ -336,13 +341,12 @@ class NounPhraseRuleset(Ruleset):
         mods = []
         for m in mods_indices:
             mod = engine.analyze(relations, m, context + [index])
-            if type(mod) is str:
+            if isinstance(mod, str):
                 mods.append(mod)
-            elif type(mod) is list:
+            elif isinstance(mod, list):
                 mods += mod
 
         return mods
-
 
     def extract(self, relations, index, context, engine, info={}):
         # Determiners
@@ -384,23 +388,23 @@ class NounPhraseRuleset(Ruleset):
             engine.analyze(relations, prep_index[0], context + [index])
 
         # ADJP modifiers
-        mods = NounPhraseRuleset.process_modifiers(self, relations, index,
+        mods = NounPhraseRuleset.process_modifiers(relations, index,
                                                    context, engine, info)
 
         # Emit propositions for modifiers
 
         # TODO: properly handle distribution of possessives.
         return_list = []
-        ids_for_preconj = [] # Ids of propositions for reference by eventual
+        ids_for_preconj = []  # Ids of propositions for reference by eventual
                              #  preconj propositions.
         for conj in conjs:
             if nns != []:
-                if type(nns[0]) is str:
+                if isinstance(nns[0], str):
                     # Multiple nn modifying the same noun. Join to conj.
-                    return_value = [word for word in [det, poss] +  nns + [conj]
+                    return_value = [word for word in [det, poss] + nns + [conj]
                                     if word is not None]
                     return_list.append(' '.join(return_value))
-                elif type(nns[0]) is list:
+                elif isinstance(nns[0], list):
                     # Single nn with cc/conj. Emit different propositions.
                     for nn in nns[0]:
                         return_value = [word for word in [det, poss, nn, conj]
@@ -432,6 +436,7 @@ class NounPhraseRuleset(Ruleset):
 
 
 class AdjectivalPhraseRuleset(Ruleset):
+
     """A base class for AdjP-like dependency substructures."""
 
     def extract(self, relations, index, context, engine, info={}):
@@ -443,6 +448,7 @@ class AdjectivalPhraseRuleset(Ruleset):
 
 
 class TopRuleset(Ruleset):
+
     """A dummy ruleset that starts the analysis process."""
 
     rel = 'TOP'
@@ -455,30 +461,35 @@ class TopRuleset(Ruleset):
 
 
 class RootRuleset(VerbPhraseRuleset):
+
     """A ruleset that processes the 'ROOT' relation."""
 
     rel = 'null'
 
 
 class XcompRuleset(VerbPhraseRuleset):
+
     """A ruleset that processes the 'xcomp' relation."""
 
     rel = 'xcomp'
 
 
 class CcompRuleset(VerbPhraseRuleset):
+
     """A ruleset that processes the 'ccomp' relation."""
 
     rel = 'ccomp'
 
 
 class PcompRuleset(VerbPhraseRuleset):
+
     """A ruleset that processes the 'pcomp' relation."""
 
     rel = 'pcomp'
 
 
 class CsubjRuleset(VerbPhraseRuleset):
+
     """A ruleset that processes the 'csubj' relation."""
 
     rel = 'csubj'
@@ -488,54 +499,63 @@ class CsubjRuleset(VerbPhraseRuleset):
 
 
 class PrtRuleset(AtomicRuleset):
+
     """A ruleset that processes the 'prt' relation."""
 
     rel = 'prt'
 
 
 class AuxRuleset(AtomicRuleset):
+
     """A ruleset that processes the 'aux' relation."""
 
     rel = 'aux'
 
 
 class AuxpassRuleset(AtomicRuleset):
+
     """A ruleset that processes the 'auxpass' relation."""
 
     rel = 'auxpass'
 
 
 class CcRuleset(AtomicRuleset):
+
     """A ruleset that processes the 'cc' relation."""
 
     rel = 'cc'
 
 
 class CopRuleset(AtomicRuleset):
+
     """A ruleset that processes the 'cop' relation."""
 
     rel = 'cop'
 
 
 class ComplmRuleset(AtomicRuleset):
+
     """A ruleset that processes the 'complm' relation."""
 
     rel = 'complm'
 
 
 class PossessiveRuleset(AtomicRuleset):
+
     """A ruleset that processes the 'possessive' relation."""
 
     rel = 'possessive'
 
 
 class NumberRuleset(AtomicRuleset):
+
     """A ruleset that processes the 'number' relation."""
 
     rel = 'number'
 
 
 class PreconjRuleset(AtomicRuleset):
+
     """A ruleset that processes the 'preconj' relation."""
 
     rel = 'preconj'
@@ -545,12 +565,14 @@ class PreconjRuleset(AtomicRuleset):
 
 
 class AdvmodRuleset(AtomicEmittingRuleset):
+
     """A ruleset that processes the 'advmod' relation."""
 
     rel = 'advmod'
 
 
 class NegRuleset(AtomicEmittingRuleset):
+
     """A ruleset that processes the 'neg' relation."""
 
     rel = 'neg'
@@ -560,6 +582,7 @@ class NegRuleset(AtomicEmittingRuleset):
 
 
 class NsubjRuleset(NounPhraseRuleset):
+
     """A ruleset that processes the 'nsubj' relation."""
 
     rel = 'nsubj'
@@ -572,6 +595,7 @@ class NsubjRuleset(NounPhraseRuleset):
 
 
 class NsubjpassRuleset(NounPhraseRuleset):
+
     """A ruleset that processes the 'nsubjpass' relation."""
 
     rel = 'nsubjpass'
@@ -584,6 +608,7 @@ class NsubjpassRuleset(NounPhraseRuleset):
 
 
 class DobjRuleset(NounPhraseRuleset):
+
     """A ruleset that processes the 'dobj' relation."""
 
     rel = 'dobj'
@@ -596,12 +621,14 @@ class DobjRuleset(NounPhraseRuleset):
 
 
 class PobjRuleset(NounPhraseRuleset):
+
     """A ruleset that processes the 'pobj' relation."""
 
     rel = 'pobj'
 
 
 class IobjRuleset(NounPhraseRuleset):
+
     """A ruleset that processes the 'iobj' relation."""
 
     rel = 'iobj'
@@ -615,6 +642,7 @@ class IobjRuleset(NounPhraseRuleset):
 
 
 class ConjRuleset(NounPhraseRuleset):
+
     """A ruleset that processes the 'conj' relation."""
 
     rel = 'conj'
@@ -627,6 +655,7 @@ class ConjRuleset(NounPhraseRuleset):
 
 
 class PossRuleset(NounPhraseRuleset):
+
     """A ruleset that processes the 'poss' relation."""
 
     rel = 'poss'
@@ -636,14 +665,14 @@ class PossRuleset(NounPhraseRuleset):
             return relations[index].word
         elif relations[index].tag in ('NN', 'NNS', 'NNP'):
             d = NounPhraseRuleset.extract(self, relations, index, context,
-                                             engine)
+                                          engine)
 
             if d['ids_for_preconj'] == []:
                 this = d['return_list']
 
                 possessive_index = Relation.get_children_with_dep('possessive',
-                                                                relations,
-                                                                index)[0]
+                                                                  relations,
+                                                                  index)[0]
                 engine.analyze(relations, possessive_index, context + [index])
 
                 referent = relations[context[-1]].word
@@ -660,12 +689,14 @@ class PossRuleset(NounPhraseRuleset):
 
 
 class AcompRuleset(AdjectivalPhraseRuleset):
+
     """A ruleset that processes the 'acomp' relation."""
 
     rel = 'acomp'
 
 
 class AmodRuleset(AdjectivalPhraseRuleset):
+
     """A ruleset that processes the 'amod' relation."""
 
     rel = 'amod'
@@ -675,6 +706,7 @@ class AmodRuleset(AdjectivalPhraseRuleset):
 
 
 class NnRuleset(Ruleset):
+
     """A ruleset that processes the 'nn' relation."""
 
     rel = 'nn'
@@ -697,6 +729,7 @@ class NnRuleset(Ruleset):
 
 
 class DetRuleset(Ruleset):
+
     """A ruleset that processes the 'det' relation."""
 
     rel = 'det'
@@ -712,6 +745,7 @@ class DetRuleset(Ruleset):
 
 
 class PrepRuleset(Ruleset):
+
     """A ruleset that processes the 'prep' relation."""
 
     rel = 'prep'
@@ -742,6 +776,7 @@ class PrepRuleset(Ruleset):
 
 
 class NumRuleset(Ruleset):
+
     """A ruleset that processes the 'num' relation."""
 
     rel = 'num'
@@ -763,9 +798,9 @@ class NumRuleset(Ruleset):
             else:
                 word = relations[index].word
 
-            if type(word) is str:
+            if isinstance(word, str):
                 words.append(word)
-            elif type(word) is list:
+            elif isinstance(word, list):
                 words += word
 
         this_number = ' '.join(words)
@@ -781,6 +816,7 @@ class NumRuleset(Ruleset):
 
 
 class QuantmodRuleset(Ruleset):
+
     """A ruleset that processes the 'quantmod' relation."""
 
     rel = 'quantmod'
