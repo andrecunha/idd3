@@ -341,7 +341,7 @@ class NounPhraseRuleset(Ruleset):
 
             this = relations[index].word + ' ' + adj[0]
 
-            engine.emit((num, this))
+            engine.emit((this, num))
 
             return {'return_list': [this],
                     'preconj': None,
