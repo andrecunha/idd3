@@ -140,6 +140,7 @@ class Engine(object):
         :prop: the proposition to be emitted.
         """
         self.props.append(prop)
+        return len(self.props)
 
     def analyze(self, relations, index=0, context=[], info={}):
         """Analyzes a sentence, using this instance's ruleset set.

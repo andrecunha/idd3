@@ -39,3 +39,5 @@
 [('sisters', '4'), ('have', 'I', 'sisters')]
 [('flowers', 'some'), ('eats', 'the cat', 'flowers')]
 [('eats', 'the cat', 'the flowers')]
+[('to East Germany',), ('to West Germany',), ('both', 1, 2), ('went', 'I')]
+[('places', 'both'), ('to places',), ('went', 'I')]
