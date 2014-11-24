@@ -538,8 +538,19 @@ class AdverbialPhraseRuleset(Ruleset):
                                       context + [index])
             engine.emit((relations[index].word, npadvmod))
 
+    @staticmethod
+    def process_preps(relations, index, context, engine, info):
+
+        """TODO: Docstring for process_preps."""
+
+        prep_indices = Relation.get_children_with_dep('prep', relations, index)
+        for prep_index in prep_indices:
+            engine.analyze(relations, prep_index, context + [index])
+
     def extract(self, relations, index, context, engine, info={}):
         self.process_npadvmod(relations, index, context, engine, info)
+
+        self.process_preps(relations, index, context, engine, info)
 
         if len(context) < 1 or relations[context[-1]].word not in be_forms:
             engine.emit((relations[index].word,))
