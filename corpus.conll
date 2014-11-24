@@ -347,7 +347,7 @@
 1	It	_	PRP	PRP	_	4	nsubj	_	_
 2	was	_	VBD	VBD	_	4	cop	_	_
 3	80	_	CD	CD	_	4	num	_	_
-4	years	_	NNS	NNS	_	5	dep	_	_
+4	years	_	NNS	NNS	_	5	npadvmod	_	_
 5	ago	_	RB	RB	_	0	null	_	_
 
 1	I	_	PRP	PRP	_	2	nsubj	_	_

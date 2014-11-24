@@ -42,3 +42,7 @@
 [('to East Germany',), ('to West Germany',), ('both', 1, 2), ('went', 'I')]
 [('places', 'both'), ('to places',), ('went', 'I')]
 [('grade', '5th'), ('in grade',), ('was', 'I')]
+[('tall', '3 1/2 feet'), ('is', 'She', 'tall')]
+[('is', 'She', 'tall')]
+[('old', '5 years'), ('is', 'She', 'old')]
+[('is', 'She', '5')]

@@ -12,16 +12,9 @@ class VerbPhraseRuleset(Ruleset):
 
     @staticmethod
     def process_subj(relations, index, context, engine, info):
-        """TODO: Docstring for process_subject.
 
-        :relations: TODO
-        :index: TODO
-        :context: TODO
-        :engine: TODO
-        :info: TODO
-        :returns: TODO
+        """TODO: Docstring for process_subj."""
 
-        """
         # nsubj
         subj_index = Relation.get_children_with_dep('nsubj', relations, index)
         if subj_index == []:
@@ -47,16 +40,9 @@ class VerbPhraseRuleset(Ruleset):
 
     @staticmethod
     def process_auxs(relations, index, context, engine, info):
-        """TODO: Docstring for process_subject.
 
-        :relations: TODO
-        :index: TODO
-        :context: TODO
-        :engine: TODO
-        :info: TODO
-        :returns: TODO
+        """TODO: Docstring for process_auxs."""
 
-        """
         # TODO: add support for multiple auxiliaries.
         aux_index = Relation.get_children_with_dep('aux', relations, index)
         auxpass_index = Relation.get_children_with_dep('auxpass', relations,
@@ -69,16 +55,9 @@ class VerbPhraseRuleset(Ruleset):
 
     @staticmethod
     def process_prt(relations, index, context, engine, info):
-        """TODO: Docstring for process_subject.
 
-        :relations: TODO
-        :index: TODO
-        :context: TODO
-        :engine: TODO
-        :info: TODO
-        :returns: TODO
+        """TODO: Docstring for process_prt."""
 
-        """
         prt_index = Relation.get_children_with_dep('prt', relations, index)
         if prt_index == []:
             prt = None
@@ -89,6 +68,9 @@ class VerbPhraseRuleset(Ruleset):
 
     @staticmethod
     def process_comps(relations, index, context, engine, info):
+
+        """TODO: Docstring for process_comps."""
+
         dobj_index = Relation.get_children_with_dep('dobj', relations, index)
         xcomp_index = Relation.get_children_with_dep('xcomp', relations, index)
         acomp_index = Relation.get_children_with_dep('acomp', relations, index)
@@ -109,32 +91,18 @@ class VerbPhraseRuleset(Ruleset):
 
     @staticmethod
     def process_ccomp(relations, index, context, engine, info):
-        """todo: docstring for process_subject.
 
-        :relations: todo
-        :index: todo
-        :context: todo
-        :engine: todo
-        :info: todo
-        :returns: todo
+        """TODO: Docstring for process_ccomp."""
 
-        """
         ccomp_index = Relation.get_children_with_dep('ccomp', relations, index)
         if ccomp_index != []:
             engine.analyze(relations, ccomp_index[0], context + [index], info)
 
     @staticmethod
     def process_iobj(relations, index, context, engine, info):
-        """todo: docstring for process_subject.
 
-        :relations: todo
-        :index: todo
-        :context: todo
-        :engine: todo
-        :info: todo
-        :returns: todo
+        """TODO: Docstring for process_iobj."""
 
-        """
         # prep + pobj
         prep_indices = Relation.get_children_with_dep('prep', relations, index)
         for prep_index in prep_indices:
@@ -147,16 +115,9 @@ class VerbPhraseRuleset(Ruleset):
 
     @staticmethod
     def process_advs(relations, index, context, engine, info):
-        """todo: docstring for process_advmods.
 
-        :relations: todo
-        :index: todo
-        :context: todo
-        :engine: todo
-        :info: todo
-        :returns: todo
+        """TODO: Docstring for process_advs."""
 
-        """
         # advmod
         advmod_indices = Relation.get_children_with_dep('advmod', relations,
                                                         index)
@@ -170,31 +131,34 @@ class VerbPhraseRuleset(Ruleset):
 
     @staticmethod
     def process_ignorables(relations, index, context, engine, info):
-        """todo: docstring for process_ignorables.
 
-        :relations: todo
-        :index: todo
-        :context: todo
-        :engine: todo
-        :info: todo
-        :returns: todo
+        """TODO: Docstring for process_ignorables."""
 
-        """
         # complm
         complm_indices = Relation.get_children_with_dep('complm', relations,
                                                         index)
         for i in complm_indices:
             engine.analyze(relations, i, context + [index])
 
+    @staticmethod
+    def process_npadvmod(relations, index, context, engine, info):
+
+        """TODO: Docstring for process_npadvmod."""
+
+        # npadvmod
+        npadvmod_indices = Relation.get_children_with_dep('npadvmod',
+                                                          relations,
+                                                          index)
+        mods = [engine.analyze(relations, i, context + [index])
+                for i in npadvmod_indices]
+
+        for mod in mods:
+            engine.emit((relations[index].word, mod))
+
     def emit_propositions(self, verb, subjs, dobjs, engine, relation):
-        """TODO: Docstring for emit_propositions.
 
-        :verb: TODO
-        :subjs: TODO
-        :dobjs: TODO
-        :returns: TODO
+        """TODO: Docstring for emit_propositions."""
 
-        """
         if relation.tag == 'VBG' and relation.rel != 'null':
             for dobj in dobjs:
                 proposition = tuple([w for w in [verb, dobj]])
@@ -208,103 +172,107 @@ class VerbPhraseRuleset(Ruleset):
                 else:
                     engine.emit((verb, subj))
 
+    def handle_action_verbs(self, relations, index, context, engine, info):
+
+        """Handle action verbs."""
+
+        subjs = self.process_subj(relations, index, context, engine, info)
+
+        auxs = self.process_auxs(relations, index, context, engine, info)
+
+        prt = self.process_prt(relations, index, context, engine, info)
+
+        verb = ' '.join([word for word in auxs + [relations[index].word, prt]
+                         if word is not None])
+
+        comps = self.process_comps(relations, index, context, engine,
+                                   {'subj': subjs[0]})  # TODO: change this.
+
+        self.process_ccomp(relations, index, context, engine,
+                           {'subj': subjs[0]})  # TODO: change this.
+
+        self.process_iobj(relations, index, context, engine, info)
+
+        self.process_advs(relations, index, context, engine, info)
+
+        self.process_ignorables(relations, index, context, engine, info)
+
+        # Emit propositions.
+        if relations[index].rel in ('xcomp', 'ccomp', 'pcomp', 'csubj'):
+            if relations[index].tag == 'VBG':
+                if comps != []:
+                    self.emit_propositions(verb, subjs, comps, engine,
+                                           relations[index])
+                return relations[index].word
+            else:
+                self.emit_propositions(verb, subjs, comps, engine,
+                                       relations[index])
+                return None
+        else:
+            self.emit_propositions(verb, subjs, comps, engine,
+                                   relations[index])
+            return None
+
+    def handle_cop_with_np(self, relations, index, context, engine, info):
+
+        """Handle copular verbs with NP complements."""
+
+        subjs = self.process_subj(relations, index, context, engine, info)
+
+        cop_index = Relation.get_children_with_dep('cop', relations, index)[0]
+        cop = engine.analyze(relations, cop_index, context + [index])
+
+        auxs = self.process_auxs(relations, index, context, engine, info)
+
+        verb = ' '.join([word for word in auxs + [cop] if word is not None])
+
+        self.process_ignorables(relations, index, context, engine, info)
+
+        this = NounPhraseRuleset.extract(self, relations, index, context,
+                                         engine, info)
+        # TODO: handle cc/conj and preconj.
+        complms = this['return_list']
+
+        for subj in subjs:
+            for compl in complms:
+                # engine.emit((verb, subj, relations[index].word))
+                engine.emit((verb, subj, compl))
+
+    def handle_cop_with_adjp(self, relations, index, context, engine, info):
+
+        """Handle copular verbs with ADJP complements."""
+
+        subjs = self.process_subj(relations, index, context, engine, info)
+
+        cop_index = Relation.get_children_with_dep('cop', relations, index)[0]
+        cop = engine.analyze(relations, cop_index, context + [index])
+
+        auxs = self.process_auxs(relations, index, context, engine, info)
+
+        verb = ' '.join([word for word in auxs + [cop] if word is not None])
+
+        self.process_ignorables(relations, index, context, engine, info)
+
+        self.process_npadvmod(relations, index, context, engine, info)
+
+        for subj in subjs:
+            engine.emit((verb, subj, relations[index].word))
+
     def extract(self, relations, index, context, engine, info={}):
         if relations[index].word == 'called':
             # TODO: handle properly.
             engine.emit(('a baby',))
             engine.emit(('called', 'I', 'her'))
             return None
-
-        # TODO: handle other VB tags.
-        if relations[index].tag in ('VBZ', 'VBD', 'VBN', 'VB', 'VBG', 'VBP'):
-            # Handle action verbs.
-
-            subjs = self.process_subj(relations, index, context, engine,
-                                      info)
-
-            auxs = self.process_auxs(relations, index, context, engine,
-                                     info)
-
-            prt = self.process_prt(relations, index, context, engine,
-                                   info)
-            verb = ' '.join([word for word
-                             in auxs + [relations[index].word, prt]
-                             if word is not None])
-
-            comps = self.process_comps(relations, index, context, engine,
-                                       {'subj': subjs[0]})  # TODO: change this.
-
-            self.process_ccomp(relations, index, context, engine,
-                               {'subj': subjs[0]})  # TODO: change this.
-
-            self.process_iobj(relations, index, context, engine, info)
-
-            self.process_advs(relations, index, context, engine, info)
-
-            self.process_ignorables(relations, index, context, engine, info)
-
-            # Emit propositions.
-            if relations[index].rel in ('xcomp', 'ccomp', 'pcomp', 'csubj'):
-                if relations[index].tag == 'VBG':
-                    if comps != []:
-                        self.emit_propositions(verb, subjs, comps, engine,
-                                               relations[index])
-                    return relations[index].word
-                else:
-                    self.emit_propositions(verb, subjs, comps, engine,
-                                           relations[index])
-                    return None
-            else:
-                self.emit_propositions(verb, subjs, comps, engine,
-                                       relations[index])
-                return None
+        elif relations[index].tag in ('VBZ', 'VBD', 'VBN', 'VB', 'VBG', 'VBP'):
+            return self.handle_action_verbs(relations, index, context, engine,
+                                            info)
         elif relations[index].tag in ('NN', 'NNS', 'NNP', 'NNPS', 'CD'):
-            # Handle copular verbs with NP complements.
-            subjs = self.process_subj(relations, index, context, engine,
-                                      info)
-
-            cop_index = Relation.get_children_with_dep('cop', relations,
-                                                       index)[0]
-            cop = engine.analyze(relations, cop_index, context + [index])
-
-            auxs = self.process_auxs(relations, index, context, engine,
-                                     info)
-
-            verb = ' '.join([word for word
-                             in auxs + [cop]
-                             if word is not None])
-
-            self.process_ignorables(relations, index, context, engine, info)
-
-            this = NounPhraseRuleset.extract(self, relations, index, context,
-                                             engine, info)
-            # TODO: handle cc/conj and preconj.
-            complms = this['return_list']
-
-            for subj in subjs:
-                for compl in complms:
-                    # engine.emit((verb, subj, relations[index].word))
-                    engine.emit((verb, subj, compl))
+            return self.handle_cop_with_np(relations, index, context, engine,
+                                           info)
         elif relations[index].tag in ('JJ'):
-            # Handle copular verbs with ADJP complements.
-            subjs = self.process_subj(relations, index, context, engine,
-                                      info)
-
-            cop_index = Relation.get_children_with_dep('cop', relations,
-                                                       index)[0]
-            cop = engine.analyze(relations, cop_index, context + [index])
-
-            auxs = self.process_auxs(relations, index, context, engine,
-                                     info)
-
-            verb = ' '.join([word for word
-                             in auxs + [cop]
-                             if word is not None])
-
-            self.process_ignorables(relations, index, context, engine, info)
-
-            for subj in subjs:
-                engine.emit((verb, subj, relations[index].word))
+            return self.handle_cop_with_adjp(relations, index, context, engine,
+                                             info)
         else:
             print('VP: cannot handle', relations[index].tag, 'yet.')
 
@@ -333,7 +301,81 @@ class NounPhraseRuleset(Ruleset):
     """A base class for NP-like dependency substructures."""
 
     @staticmethod
+    def process_determiners(relations, index, context, engine, info={}):
+
+        """TODO: Docstring for process_determiners."""
+
+        det_index = Relation.get_children_with_dep('det', relations, index)
+        if det_index == []:
+            det = None
+        else:
+            det = engine.analyze(relations, det_index[0], context + [index])
+
+        return det
+
+    @staticmethod
+    def process_possessives(relations, index, context, engine, info={}):
+
+        """TODO: Docstring for process_possessives."""
+
+        poss_index = Relation.get_children_with_dep('poss', relations, index)
+        if poss_index == []:
+            poss = None
+        else:
+            poss = engine.analyze(relations, poss_index[0], context + [index])
+
+        return poss
+
+    @staticmethod
+    def process_noun_modifiers(relations, index, context, engine, info={}):
+
+        """TODO: Docstring for process_noun_modifiers."""
+
+        nn_indices = Relation.get_children_with_dep('nn', relations, index)
+        nns = [engine.analyze(relations, i, context + [index])
+               for i in nn_indices]
+
+        return nns
+
+    @staticmethod
+    def process_conjs(relations, index, context, engine, info={}):
+
+        """TODO: Docstring for process_conjs."""
+
+        # Composite NP with conjunction
+
+        cc_index = Relation.get_children_with_dep('cc', relations, index)
+        if cc_index != []:
+            engine.analyze(relations, cc_index[0], context + [index])
+            conj_index = Relation.get_children_with_dep('conj', relations,
+                                                        index)
+            conjs = [engine.analyze(relations, i, context + [index])
+                     for i in conj_index]
+            # TODO: check if this makes sense.
+            conjs = [c[0] for c in conjs]
+        else:
+            conjs = []
+
+        conjs = [relations[index].word] + conjs
+
+        return conjs
+
+    @staticmethod
+    def process_preps(relations, index, context, engine, info={}):
+
+        """TODO: Docstring for process_preps."""
+
+        # VP modifiers
+        prep_index = Relation.get_children_with_dep('prep', relations, index)
+        if prep_index != []:
+            engine.analyze(relations, prep_index[0], context + [index])
+
+    @staticmethod
     def process_modifiers(relations, index, context, engine, info={}):
+
+        """TODO: Docstring for process_modifiers."""
+
+        # ADJP modifiers
         amod_indices = Relation.get_children_with_dep('amod', relations, index)
         num_indices = Relation.get_children_with_dep('num', relations, index)
 
@@ -348,55 +390,31 @@ class NounPhraseRuleset(Ruleset):
 
         return mods
 
-    def extract(self, relations, index, context, engine, info={}):
-        # Determiners
-        det_index = Relation.get_children_with_dep('det', relations, index)
-        if det_index == []:
-            det = None
+    @staticmethod
+    def process_preconj(relations, index, context, engine, info={}):
+
+        """TODO: Docstring for process_preconj."""
+
+        preconj_indices = Relation.get_children_with_dep('preconj', relations,
+                                                         index)
+        if preconj_indices != []:
+            preconj = engine.analyze(relations, preconj_indices[0],
+                                     context + [index])
         else:
-            det = engine.analyze(relations, det_index[0], context + [index])
+            preconj = None
 
-        # Possessives
-        poss_index = Relation.get_children_with_dep('poss', relations, index)
-        if poss_index == []:
-            poss = None
-        else:
-            poss = engine.analyze(relations, poss_index[0], context + [index])
+        return preconj
 
-        # Noun modifiers
-        nn_indices = Relation.get_children_with_dep('nn', relations, index)
-        nns = [engine.analyze(relations, i, context + [index])
-               for i in nn_indices]
+    @staticmethod
+    def assemble_return_list(det, poss, nns, conjs):
 
-        # Composite NP with conjunction
-        cc_index = Relation.get_children_with_dep('cc', relations, index)
-        if cc_index != []:
-            engine.analyze(relations, cc_index[0], context + [index])
-            conj_index = Relation.get_children_with_dep('conj', relations,
-                                                        index)
-            conjs = [engine.analyze(relations, i, context + [index])
-                     for i in conj_index]
-            # TODO: check if this makes sense.
-            conjs = [c[0] for c in conjs]
-        else:
-            conjs = []
-        conjs = [relations[index].word] + conjs
-
-        # VP modifiers
-        prep_index = Relation.get_children_with_dep('prep', relations, index)
-        if prep_index != []:
-            engine.analyze(relations, prep_index[0], context + [index])
-
-        # ADJP modifiers
-        mods = NounPhraseRuleset.process_modifiers(relations, index,
-                                                   context, engine, info)
-
-        # Emit propositions for modifiers
+        """TODO: Docstring for assemble_return_list."""
 
         # TODO: properly handle distribution of possessives.
         return_list = []
-        ids_for_preconj = []  # Ids of propositions for reference by eventual
-                             #  preconj propositions.
+        ids_for_preconj = []    # Ids of propositions for reference by eventual
+        # preconj propositions.
+
         for conj in conjs:
             if nns != []:
                 if isinstance(nns[0], str):
@@ -418,17 +436,36 @@ class NounPhraseRuleset(Ruleset):
                                 if word is not None]
                 return_list.append(' '.join(return_value))
 
+        return return_list, ids_for_preconj
+
+    def extract(self, relations, index, context, engine, info={}):
+        det = NounPhraseRuleset.process_determiners(relations, index, context,
+                                                    engine, info)
+
+        poss = NounPhraseRuleset.process_possessives(relations, index, context,
+                                                     engine, info)
+
+        nns = NounPhraseRuleset.process_noun_modifiers(relations, index,
+                                                       context, engine, info)
+
+        conjs = NounPhraseRuleset.process_conjs(relations, index, context,
+                                                engine, info)
+
+        NounPhraseRuleset.process_preps(relations, index, context, engine, info)
+
+        mods = NounPhraseRuleset.process_modifiers(relations, index,
+                                                   context, engine, info)
+
+        return_list, ids_for_preconj = NounPhraseRuleset.\
+            assemble_return_list(det, poss, nns, conjs)
+
+        # Emit propositions for modifiers
         for amod in mods:
             for noun in return_list:
                 engine.emit((noun, amod))
 
-        preconj_indices = Relation.get_children_with_dep('preconj', relations,
-                                                         index)
-        if preconj_indices != []:
-            preconj = engine.analyze(relations, preconj_indices[0],
-                                     context + [index])
-        else:
-            preconj = None
+        preconj = NounPhraseRuleset.process_preconj(relations, index, context,
+                                                    engine, info)
 
         return {'return_list': return_list,
                 'preconj': preconj,
@@ -685,6 +722,39 @@ class PossRuleset(NounPhraseRuleset):
             print('WARNING: poss cannot handle', relations[index].tag, 'yet')
 
 
+class NpadvmodRuleset(Ruleset):
+
+    """A ruleset that processes the 'npadvmod' relation."""
+
+    rel = 'npadvmod'
+
+    def extract(self, relations, index, context, engine, info={}):
+        det_indices = Relation.get_children_with_dep('det', relations, index)
+        poss_indices = Relation.get_children_with_dep('poss', relations, index)
+        nn_indices = Relation.get_children_with_dep('nn', relations, index)
+        prep_indices = Relation.get_children_with_dep('prep', relations, index)
+        amod_indices = Relation.get_children_with_dep('amod', relations, index)
+        num_indices = Relation.get_children_with_dep('num', relations, index)
+
+        word_indices = sorted(det_indices + poss_indices + nn_indices +
+                              prep_indices + amod_indices + num_indices +
+                              [index])
+
+        words = []
+        for w in word_indices:
+            if w == index:
+                word = relations[index].word
+            else:
+                word = engine.analyze(relations, w, context + [index])
+
+            if isinstance(word, str):
+                words.append(word)
+            elif isinstance(word, list):
+                words += word
+
+        return ' '.join(words)
+
+
 # Adjectival-Phrase rulesets
 
 
@@ -853,6 +923,7 @@ all_rulesets = [TopRuleset(),
                 IobjRuleset(),
                 ConjRuleset(),
                 PossRuleset(),
+                NpadvmodRuleset(),
                 # Adjectival-Phrase rulesets
                 AcompRuleset(),
                 AmodRuleset(),
