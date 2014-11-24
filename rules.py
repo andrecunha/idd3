@@ -127,6 +127,11 @@ class VerbPhraseRuleset(Ruleset):
         for i in advmod_indices:
             engine.analyze(relations, i, context + [index])
 
+        # tmod
+        tmod_indices = Relation.get_children_with_dep('tmod', relations, index)
+        for i in tmod_indices:
+            engine.analyze(relations, i, context + [index])
+
         # neg
         neg_indices = Relation.get_children_with_dep('neg', relations, index)
         for i in neg_indices:
@@ -825,6 +830,18 @@ class NpadvmodRuleset(Ruleset):
         return ' '.join(words)
 
 
+class TmodRuleset(NounPhraseRuleset):
+
+    """A ruleset that processes the 'tmod' relation."""
+
+    rel = 'tmod'
+
+    def extract(self, relations, index, context, engine, info={}):
+        this = NounPhraseRuleset.extract(self, relations, index, context,
+                                         engine, info)['return_list'][0]
+        engine.emit((this, ))
+
+
 # Adjectival-Phrase rulesets
 
 
@@ -1003,6 +1020,7 @@ all_rulesets = [TopRuleset(),
                 ConjRuleset(),
                 PossRuleset(),
                 NpadvmodRuleset(),
+                TmodRuleset(),
                 # Adjectival-Phrase rulesets
                 AcompRuleset(),
                 AmodRuleset(),
