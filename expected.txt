@@ -46,3 +46,4 @@
 [('is', 'She', 'tall')]
 [('old', '5 years'), ('is', 'She', 'old')]
 [('is', 'She', '5')]
+[('ago', '80 years'), ('was', 'It', 'ago')]

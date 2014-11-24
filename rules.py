@@ -3,6 +3,9 @@ from __future__ import print_function, unicode_literals, division
 from idd3 import Relation, Ruleset
 
 
+be_forms = ['am', 'are', 'is', 'being', 'was', 'were', 'been']
+
+
 # Base classes.
 
 
@@ -172,9 +175,44 @@ class VerbPhraseRuleset(Ruleset):
                 else:
                     engine.emit((verb, subj))
 
-    def handle_action_verbs(self, relations, index, context, engine, info):
+    def handle_be_as_root(self, relations, index, context, engine, info):
 
-        """Handle action verbs."""
+        """Handle 'to be' as the VP root."""
+
+        subjs = self.process_subj(relations, index, context, engine, info)
+
+        auxs = self.process_auxs(relations, index, context, engine, info)
+
+        verb = ' '.join([word for word in auxs + [relations[index].word]
+                         if word is not None])
+
+        # Prepositional modifiers.
+        prep_indices = Relation.get_children_with_dep('prep', relations, index)
+        for prep_index in prep_indices:
+            engine.analyze(relations, prep_index, context + [index])
+
+        # Adverbial modifiers.
+        advmod_indices = Relation.get_children_with_dep('advmod', relations,
+                                                        index)
+        if advmod_indices != []:
+            advmod = engine.analyze(relations, advmod_indices[0],
+                                    context + [index])
+        else:
+            advmod = None
+
+        self.process_ignorables(relations, index, context, engine, info)
+
+        # Emit propositions.
+        if advmod is not None:
+            for subj in subjs:
+                engine.emit((verb, subj, advmod))
+        else:
+            for subj in subjs:
+                engine.emit((verb, subj))
+
+    def handle_action_verb(self, relations, index, context, engine, info):
+
+        """Handle an action verb as the VP root."""
 
         subjs = self.process_subj(relations, index, context, engine, info)
 
@@ -264,9 +302,12 @@ class VerbPhraseRuleset(Ruleset):
             engine.emit(('a baby',))
             engine.emit(('called', 'I', 'her'))
             return None
+        elif relations[index].word in be_forms:
+            return self.handle_be_as_root(relations, index, context, engine,
+                                          info)
         elif relations[index].tag in ('VBZ', 'VBD', 'VBN', 'VB', 'VBG', 'VBP'):
-            return self.handle_action_verbs(relations, index, context, engine,
-                                            info)
+            return self.handle_action_verb(relations, index, context, engine,
+                                           info)
         elif relations[index].tag in ('NN', 'NNS', 'NNP', 'NNPS', 'CD'):
             return self.handle_cop_with_np(relations, index, context, engine,
                                            info)
@@ -481,6 +522,31 @@ class AdjectivalPhraseRuleset(Ruleset):
         return [relations[index].word]
 
 
+class AdverbialPhraseRuleset(Ruleset):
+
+    """A base class for ADVP-like dependency substructures."""
+
+    @staticmethod
+    def process_npadvmod(relations, index, context, engine, info={}):
+
+        """TODO: Docstring for process_npadvmod."""
+
+        npadvmod_indices = Relation.get_children_with_dep('npadvmod',
+                                                          relations, index)
+        if npadvmod_indices != []:
+            npadvmod = engine.analyze(relations, npadvmod_indices[0],
+                                      context + [index])
+            engine.emit((relations[index].word, npadvmod))
+
+    def extract(self, relations, index, context, engine, info={}):
+        self.process_npadvmod(relations, index, context, engine, info)
+
+        if len(context) < 1 or relations[context[-1]].word not in be_forms:
+            engine.emit((relations[index].word,))
+
+        return (relations[index].word)
+
+
 # Derived classes.
 
 
@@ -599,13 +665,6 @@ class PreconjRuleset(AtomicRuleset):
 
 
 # Atomic emitting rulesets.
-
-
-class AdvmodRuleset(AtomicEmittingRuleset):
-
-    """A ruleset that processes the 'advmod' relation."""
-
-    rel = 'advmod'
 
 
 class NegRuleset(AtomicEmittingRuleset):
@@ -772,6 +831,16 @@ class AmodRuleset(AdjectivalPhraseRuleset):
     rel = 'amod'
 
 
+# Adverbial-Phrase rulesets
+
+
+class AdvmodRuleset(AdverbialPhraseRuleset):
+
+    """A ruleset that processes the 'advmod' relation."""
+
+    rel = 'advmod'
+
+
 # Uncategorized rulesets.
 
 
@@ -913,7 +982,6 @@ all_rulesets = [TopRuleset(),
                 NumberRuleset(),
                 PreconjRuleset(),
                 # Atomic emitting rulesets.
-                AdvmodRuleset(),
                 NegRuleset(),
                 # Noun-Phrase rulesets.
                 NsubjRuleset(),
@@ -927,6 +995,8 @@ all_rulesets = [TopRuleset(),
                 # Adjectival-Phrase rulesets
                 AcompRuleset(),
                 AmodRuleset(),
+                # Adverbial-Phrase rulesets
+                AdvmodRuleset(),
                 # Uncategorized rulesets.
                 NnRuleset(),
                 DetRuleset(),
