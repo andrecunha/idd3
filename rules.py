@@ -24,7 +24,7 @@ class VerbPhraseRuleset(Ruleset):
             if relations[index].rel == 'xcomp':
                 subj = ['(%s)' % info['subj']]
             else:
-                subj = ['NO_NSUBJ']  # TODO: remove.
+                subj = ['(NO_SUBJ)']  # TODO: remove.
         else:
             subj = engine.analyze(relations, subj_index[0], context + [index])
 
@@ -298,8 +298,12 @@ class VerbPhraseRuleset(Ruleset):
 
         self.process_npadvmod(relations, index, context, engine, info)
 
+        this = AdjectivalPhraseRuleset.extract(self, relations, index, context,
+                                               engine, info)
+
         for subj in subjs:
-            engine.emit((verb, subj, relations[index].word))
+            for word in this:
+                engine.emit((verb, subj, word))
 
     def extract(self, relations, index, context, engine, info={}):
         if relations[index].word == 'called':
@@ -452,6 +456,16 @@ class NounPhraseRuleset(Ruleset):
         return preconj
 
     @staticmethod
+    def process_vmod(relations, index, context, engine, info={}):
+
+        """TODO: Docstring for process_vmod."""
+
+        vmod_indices = Relation.get_children_with_dep('vmod', relations,
+                                                      index)
+        for i in vmod_indices:
+            engine.analyze(relations, i, context + [index], {'subj': 'NO_SUBJ'})
+
+    @staticmethod
     def assemble_return_list(det, poss, nns, conjs):
 
         """TODO: Docstring for assemble_return_list."""
@@ -502,6 +516,8 @@ class NounPhraseRuleset(Ruleset):
         mods = NounPhraseRuleset.process_modifiers(relations, index,
                                                    context, engine, info)
 
+        NounPhraseRuleset.process_vmod(relations, index, context, engine, info)
+
         return_list, ids_for_preconj = NounPhraseRuleset.\
             assemble_return_list(det, poss, nns, conjs)
 
@@ -522,9 +538,44 @@ class AdjectivalPhraseRuleset(Ruleset):
 
     """A base class for AdjP-like dependency substructures."""
 
+    @staticmethod
+    def process_advmods(relations, index, context, engine, info={}):
+
+        """TODO: Docstring for process_advmods."""
+
+        advmod_indices = Relation.get_children_with_dep('advmod', relations,
+                                                        index)
+        advmods = [engine.analyze(relations, i, context + [index],
+                                  {'no_emit': True})
+                   for i in advmod_indices]
+
+        return advmods
+
+    @staticmethod
+    def process_xcomp(relations, index, context, engine, info={}):
+
+        """TODO: Docstring for process_xcomp."""
+
+        xcomp_indices = Relation.get_children_with_dep('xcomp', relations,
+                                                       index)
+        for i in xcomp_indices:
+            engine.analyze(relations, i, context + [index], {'subj': 'NO_SUBJ'})
+
     def extract(self, relations, index, context, engine, info={}):
-        # TODO: complete. Add cc/conj handling.
-        return [relations[index].word]
+        advmods = AdjectivalPhraseRuleset.process_advmods(relations, index,
+                                                          context, engine, info)
+
+        AdjectivalPhraseRuleset.process_xcomp(relations, index,
+                                              context, engine, info)
+
+        # TODO: Add cc/conj handling.
+        this = [relations[index].word]
+
+        for advmod in advmods:
+            for word in this:
+                engine.emit((word, advmod))
+
+        return this
 
 
 class AdverbialPhraseRuleset(Ruleset):
@@ -557,7 +608,9 @@ class AdverbialPhraseRuleset(Ruleset):
 
         self.process_preps(relations, index, context, engine, info)
 
-        if len(context) < 1 or relations[context[-1]].word not in be_forms:
+        if 'no_emit' not in info\
+                and not (len(context) >= 1
+                         and relations[context[-1]].word in be_forms):
             engine.emit((relations[index].word,))
 
         return (relations[index].word)
@@ -612,6 +665,13 @@ class CsubjRuleset(VerbPhraseRuleset):
     """A ruleset that processes the 'csubj' relation."""
 
     rel = 'csubj'
+
+
+class VmodRuleset(VerbPhraseRuleset):
+
+    """A ruleset that processes the 'vmod' relation."""
+
+    rel = 'vmod'
 
 
 # Atomic rulesets.
@@ -903,7 +963,7 @@ class DetRuleset(Ruleset):
 
     def extract(self, relations, index, context, engine, info={}):
         # TODO: check for cases like 'some', 'any', 'all', etc.
-        if relations[index].word.lower() in ('the', 'a', 'an'):
+        if relations[index].word.lower() in ('the', 'a', 'an', 'this', 'these'):
             return relations[index].word.lower()
         else:
             # TODO: maybe get the subject from info.
@@ -999,6 +1059,7 @@ all_rulesets = [TopRuleset(),
                 CcompRuleset(),
                 PcompRuleset(),
                 CsubjRuleset(),
+                VmodRuleset(),
                 # Atomic rulesets.
                 PrtRuleset(),
                 AuxRuleset(),
