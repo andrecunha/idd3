@@ -43,6 +43,26 @@ class RemovePunctuation(Transformation):
         delete_indices(relations, indices_to_remove)
 
 
+class RemoveParataxisFillers(Transformation):
+    """Removes lexical fillers like 'I mean'."""
+
+    def transform(self, relations):
+        for i, relation in enumerate(relations):
+            if relation.rel == 'parataxis':
+                if relation.word == 'mean' \
+                        and len(relation.deps) == 1\
+                        and relations[relation.deps[0]].word == "I":
+                    delete_indices(relations, [i, relation.deps[0]])
+
+
+class RemoveUtteranceInitialConjunction(Transformation):
+    """Removes commonly used utterance-initial conjuntions (and, then)."""
+
+    def transform(self, relations):
+        if relations[1].word.lower() in ('and', 'then'):
+            delete_indices(relations, [1])
+
+
 class JoinMultiWordExpressions(Transformation):
     """Joins multi-word expressions in a single node. """
 
@@ -108,5 +128,7 @@ class JoinPhrasalModifiers(Transformation):
 
 
 all_transformations = [RemovePunctuation(),
+                       RemoveParataxisFillers(),
+                       RemoveUtteranceInitialConjunction(),
                        JoinPhrasalModifiers(),
                        JoinMultiWordExpressions()]
