@@ -32,10 +32,8 @@ def demo():
     pprint.pprint(engine.props)
 
     print(colored('Unprocessed relations:', 'white', attrs=['bold']))
-    for relation in relations:
-        if not relation.processed:
-            print(relation)
-
+    for relation in engine.get_unprocessed_relations(relations):
+        print(relation)
 
 if __name__ == '__main__':
     if len(argv) != 3:

@@ -28,5 +28,9 @@ def test():
 
         assert props == exp
 
+        unprocessed_relations = engine.get_unprocessed_relations(relations)
+
+        assert unprocessed_relations == []
+
 if __name__ == '__main__':
     test()

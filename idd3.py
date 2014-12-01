@@ -115,7 +115,7 @@ class Engine(object):
         self.transformations = transformations
 
     def _build_rulesets_dict(self, relations):
-        """Creates a dictionary associating relation labels to their
+        """Create a dictionary associating relation labels to their
             corresponding ruleset instance.
 
         :relations: the list of relations in a sentence.
@@ -134,7 +134,7 @@ class Engine(object):
             self._rulesets_dict[relation.rel] = ruleset
 
     def emit(self, prop):
-        """Emits a new proposition, storing it in this instance's
+        """Emit a new proposition, storing it in this instance's
             'props' attribute.
 
         :prop: the proposition to be emitted.
@@ -142,7 +142,8 @@ class Engine(object):
         self.props.append(prop)
         return len(self.props)
 
-    def mark_processed(self, relations, index):
+    @staticmethod
+    def mark_processed(relations, index):
         """Mark a relation as processed.
 
         :relations: the list of relations.
@@ -151,7 +152,7 @@ class Engine(object):
         relations[index].processed = True
 
     def analyze(self, relations, index=0, context=[], info={}):
-        """Analyzes a sentence, using this instance's ruleset set.
+        """Analyze a sentence, using this instance's ruleset set.
 
         :relations: the relations in a sentence.
         :index: the index of the relation to be analyzed.
@@ -177,3 +178,7 @@ class Engine(object):
         self.mark_processed(relations, index)
 
         return value
+
+    @staticmethod
+    def get_unprocessed_relations(relations):
+        return [relation for relation in relations if not relation.processed]
