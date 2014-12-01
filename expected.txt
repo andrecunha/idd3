@@ -57,3 +57,4 @@
 [('good', 'Really'), ('people', 'good'), ('here',), ('come', 'people')]
 [('were', 'these people', 'prosperous'), ('mean', 'I')]
 [('to call', '(NO_SUBJ)', 'her own'), ('to have', '(NO_SUBJ)', 'a home'), ('was', 'that', 'nice')]
+[('long', 'long'), ('a time', 'long'), ('a time',), ('was gone', 'She')]

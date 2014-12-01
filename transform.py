@@ -127,8 +127,28 @@ class JoinPhrasalModifiers(Transformation):
                     relations[index].deps = sorted(relations[index].deps)
 
 
+class FixAdjectiveRepetition(Transformation):
+
+    """Handles adjective repetition as intensifier (e.g., she was gone a long
+        long time.). In this case, the first adjective is turned into an
+        adverb and connected to the second adjective."""
+
+    def transform(self, relations):
+        for i in range(len(relations)):
+            if relations[i].tag == 'JJ':
+                if relations[i + 1].tag == 'JJ'\
+                        and relations[i + 1].word == relations[i].word\
+                        and relations[i + 1].head == relations[i].head\
+                        and relations[i + 1].rel == relations[i].rel:
+                    relations[i].tag = 'RB'
+                    relations[i].head = i + 1
+                    relations[i].rel = 'advmod'
+                    relations[i + 1].deps += [i]
+
+
 all_transformations = [RemovePunctuation(),
                        RemoveParataxisFillers(),
                        RemoveUtteranceInitialConjunction(),
                        JoinPhrasalModifiers(),
-                       JoinMultiWordExpressions()]
+                       JoinMultiWordExpressions(),
+                       FixAdjectiveRepetition()]

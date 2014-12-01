@@ -437,12 +437,12 @@
 4	a	_	DT	DT	_	7	det	_	_
 5	long	_	JJ	JJ	_	7	amod	_	_
 6	long	_	JJ	JJ	_	7	amod	_	_
-7	time	_	NN	NN	_	3	dobj	_	_
+7	time	_	NN	NN	_	3	tmod	_	_
 8	.	_	.	.	_	3	punct	_	_
 
 1	He	_	PRP	PRP	_	5	nsubj	_	_
 2	is	_	VBZ	VBZ	_	5	cop	_	_
-3	very	_	RB	RB	_	5	advmod	_	_
+3	very	_	RB	RB	_	4	advmod	_	_
 4	very	_	RB	RB	_	5	advmod	_	_
 5	sick	_	JJ	JJ	_	0	null	_	_
 6	.	_	.	.	_	5	punct	_	_
