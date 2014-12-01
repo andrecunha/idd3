@@ -58,3 +58,4 @@
 [('were', 'these people', 'prosperous'), ('mean', 'I')]
 [('to call', '(NO_SUBJ)', 'her own'), ('to have', '(NO_SUBJ)', 'a home'), ('was', 'that', 'nice')]
 [('long', 'long'), ('a time', 'long'), ('a time',), ('was gone', 'She')]
+[('very', 'very'), ('sick', 'very'), ('is', 'He', 'sick')]

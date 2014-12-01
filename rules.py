@@ -595,6 +595,18 @@ class AdverbialPhraseRuleset(Ruleset):
             engine.emit((relations[index].word, npadvmod))
 
     @staticmethod
+    def process_advmods(relations, index, context, engine, info={}):
+
+        """TODO: Docstring for process_advmods."""
+
+        advmod_indices = Relation.get_children_with_dep('advmod',
+                                                        relations, index)
+        for i in advmod_indices:
+            advmod = engine.analyze(relations, i, context + [index],
+                                    {'no_emit': True})
+            engine.emit((relations[index].word, advmod))
+
+    @staticmethod
     def process_preps(relations, index, context, engine, info):
 
         """TODO: Docstring for process_preps."""
@@ -605,6 +617,8 @@ class AdverbialPhraseRuleset(Ruleset):
 
     def extract(self, relations, index, context, engine, info={}):
         self.process_npadvmod(relations, index, context, engine, info)
+
+        self.process_advmods(relations, index, context, engine, info)
 
         self.process_preps(relations, index, context, engine, info)
 

@@ -144,7 +144,27 @@ class FixAdjectiveRepetition(Transformation):
                     relations[i].tag = 'RB'
                     relations[i].head = i + 1
                     relations[i].rel = 'advmod'
-                    relations[i + 1].deps += [i]
+                    relations[i + 1].deps.append(i)
+
+
+class FixAdverbRepetition(Transformation):
+
+    """Handles adverb repetition as intensifier (e.g., he is very very sick).
+        In this case, we make sure the first adverb is connected to the second,
+        not to the following word (usually an adjective)."""
+
+    def transform(self, relations):
+        for i in range(len(relations)):
+            if relations[i].tag == 'RB':
+                if i + 1 < len(relations)\
+                        and relations[i + 1].tag == 'RB'\
+                        and relations[i + 1].word == relations[i].word\
+                        and relations[i + 1].rel == relations[i].rel\
+                        and relations[i].head != i + 1:
+                    relations[i].head = i + 1
+                    relations[i + 1].deps.append(i)
+
+        import pprint; pprint.pprint(relations)
 
 
 all_transformations = [RemovePunctuation(),
@@ -152,4 +172,5 @@ all_transformations = [RemovePunctuation(),
                        RemoveUtteranceInitialConjunction(),
                        JoinPhrasalModifiers(),
                        JoinMultiWordExpressions(),
-                       FixAdjectiveRepetition()]
+                       FixAdjectiveRepetition(),
+                       FixAdverbRepetition()]
