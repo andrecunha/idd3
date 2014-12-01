@@ -449,7 +449,7 @@
 
 1	The	_	DT	DT	_	2	det	_	_
 2	town	_	NN	NN	_	5	nsubj	_	_
-3	itself	_	PRP	PRP	_	2	dep	_	_
+3	itself	_	PRP	PRP	_	2	amod	_	_
 4	was	_	VBD	VBD	_	5	cop	_	_
 5	beautiful	_	JJ	JJ	_	0	null	_	_
 6	.	_	.	.	_	5	punct	_	_

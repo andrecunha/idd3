@@ -163,8 +163,27 @@ class FixAdverbRepetition(Transformation):
                         and relations[i].head != i + 1:
                     relations[i].head = i + 1
                     relations[i + 1].deps.append(i)
+                    relations[i + 1].deps.sort()
 
-        import pprint; pprint.pprint(relations)
+
+class FixReflexivePronouns(Transformation):
+
+    """Handles reflexive pronouns following nouns. Here, we connect the
+        pronoun to the previous noun as an adjectival modifier."""
+
+    reflexive_pronouns = ['myself', 'yourself', 'himself', 'herself', 'itself',
+                          'ourselves', 'yourselves', 'themselves']
+
+    def transform(self, relations):
+        for i in range(len(relations)):
+            if relations[i].tag == 'PRP'\
+                    and relations[i].word in self.reflexive_pronouns\
+                    and relations[i - 1].tag in ('NN', 'NNS', 'NNP', 'NNPS'):
+                relations[relations[i].head].deps.remove(i)
+                relations[i].head = i - 1
+                relations[i].rel = 'amod'
+                relations[i - 1].deps.append(i)
+                relations[i - 1].deps.sort()
 
 
 all_transformations = [RemovePunctuation(),
@@ -173,4 +192,5 @@ all_transformations = [RemovePunctuation(),
                        JoinPhrasalModifiers(),
                        JoinMultiWordExpressions(),
                        FixAdjectiveRepetition(),
-                       FixAdverbRepetition()]
+                       FixAdverbRepetition(),
+                       FixReflexivePronouns()]
