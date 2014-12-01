@@ -136,7 +136,8 @@ class FixAdjectiveRepetition(Transformation):
     def transform(self, relations):
         for i in range(len(relations)):
             if relations[i].tag == 'JJ':
-                if relations[i + 1].tag == 'JJ'\
+                if i + 1 < len(relations)\
+                        and relations[i + 1].tag == 'JJ'\
                         and relations[i + 1].word == relations[i].word\
                         and relations[i + 1].head == relations[i].head\
                         and relations[i + 1].rel == relations[i].rel:
