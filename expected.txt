@@ -3,7 +3,6 @@
 [('has eaten', 'the cat', 'food')]
 [('to the kitten',), ('gave', 'the cat', 'the milk')]
 [('(to) the kitten',), ('gave', 'the cat', 'the milk')]
-[('a baby',), ('called', 'I', 'her')]
 [('to eat', '(the cat)', 'food'), ('wanted', 'the cat')]
 [('raise', '(I)', 'my brothers'), ('raise', '(I)', 'my sisters'), ('So',),('helped', 'I')]
 [('see', '(I)', 'the movie'), ('did go', 'I')]
@@ -61,3 +60,5 @@
 [('very', 'very'), ('sick', 'very'), ('is', 'He', 'sick')]
 [('the town', 'itself'), ('was', 'the town', 'beautiful')]
 [('for herself',), ('bought', 'She', 'it')]
+[('the cats', 'Some of'), ('were', 'the cats', 'happy')]
+[('cats', 'Some'), ('were', 'cats', 'happy')]

@@ -142,6 +142,14 @@ class Engine(object):
         self.props.append(prop)
         return len(self.props)
 
+    def mark_processed(self, relations, index):
+        """Mark a relation as processed.
+
+        :relations: the list of relations.
+        :index: the index of the relation to be marked as processed.
+        """
+        relations[index].processed = True
+
     def analyze(self, relations, index=0, context=[], info={}):
         """Analyzes a sentence, using this instance's ruleset set.
 
@@ -166,6 +174,6 @@ class Engine(object):
         value = self._rulesets_dict[relations[index].rel]\
             .extract(relations, index, context, self, info)
 
-        relations[index].processed = True
+        self.mark_processed(relations, index)
 
         return value

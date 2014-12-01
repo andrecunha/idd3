@@ -306,12 +306,7 @@ class VerbPhraseRuleset(Ruleset):
                 engine.emit((verb, subj, word))
 
     def extract(self, relations, index, context, engine, info={}):
-        if relations[index].word == 'called':
-            # TODO: handle properly.
-            engine.emit(('a baby',))
-            engine.emit(('called', 'I', 'her'))
-            return None
-        elif relations[index].word in be_forms:
+        if relations[index].word in be_forms:
             return self.handle_be_as_root(relations, index, context, engine,
                                           info)
         elif relations[index].tag in ('VBZ', 'VBD', 'VBN', 'VB', 'VBG', 'VBP'):
@@ -498,7 +493,33 @@ class NounPhraseRuleset(Ruleset):
 
         return return_list, ids_for_preconj
 
+    def handle_np_with_of_phrase(relations, index, context, engine, info={}):
+
+        """Handle noun phrases that start with 'of' phrases, such as
+            'some of'."""
+
+        prep_index = Relation.get_children_with_dep('prep', relations, index)[0]
+        pobj_index = Relation.get_children_with_dep('pobj', relations,
+                                                    prep_index)[0]
+
+        pobj_return_value = engine.analyze(relations, pobj_index, context +
+                                           [index, prep_index])
+
+        for noun in pobj_return_value['return_list']:
+            engine.emit((noun, relations[index].word + ' ' +
+                         relations[prep_index].word))
+
+        engine.mark_processed(relations, prep_index)
+
+        return pobj_return_value
+
     def extract(self, relations, index, context, engine, info={}):
+        if relations[index].word.lower() in ('some', 'kind') and\
+                relations[relations[index].deps[0]].rel == 'prep':
+            return NounPhraseRuleset.handle_np_with_of_phrase(relations, index,
+                                                              context, engine,
+                                                              info)
+
         det = NounPhraseRuleset.process_determiners(relations, index, context,
                                                     engine, info)
 
