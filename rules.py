@@ -201,7 +201,7 @@ class VerbPhraseRuleset(Ruleset):
                                                         index)
         if advmod_indices != []:
             advmod = engine.analyze(relations, advmod_indices[0],
-                                    context + [index])
+                                    context + [index], {'no_emit': True})
         else:
             advmod = None
 
@@ -209,8 +209,16 @@ class VerbPhraseRuleset(Ruleset):
 
         # Emit propositions.
         if advmod is not None:
-            for subj in subjs:
-                engine.emit((verb, subj, advmod))
+            if subjs[0].lower() == 'it':
+                # 'It' is usually considered a dummy, semantically empty
+                #   subject, so we join the adverbial modifier (usually a date,
+                #   an age, or something similar) in the main proposition.
+                for subj in subjs:
+                    engine.emit((verb, subj, advmod))
+            else:
+                engine.emit((advmod,))
+                for subj in subjs:
+                    engine.emit((verb, subj))
         else:
             for subj in subjs:
                 engine.emit((verb, subj))
@@ -309,7 +317,7 @@ class VerbPhraseRuleset(Ruleset):
         if relations[index].word in be_forms:
             return self.handle_be_as_root(relations, index, context, engine,
                                           info)
-        elif relations[index].tag in ('VBZ', 'VBD', 'VBN', 'VB', 'VBG', 'VBP'):
+        if relations[index].tag in ('VBZ', 'VBD', 'VBN', 'VB', 'VBG', 'VBP'):
             return self.handle_action_verb(relations, index, context, engine,
                                            info)
         elif relations[index].tag in ('NN', 'NNS', 'NNP', 'NNPS', 'CD'):
@@ -643,9 +651,7 @@ class AdverbialPhraseRuleset(Ruleset):
 
         self.process_preps(relations, index, context, engine, info)
 
-        if 'no_emit' not in info\
-                and not (len(context) >= 1
-                         and relations[context[-1]].word in be_forms):
+        if 'no_emit' not in info:
             engine.emit((relations[index].word,))
 
         return (relations[index].word)
