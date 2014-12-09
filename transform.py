@@ -63,6 +63,17 @@ class RemoveUtteranceInitialConjunction(Transformation):
             delete_indices(relations, [1])
 
 
+class JoinNoLonger(Transformation):
+
+    """Joins 'no longer' as a multiword expression."""
+
+    def transform(self, relations):
+        for i in range(len(relations)):
+            if relations[i].word == 'no' and relations[i + 1].word == 'longer':
+                relations[i].rel = 'mwe'
+                relations[i + 1].rel = 'neg'
+
+
 class JoinMultiWordExpressions(Transformation):
     """Joins multi-word expressions in a single node. """
 
@@ -189,8 +200,9 @@ class FixReflexivePronouns(Transformation):
 all_transformations = [RemovePunctuation(),
                        RemoveParataxisFillers(),
                        RemoveUtteranceInitialConjunction(),
-                       JoinPhrasalModifiers(),
+                       JoinNoLonger(),
                        JoinMultiWordExpressions(),
+                       JoinPhrasalModifiers(),
                        FixAdjectiveRepetition(),
                        FixAdverbRepetition(),
                        FixReflexivePronouns()]

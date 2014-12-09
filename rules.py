@@ -163,23 +163,6 @@ class VerbPhraseRuleset(Ruleset):
         for mod in mods:
             engine.emit((relations[index].word, mod))
 
-    def emit_propositions(self, verb, subjs, dobjs, engine, relation):
-
-        """TODO: Docstring for emit_propositions."""
-
-        if relation.tag == 'VBG' and relation.rel != 'null':
-            for dobj in dobjs:
-                proposition = tuple([w for w in [verb, dobj]])
-                engine.emit(proposition)
-        else:
-            for subj in subjs:
-                if len(dobjs) > 0:
-                    for dobj in dobjs:
-                        proposition = tuple([w for w in [verb, subj, dobj]])
-                        engine.emit(proposition)
-                else:
-                    engine.emit((verb, subj))
-
     @staticmethod
     def process_pp_when_be_is_root(relations, index, context, engine, info,
                                    subjs):
@@ -231,6 +214,34 @@ class VerbPhraseRuleset(Ruleset):
             advmod = []
 
         return advmod
+
+    @staticmethod
+    def process_discourse_markers(relations, index, context, engine, info):
+
+        """TODO: Docstring for process_discourse_markers."""
+
+        discourse_indices = Relation.get_children_with_dep('discourse',
+                                                           relations, index)
+
+        for i in discourse_indices:
+            engine.analyze(relations, i, context + [index])
+
+    def emit_propositions(self, verb, subjs, dobjs, engine, relation):
+
+        """TODO: Docstring for emit_propositions."""
+
+        if relation.tag == 'VBG' and relation.rel != 'null':
+            for dobj in dobjs:
+                proposition = tuple([w for w in [verb, dobj]])
+                engine.emit(proposition)
+        else:
+            for subj in subjs:
+                if len(dobjs) > 0:
+                    for dobj in dobjs:
+                        proposition = tuple([w for w in [verb, subj, dobj]])
+                        engine.emit(proposition)
+                else:
+                    engine.emit((verb, subj))
 
     def handle_be_as_root(self, relations, index, context, engine, info):
 
@@ -368,6 +379,10 @@ class VerbPhraseRuleset(Ruleset):
                 engine.emit((verb, subj, word))
 
     def extract(self, relations, index, context, engine, info={}):
+        # Process discourse markers.
+        VerbPhraseRuleset.process_discourse_markers(relations, index, context,
+                                                    engine, info)
+
         if relations[index].word in be_forms:
             return self.handle_be_as_root(relations, index, context, engine,
                                           info)
@@ -845,6 +860,13 @@ class NegRuleset(AtomicEmittingRuleset):
     rel = 'neg'
 
 
+class DiscourseRuleset(AtomicEmittingRuleset):
+
+    """A ruleset that processes the 'discourse' relation."""
+
+    rel = 'discourse'
+
+
 # Noun-Phrase rulesets.
 
 
@@ -1167,6 +1189,7 @@ all_rulesets = [TopRuleset(),
                 PreconjRuleset(),
                 # Atomic emitting rulesets.
                 NegRuleset(),
+                DiscourseRuleset(),
                 # Noun-Phrase rulesets.
                 NsubjRuleset(),
                 NsubjpassRuleset(),

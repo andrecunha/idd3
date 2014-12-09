@@ -517,7 +517,7 @@
 1	The	_	DT	DT	_	2	det	_	_
 2	cat	_	NN	NN	_	3	nsubj	_	_
 3	lives	_	VBZ	VBZ	_	0	null	_	_
-4	out	_	RP	RP	_	3	prt	_	_
+4	out	_	RB	RB	_	3	advmod	_	_
 5	in	_	IN	IN	_	3	prep	_	_
 6	the	_	DT	DT	_	7	det	_	_
 7	country	_	NN	NN	_	5	pobj	_	_
@@ -525,7 +525,7 @@
 
 1	He	_	PRP	PRP	_	2	nsubj	_	_
 2	went	_	VBD	VBD	_	0	null	_	_
-3	back	_	RB	RB	_	2	advmod	_	_
+3	back	_	RP	RP	_	2	prt	_	_
 4	into	_	IN	IN	_	2	prep	_	_
 5	Chicago	_	NNP	NNP	_	4	pobj	_	_
 6	.	_	.	.	_	2	punct	_	_
@@ -540,14 +540,14 @@
 8	.	_	.	.	_	5	punct	_	_
 
 1	The	_	DT	DT	_	2	det	_	_
-2	cat	_	NN	NN	_	0	null	_	_
-3	no	_	DT	DT	_	4	det	_	_
-4	longer	_	NN	NN	_	5	nsubj	_	_
-5	eats	_	VBZ	VBZ	_	2	rcmod	_	_
+2	cat	_	NN	NN	_	5	nsubj	_	_
+3	no	_	RB	RB	_	4	neg	_	_
+4	longer	_	RB	RB	_	5	advmod	_	_
+5	eats	_	VBZ	VBZ	_	0	null	_	_
 6	turtles	_	NNS	NNS	_	5	dobj	_	_
-7	.	_	.	.	_	2	punct	_	_
+7	.	_	.	.	_	5	punct	_	_
 
-1	Yes	_	NNS	NNS	_	5	nsubj	_	_
+1	Yes	_	NNS	NNS	_	5	discourse	_	_
 2	,	_	,	,	_	5	punct	_	_
 3	it	_	PRP	PRP	_	5	nsubj	_	_
 4	did	_	VBD	VBD	_	5	aux	_	_
