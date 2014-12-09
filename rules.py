@@ -180,6 +180,58 @@ class VerbPhraseRuleset(Ruleset):
                 else:
                     engine.emit((verb, subj))
 
+    @staticmethod
+    def process_pp_when_be_is_root(relations, index, context, engine, info,
+                                   subjs):
+
+        """TODO: Docstring for process_pp_when_be_is_root."""
+
+        prep_indices = Relation.get_children_with_dep('prep', relations,
+                                                      index)
+        if prep_indices == []:
+            return []
+
+        if subjs[0].lower() == 'it':
+            prep_index = prep_indices[0]
+            pobj_index = Relation.get_children_with_dep('pobj', relations,
+                                                        prep_index)[0]
+
+            pobj_return_value = engine.analyze(relations, pobj_index, context +
+                                               [index, prep_index])
+
+            return_list = []
+            for noun in pobj_return_value['return_list']:
+                return_list.append(relations[prep_index].word + ' ' + noun)
+
+            engine.mark_processed(relations, prep_index)
+
+            return return_list
+        else:
+            for prep_index in prep_indices:
+                engine.analyze(relations, prep_index, context + [index])
+            return []
+
+    @staticmethod
+    def process_advmod_when_be_is_root(relations, index, context, engine, info,
+                                       subjs):
+
+        """TODO: Docstring for process_advmod_when_be_is_root."""
+
+        advmod_indices = Relation.get_children_with_dep('advmod', relations,
+                                                        index)
+        if advmod_indices != []:
+            if subjs[0].lower() == 'it':
+                _info = {'no_emit': True}
+            else:
+                _info = {}
+
+            advmod = [engine.analyze(relations, advmod_indices[0],
+                                     context + [index], _info)]
+        else:
+            advmod = []
+
+        return advmod
+
     def handle_be_as_root(self, relations, index, context, engine, info):
 
         """Handle 'to be' as the VP root."""
@@ -192,31 +244,33 @@ class VerbPhraseRuleset(Ruleset):
                          if word is not None])
 
         # Prepositional modifiers.
-        prep_indices = Relation.get_children_with_dep('prep', relations, index)
-        for prep_index in prep_indices:
-            engine.analyze(relations, prep_index, context + [index])
+        prep_mods = VerbPhraseRuleset.process_pp_when_be_is_root(relations,
+                                                                 index, context,
+                                                                 engine, info,
+                                                                 subjs)
 
         # Adverbial modifiers.
-        advmod_indices = Relation.get_children_with_dep('advmod', relations,
-                                                        index)
-        if advmod_indices != []:
-            advmod = engine.analyze(relations, advmod_indices[0],
-                                    context + [index], {'no_emit': True})
-        else:
-            advmod = None
+        advmods = VerbPhraseRuleset.process_advmod_when_be_is_root(relations,
+                                                                   index,
+                                                                   context,
+                                                                   engine, info,
+                                                                   subjs)
+
+        mods = prep_mods + advmods
 
         self.process_ignorables(relations, index, context, engine, info)
 
         # Emit propositions.
-        if advmod is not None:
+        if mods != []:
             if subjs[0].lower() == 'it':
                 # 'It' is usually considered a dummy, semantically empty
-                #   subject, so we join the adverbial modifier (usually a date,
-                #   an age, or something similar) in the main proposition.
+                #   subject, so we join the adverbial and prepositional
+                #   modifiers (usually a date, an age, or something similar)
+                #   in the main proposition.
                 for subj in subjs:
-                    engine.emit((verb, subj, advmod))
+                    for mod in mods:
+                        engine.emit((verb, subj, mod))
             else:
-                engine.emit((advmod,))
                 for subj in subjs:
                     engine.emit((verb, subj))
         else:

@@ -63,3 +63,7 @@
 [('the cats', 'Some of'), ('were', 'the cats', 'happy')]
 [('cats', 'Some'), ('were', 'cats', 'happy')]
 [('them', 'Some of'), ('to Hawaii',), ('before',), ('had been', 'them')]
+[('fat', 'kind of'), ('was', 'the cat', 'fat')]
+[('in San Francisco',), ('lived', 'He')]
+[('was', 'It', 'in 1942')]
+[('was', 'It', 'on time')]
