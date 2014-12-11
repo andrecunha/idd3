@@ -572,7 +572,7 @@
 4	because	_	IN	IN	_	6	mark	_	_
 5	I	_	PRP	PRP	_	6	nsubj	_	_
 6	ate	_	VBP	VBP	_	2	advcl	_	_
-7	rotten	_	RB	RB	_	6	advmod	_	_
+7	rotten	_	JJ	JJ	_	8	amod	_	_
 8	food	_	NN	NN	_	6	dobj	_	_
 9	.	_	.	.	_	2	punct	_	_
 
@@ -580,9 +580,9 @@
 2	likes	_	VBZ	VBZ	_	0	null	_	_
 3	vanilla	_	NN	NN	_	2	dobj	_	_
 4	,	_	,	,	_	2	punct	_	_
-5	whereas	_	CC	CC	_	2	cc	_	_
+5	whereas	_	IN	IN	_	7	mark	_	_
 6	I	_	PRP	PRP	_	7	nsubj	_	_
-7	like	_	VBP	VBP	_	2	conj	_	_
+7	like	_	VBP	VBP	_	2	advcl	_	_
 8	chocolate	_	NN	NN	_	7	dobj	_	_
 9	.	_	.	.	_	2	punct	_	_
 
