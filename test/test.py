@@ -1,6 +1,10 @@
 # -*- coding: utf-8 -*-
 from __future__ import print_function, unicode_literals, division
-from idd3 import Relation, Engine, rules, transform
+
+import sys
+sys.path.append('..')
+
+import idd3
 import nltk
 
 
@@ -12,12 +16,13 @@ def test():
 
     graphs = nltk.parse.dependencygraph.DependencyGraph.load('corpus.conll')
 
-    engine = Engine(rules.all_rulesets, transform.all_transformations)
+    engine = idd3.Engine(idd3.rules.all_rulesets,
+                         idd3.transform.all_transformations)
 
     for i in range(up_to_index):
         relations = []
         for relation in graphs[i].nodelist:
-            relations.append(Relation(**relation))
+            relations.append(idd3.Relation(**relation))
 
         engine.analyze(relations)
         props = engine.props
