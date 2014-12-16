@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import print_function, unicode_literals, division
-from idd3 import Relation, Engine
-import rules
-import transform
+from idd3 import Relation, Engine, rules, transform
 import nltk
 
 

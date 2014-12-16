@@ -224,24 +224,24 @@ class NsubjRuleset(NounPhraseRuleset):
     rel = 'nsubj'
 
     def extract(self, relations, index, context, engine, info={}):
-    	"""extract(relations, index, context, engine, info) -> list(str)
+        """extract(relations, index, context, engine, info) -> list(str)
 
-    	This ruleset returns a list of strings, corresponding to the
-    		return_list value of NounPhraseRuleset.
+        This ruleset returns a list of strings, corresponding to the
+            return_list value of NounPhraseRuleset.
 
-    	Examples:
+        Examples:
 
-    		* The man was sitting in the park.
-    			nsubj(sitting, man)
-    			det(man, the)
-    			-> return ['the man']
+            * The man was sitting in the park.
+                nsubj(sitting, man)
+                det(man, the)
+                -> return ['the man']
 
-    		* Mary and John were sitting in the park.
-    			nsubj(seen, Mary)
-    			cc(Mary, and)
-    			conj(Mary, John)
-    			-> return ['Mary, 'John']
-    	"""
+            * Mary and John were sitting in the park.
+                nsubj(seen, Mary)
+                cc(Mary, and)
+                conj(Mary, John)
+                -> return ['Mary, 'John']
+        """
         d = NounPhraseRuleset.extract(self, relations, index, context, engine,
                                       info)
         if d['ids_for_preconj'] == []:
@@ -255,24 +255,24 @@ class NsubjpassRuleset(NounPhraseRuleset):
     rel = 'nsubjpass'
 
     def extract(self, relations, index, context, engine, info={}):
-    	"""extract(relations, index, context, engine, info) -> list(str)
+        """extract(relations, index, context, engine, info) -> list(str)
 
-    	This ruleset returns a list of strings, corresponding to the
-    		return_list value of NounPhraseRuleset.
+        This ruleset returns a list of strings, corresponding to the
+            return_list value of NounPhraseRuleset.
 
-    	Examples:
+        Examples:
 
-    		* The man was seen in the park.
-    			nsubjpass(seen, man)
-    			det(man, the)
-    			-> return ['the man']
+            * The man was seen in the park.
+                nsubjpass(seen, man)
+                det(man, the)
+                -> return ['the man']
 
-    		* Mary and John were seen in the park.
-    			nsubjpass(seen, Mary)
-    			cc(Mary, and)
-    			conj(Mary, John)
-    			-> return ['Mary, 'John']
-    	"""
+            * Mary and John were seen in the park.
+                nsubjpass(seen, Mary)
+                cc(Mary, and)
+                conj(Mary, John)
+                -> return ['Mary, 'John']
+        """
         d = NounPhraseRuleset.extract(self, relations, index, context, engine,
                                       info)
         if d['ids_for_preconj'] == []:
@@ -286,23 +286,23 @@ class DobjRuleset(NounPhraseRuleset):
     rel = 'dobj'
 
     def extract(self, relations, index, context, engine, info={}):
-    	"""extract(relations, index, context, engine, info) -> list(str)
+        """extract(relations, index, context, engine, info) -> list(str)
 
-    	This ruleset returns a list of strings, corresponding to the
-    		return_list value of NounPhraseRuleset.
+        This ruleset returns a list of strings, corresponding to the
+            return_list value of NounPhraseRuleset.
 
-    	Examples:
+        Examples:
 
-    		* I saw her.
-    			dobj(saw, her)
-    			-> return ['her']
+            * I saw her.
+                dobj(saw, her)
+                -> return ['her']
 
-    		* I saw Mary and John
-    			dobj(saw, Mary)
-    			cc(Mary, and)
-    			conj(Mary, John)
-    			-> return ['Mary, 'John']
-    	"""
+            * I saw Mary and John
+                dobj(saw, Mary)
+                cc(Mary, and)
+                conj(Mary, John)
+                -> return ['Mary, 'John']
+        """
         d = NounPhraseRuleset.extract(self, relations, index, context, engine,
                                       info)
         if d['ids_for_preconj'] == []:
@@ -323,25 +323,25 @@ class IobjRuleset(NounPhraseRuleset):
     rel = 'iobj'
 
     def extract(self, relations, index, context, engine, info={}):
-    	"""extract(relations, index, context, engine, info) -> None
+        """extract(relations, index, context, engine, info) -> None
 
-    	The indirect object of a verb always generates a proposition.
+        The indirect object of a verb always generates a proposition.
 
-    	Examples:
+        Examples:
 
-    		* I gave her a book.
-    			iobj(gave, her)
-    			-> emit(((to) her))
-    			-> return None
+            * I gave her a book.
+                iobj(gave, her)
+                -> emit(((to) her))
+                -> return None
 
-    		* I gave John and Mary a book.
-    			iobj(gave, John)
-    			cc(John, and)
-    			conj(John, Mary)
-    			-> emit(((to) John))
-    			-> emit(((to) Mary))
-    			-> return None
-    	"""
+            * I gave John and Mary a book.
+                iobj(gave, John)
+                cc(John, and)
+                conj(John, Mary)
+                -> emit(((to) John))
+                -> emit(((to) Mary))
+                -> return None
+        """
         d = NounPhraseRuleset.extract(self, relations, index, context,
                                       engine)
         if d['ids_for_preconj'] == []:
@@ -356,18 +356,18 @@ class ConjRuleset(NounPhraseRuleset):
     rel = 'conj'
 
     def extract(self, relations, index, context, engine, info={}):
-    	"""extract(relations, index, context, engine, info) -> list(str)
+        """extract(relations, index, context, engine, info) -> list(str)
 
-    	This ruleset returns a list of strings, corresponding to the
-    		return_list value of NounPhraseRuleset.
+        This ruleset returns a list of strings, corresponding to the
+            return_list value of NounPhraseRuleset.
 
-    	Examples:
+        Examples:
 
-    		* Mary and John
-    			conj(Mary, John)
-    			-> return ['John']
-    	"""
-    	# TODO: Maybe just return the first element in the list.
+            * Mary and John
+                conj(Mary, John)
+                -> return ['John']
+        """
+        # TODO: Maybe just return the first element in the list.
         d = NounPhraseRuleset.extract(self, relations, index, context,
                                       engine)
         if d['ids_for_preconj'] == []:
@@ -381,24 +381,24 @@ class PossRuleset(NounPhraseRuleset):
     rel = 'poss'
 
     def extract(self, relations, index, context, engine, info={}):
-    	"""extract(relations, index, context, engine, info) -> str | None
+        """extract(relations, index, context, engine, info) -> str | None
 
-    	If the possessive modifier is a pronoun (PRP$), the pronoun is
-    		returned; if it's an NP modifier with a "'s", the NP is emitted
-    		as a proposition, and None is returned.
+        If the possessive modifier is a pronoun (PRP$), the pronoun is
+            returned; if it's an NP modifier with a "'s", the NP is emitted
+            as a proposition, and None is returned.
 
-    	Examples:
+        Examples:
 
-    		* My friend
-    			poss(friend, My)
-    			-> return "My"
+            * My friend
+                poss(friend, My)
+                -> return "My"
 
-    		* John's friend
-    			poss(friend, John)
-    			possessive(John, 's)
-    			-> emit((friend, John's))
-    			-> return None
-    	"""
+            * John's friend
+                poss(friend, John)
+                possessive(John, 's)
+                -> emit((friend, John's))
+                -> return None
+        """
         if relations[index].tag == 'PRP$':
             return relations[index].word
         elif relations[index].tag in ('NN', 'NNS', 'NNP'):
@@ -430,18 +430,18 @@ class NpadvmodRuleset(Ruleset):
     rel = 'npadvmod'
 
     def extract(self, relations, index, context, engine, info={}):
-    	"""extract(relations, index, context, engine, info) -> str
+        """extract(relations, index, context, engine, info) -> str
 
-    	This ruleset returns the NP modifier as a string, without emiting
-    		any proposition.
+        This ruleset returns the NP modifier as a string, without emiting
+            any proposition.
 
-    	Examples:
+        Examples:
 
-    		* He is 40 years old.
-    			npadvmod(old, years)
-    			num(years, 40)
-    			-> return "40 years"
-    	"""
+            * He is 40 years old.
+                npadvmod(old, years)
+                num(years, 40)
+                -> return "40 years"
+        """
         det_indices = Relation.get_children_with_dep('det', relations, index)
         poss_indices = Relation.get_children_with_dep('poss', relations, index)
         nn_indices = Relation.get_children_with_dep('nn', relations, index)
@@ -475,17 +475,17 @@ class TmodRuleset(NounPhraseRuleset):
     rel = 'tmod'
 
     def extract(self, relations, index, context, engine, info={}):
-    	"""extract(relations, index, context, engine, info) -> None
+        """extract(relations, index, context, engine, info) -> None
 
-    	A temporal modifier always generates a proposition.
+        A temporal modifier always generates a proposition.
 
-    	Examples:
+        Examples:
 
-    		* Last night, I ran to the hills.
-    			tmod(ran, night)
-    			amod(night, Last)
-    			-> emit((Last night))
-    	"""
+            * Last night, I ran to the hills.
+                tmod(ran, night)
+                amod(night, Last)
+                -> emit((Last night))
+        """
         this = NounPhraseRuleset.extract(self, relations, index, context,
                                          engine, info)['return_list'][0]
         engine.emit((this, ))

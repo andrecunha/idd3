@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 from __future__ import print_function, unicode_literals, division
 from idd3 import Relation, Ruleset
+from idd3.rules.adjp_rulesets import AdjectivalPhraseRuleset
+from idd3.rules.np_rulesets import NounPhraseRuleset
 
 
 be_forms = ['am', 'are', 'is', 'being', 'was', 'were', 'been']
@@ -455,4 +457,4 @@ class AdvclRuleset(VerbPhraseRuleset):
 
     """A ruleset that processes the 'advcl' relation."""
 
-    rel = 'advcl' 
+    rel = 'advcl'
