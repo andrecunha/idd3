@@ -46,9 +46,6 @@ class VerbPhraseRuleset(Ruleset):
 
         """TODO: Docstring for process_auxs."""
 
-        if 'aux' in info:
-            return info['aux']
-
         # TODO: add support for multiple auxiliaries.
         aux_index = Relation.get_children_with_dep('aux', relations, index)
         auxpass_index = Relation.get_children_with_dep('auxpass', relations,
@@ -56,6 +53,9 @@ class VerbPhraseRuleset(Ruleset):
         auxs_index = sorted(aux_index + auxpass_index)
         auxs = [engine.analyze(relations, i, context + [index])
                 for i in auxs_index]
+
+        if auxs == [] and 'aux' in info:
+            auxs = info['aux']
 
         return auxs
 
@@ -272,11 +272,11 @@ class VerbPhraseRuleset(Ruleset):
 
         prop_ids = []
 
-        if relation.tag == 'VBG' and relation.rel != 'null':
+        if relation.tag == 'VBG' and relation.rel not in ('null', 'conj'):
             for dobj in dobjs:
-                proposition = tuple([w for w in [verb, dobj]])
-                prop_id = engine.emit(proposition)
-                prop_ids.append(prop_id)
+                    proposition = tuple([w for w in [verb, dobj]])
+                    prop_id = engine.emit(proposition)
+                    prop_ids.append(prop_id)
         else:
             for subj in subjs:
                 if len(dobjs) > 0:
