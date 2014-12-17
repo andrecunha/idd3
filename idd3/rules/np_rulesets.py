@@ -56,7 +56,8 @@ class NounPhraseRuleset(Ruleset):
             engine.analyze(relations, cc_index[0], context + [index])
             conj_index = Relation.get_children_with_dep('conj', relations,
                                                         index)
-            conjs = [engine.analyze(relations, i, context + [index])
+            conjs = [engine.analyze(relations, i, context + [index],
+                                    info={'class': 'NP'})
                      for i in conj_index]
             # TODO: check if this makes sense.
             conjs = [c[0] for c in conjs]
@@ -120,7 +121,8 @@ class NounPhraseRuleset(Ruleset):
         vmod_indices = Relation.get_children_with_dep('vmod', relations,
                                                       index)
         for i in vmod_indices:
-            engine.analyze(relations, i, context + [index], {'subj': 'NO_SUBJ'})
+            engine.analyze(relations, i, context + [index],
+                           {'subj': ['NO_SUBJ']})
 
     @staticmethod
     def assemble_return_list(det, poss, nns, conjs):
@@ -347,31 +349,6 @@ class IobjRuleset(NounPhraseRuleset):
         if d['ids_for_preconj'] == []:
             for value in d['return_list']:
                 engine.emit(('(to) ' + value,))
-
-
-class ConjRuleset(NounPhraseRuleset):
-
-    """A ruleset that processes the 'conj' relation."""
-
-    rel = 'conj'
-
-    def extract(self, relations, index, context, engine, info={}):
-        """extract(relations, index, context, engine, info) -> list(str)
-
-        This ruleset returns a list of strings, corresponding to the
-            return_list value of NounPhraseRuleset.
-
-        Examples:
-
-            * Mary and John
-                conj(Mary, John)
-                -> return ['John']
-        """
-        # TODO: Maybe just return the first element in the list.
-        d = NounPhraseRuleset.extract(self, relations, index, context,
-                                      engine)
-        if d['ids_for_preconj'] == []:
-            return d['return_list']
 
 
 class PossRuleset(NounPhraseRuleset):

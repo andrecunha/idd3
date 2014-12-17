@@ -21,7 +21,7 @@ class VerbPhraseRuleset(Ruleset):
         subj_index = Relation.get_children_with_dep('nsubj', relations, index)
         if subj_index == []:
             if 'subj' in info:
-                subj = ['(%s)' % info['subj']]
+                subj = ['(%s)' % s for s in info['subj']]
             else:
                 subj = ['(NO_SUBJ)']  # TODO: remove.
         else:
@@ -44,6 +44,9 @@ class VerbPhraseRuleset(Ruleset):
     def process_auxs(relations, index, context, engine, info):
 
         """TODO: Docstring for process_auxs."""
+
+        if 'aux' in info:
+            return info['aux']
 
         # TODO: add support for multiple auxiliaries.
         aux_index = Relation.get_children_with_dep('aux', relations, index)
@@ -235,6 +238,27 @@ class VerbPhraseRuleset(Ruleset):
 
         return advcl_markers
 
+    @staticmethod
+    def process_conjs(relations, index, context, engine, info, subjs, auxs,
+                      prop_ids):
+        cc_indices = Relation.get_children_with_dep('cc', relations, index)
+
+        if cc_indices != []:
+            conjunction = engine.analyze(relations, cc_indices[0],
+                                         context + [index])
+
+            conj_indices = Relation.get_children_with_dep('conj', relations,
+                                                          index)
+
+            for i in conj_indices:
+                engine.analyze(relations, i, context + [index],
+                               info={'class': 'VP',
+                                     'subj': subjs,
+                                     'aux': auxs})
+
+            conj_prop = tuple([conjunction] + prop_ids)
+            engine.emit(conj_prop)
+
     def emit_propositions(self, verb, subjs, dobjs, engine, relation):
 
         """TODO: Docstring for emit_propositions."""
@@ -297,6 +321,9 @@ class VerbPhraseRuleset(Ruleset):
             for subj in subjs:
                 engine.emit((verb, subj))
 
+        self.subjs = subjs
+        self.auxs = auxs
+
     def handle_action_verb(self, relations, index, context, engine, info):
 
         """Handle an action verb as the VP root."""
@@ -311,16 +338,19 @@ class VerbPhraseRuleset(Ruleset):
                          if word is not None])
 
         comps = self.process_comps(relations, index, context, engine,
-                                   {'subj': subjs[0]})  # TODO: change this.
+                                   {'subj': subjs})
 
         self.process_ccomp(relations, index, context, engine,
-                           {'subj': subjs[0]})  # TODO: change this.
+                           {'subj': subjs})
 
         self.process_iobj(relations, index, context, engine, info)
 
         self.process_advs(relations, index, context, engine, info)
 
         self.process_ignorables(relations, index, context, engine, info)
+
+        self.subjs = subjs
+        self.auxs = auxs
 
         # Emit propositions.
         if relations[index].rel in ('xcomp', 'ccomp', 'pcomp', 'csubj'):
@@ -358,10 +388,15 @@ class VerbPhraseRuleset(Ruleset):
         # TODO: handle cc/conj and preconj.
         complms = this['return_list']
 
+        self.emitted_prop_ids = []
         for subj in subjs:
             for compl in complms:
                 # engine.emit((verb, subj, relations[index].word))
-                engine.emit((verb, subj, compl))
+                prop_id = engine.emit((verb, subj, compl))
+                self.emitted_prop_ids.append(prop_id)
+
+        self.subjs = subjs
+        self.auxs = auxs
 
     def handle_cop_with_adjp(self, relations, index, context, engine, info):
 
@@ -383,9 +418,14 @@ class VerbPhraseRuleset(Ruleset):
         this = AdjectivalPhraseRuleset.extract(self, relations, index, context,
                                                engine, info)
 
+        self.emitted_prop_ids = []
         for subj in subjs:
             for word in this:
-                engine.emit((verb, subj, word))
+                prop_id = engine.emit((verb, subj, word))
+                self.emitted_prop_ids.append(prop_id)
+
+        self.subjs = subjs
+        self.auxs = auxs
 
     def extract(self, relations, index, context, engine, info={}):
         # Process discourse markers.
@@ -393,22 +433,28 @@ class VerbPhraseRuleset(Ruleset):
                                                     engine, info)
 
         if relations[index].word in be_forms:
-            return self.handle_be_as_root(relations, index, context, engine,
-                                          info)
-        if relations[index].tag in ('VBZ', 'VBD', 'VBN', 'VB', 'VBG', 'VBP'):
-            return self.handle_action_verb(relations, index, context, engine,
-                                           info)
+            return_value = self.handle_be_as_root(relations, index, context,
+                                                  engine, info)
+        elif relations[index].tag in ('VBZ', 'VBD', 'VBN', 'VB', 'VBG', 'VBP'):
+            return_value = self.handle_action_verb(relations, index, context,
+                                                   engine, info)
         elif relations[index].tag in ('NN', 'NNS', 'NNP', 'NNPS', 'CD'):
-            return self.handle_cop_with_np(relations, index, context, engine,
-                                           info)
+            return_value = self.handle_cop_with_np(relations, index, context,
+                                                   engine, info)
         elif relations[index].tag in ('JJ'):
-            return self.handle_cop_with_adjp(relations, index, context, engine,
-                                             info)
+            return_value = self.handle_cop_with_adjp(relations, index, context,
+                                                     engine, info)
         else:
             print('VP: cannot handle', relations[index].tag, 'yet.')
 
         # Process adverbial clauses.
         VerbPhraseRuleset.process_advcl(relations, index, context, engine, info)
+
+        # Process conjunctions.
+        VerbPhraseRuleset.process_conjs(relations, index, context, engine,
+                                        info, self.subjs, self.auxs, [])
+
+        return return_value
 
 
 class RootRuleset(VerbPhraseRuleset):

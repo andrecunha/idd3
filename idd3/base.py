@@ -1,6 +1,10 @@
 # -*- coding: utf-8 -*-
 from __future__ import print_function, unicode_literals, division
 
+import logging
+logging.basicConfig(level=logging.DEBUG)
+logger = logging.getLogger(__name__)
+
 
 class Relation(object):
     """Represents a relation in the dependency tree."""
@@ -171,6 +175,10 @@ class Engine(object):
             for relation in relations:
                 relation.processed = False
             self._build_rulesets_dict(relations)
+
+        logger.debug('Will call ruleset %s',
+                     self._rulesets_dict[relations[index].rel]
+                     .__class__.__name__)
 
         value = self._rulesets_dict[relations[index].rel]\
             .extract(relations, index, context, self, info)

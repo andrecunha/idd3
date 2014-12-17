@@ -1,6 +1,12 @@
 # -*- coding: utf-8 -*-
 from __future__ import print_function, unicode_literals, division
 from idd3 import Relation, Ruleset
+from idd3.rules.np_rulesets import NounPhraseRuleset
+from idd3.rules.vp_rulesets import VerbPhraseRuleset
+
+import logging
+logging.basicConfig(level=logging.DEBUG)
+logger = logging.getLogger(__name__)
 
 
 class TopRuleset(Ruleset):
@@ -11,7 +17,43 @@ class TopRuleset(Ruleset):
 
     def extract(self, relations, index, context, engine, info={}):
         return engine.analyze(relations, relations[index].deps[0], [index])
- 
+
+
+class ConjRuleset(NounPhraseRuleset, VerbPhraseRuleset):
+
+    """A ruleset that processes the 'conj' relation."""
+
+    rel = 'conj'
+
+    def extract(self, relations, index, context, engine, info={}):
+        """extract(relations, index, context, engine, info) -> list(str)
+        OUTDATED
+
+        This ruleset returns a list of strings, corresponding to the
+            return_list value of NounPhraseRuleset.
+
+        Examples:
+
+            * Mary and John
+                conj(Mary, John)
+                -> return ['John']
+        """
+
+        if info['class'] == 'NP':
+            logger.debug('ConjRuleset is processing node as NP')
+
+            # TODO: Maybe just return the first element in the list.
+            d = NounPhraseRuleset.extract(self, relations, index, context,
+                                          engine)
+            if d['ids_for_preconj'] == []:
+                return d['return_list']
+        elif info['class'] == 'VP':
+            logger.debug('ConjRuleset is processing node as VP')
+
+            d = VerbPhraseRuleset.extract(self, relations, index, context,
+                                          engine, info)
+            return d
+
 
 class NnRuleset(Ruleset):
 
@@ -41,7 +83,8 @@ class NnRuleset(Ruleset):
             engine.analyze(relations, cc_indices[0], context + [index])
             conj_indices = Relation.get_children_with_dep('conj', relations,
                                                           index)
-            conjs = [engine.analyze(relations, i, context + [index])
+            conjs = [engine.analyze(relations, i, context + [index],
+                                    info={'class': 'NP'})
                      for i in conj_indices]
             conjs = [c[0] for c in conjs]  # TODO: check if this makes sense.
 
@@ -176,7 +219,8 @@ class NumRuleset(Ruleset):
         words = []
         for n in indices:
             if n != index:
-                word = engine.analyze(relations, n, context + [index])
+                word = engine.analyze(relations, n, context + [index],
+                                      info={'class': 'NP'})
             else:
                 word = relations[index].word
 
