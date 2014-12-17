@@ -33,6 +33,7 @@ all_rulesets = [TopRuleset(),
                 PossessiveRuleset(),
                 NumberRuleset(),
                 PreconjRuleset(),
+                MarkRuleset(),
                 # Atomic emitting rulesets.
                 NegRuleset(),
                 DiscourseRuleset(),

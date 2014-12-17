@@ -73,3 +73,10 @@ class PreconjRuleset(AtomicRuleset):
     """A ruleset that processes the 'preconj' relation."""
 
     rel = 'preconj'
+
+
+class MarkRuleset(AtomicRuleset):
+
+    """A ruleset that processes the 'mark' relation."""
+
+    rel = 'mark'

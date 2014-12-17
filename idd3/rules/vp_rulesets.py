@@ -233,14 +233,16 @@ class VerbPhraseRuleset(Ruleset):
             engine.analyze(relations, i, context + [index])
 
     @staticmethod
-    def process_advcl(relations, index, context, engine, info):
+    def process_advcl(relations, index, context, engine, info, prop_ids):
         advcl_indices = Relation.get_children_with_dep('advcl',
                                                        relations, index)
 
-        advcl_markers = [engine.analyze(relations, i, context + [index])
-                         for i in advcl_indices]
-
-        return advcl_markers
+        for i in advcl_indices:
+            _, _prop_ids, marker = engine.analyze(relations, i,
+                                                  context + [index])
+            for p in prop_ids:
+                prop = tuple([marker, p] + _prop_ids)
+                engine.emit(prop)
 
     @staticmethod
     def process_conjs(relations, index, context, engine, info, subjs, auxs,
@@ -471,7 +473,8 @@ class VerbPhraseRuleset(Ruleset):
             print('VP: cannot handle', relations[index].tag, 'yet.')
 
         # Process adverbial clauses.
-        VerbPhraseRuleset.process_advcl(relations, index, context, engine, info)
+        VerbPhraseRuleset.process_advcl(relations, index, context, engine,
+                                        info, return_value[1])
 
         # Process conjunctions.
         VerbPhraseRuleset.process_conjs(relations, index, context, engine,
@@ -528,3 +531,16 @@ class AdvclRuleset(VerbPhraseRuleset):
     """A ruleset that processes the 'advcl' relation."""
 
     rel = 'advcl'
+
+    def extract(self, relations, index, context, engine, info={}):
+        status, prop_ids = VerbPhraseRuleset.extract(self, relations, index,
+                                                     context, engine, info)
+
+        mark_index = Relation.get_children_with_dep('mark', relations, index)
+
+        if mark_index != []:
+            marker = engine.analyze(relations, mark_index[0], context + [index])
+        else:
+            marker = 'NO_MARKER'
+
+        return status, prop_ids, marker
