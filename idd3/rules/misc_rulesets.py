@@ -178,7 +178,7 @@ class PrepRuleset(Ruleset):
         pcomp_index = Relation.get_children_with_dep('pcomp', relations, index)
         if pcomp_index != []:
             pcomp = engine.analyze(relations, pcomp_index[0],
-                                   context + [index])
+                                   context + [index])[0]
             if pcomp is not None:
                 engine.emit((relations[index].word + ' ' + pcomp,))
             # TODO: check the 'else' condition.

@@ -36,7 +36,8 @@ class VerbPhraseRuleset(Ruleset):
         # csubj
         subj_index = Relation.get_children_with_dep('csubj', relations, index)
         if subj_index != []:
-            subj = [engine.analyze(relations, subj_index[0], context + [index])]
+            subj = [engine.analyze(relations, subj_index[0],
+                                   context + [index])[0]]
 
         return subj
 
@@ -86,6 +87,9 @@ class VerbPhraseRuleset(Ruleset):
 
         comps = []
         for comp in _comps:
+            if isinstance(comp, tuple):
+                comp = comp[0]
+
             if isinstance(comp, list):
                 comps.extend(comp)
             else:
@@ -251,10 +255,11 @@ class VerbPhraseRuleset(Ruleset):
                                                           index)
 
             for i in conj_indices:
-                engine.analyze(relations, i, context + [index],
-                               info={'class': 'VP',
-                                     'subj': subjs,
-                                     'aux': auxs})
+                _, _prop_ids = engine.analyze(relations, i, context + [index],
+                                              info={'class': 'VP',
+                                                    'subj': subjs,
+                                                    'aux': auxs})
+                prop_ids.extend(_prop_ids)
 
             conj_prop = tuple([conjunction] + prop_ids)
             engine.emit(conj_prop)
@@ -263,18 +268,25 @@ class VerbPhraseRuleset(Ruleset):
 
         """TODO: Docstring for emit_propositions."""
 
+        prop_ids = []
+
         if relation.tag == 'VBG' and relation.rel != 'null':
             for dobj in dobjs:
                 proposition = tuple([w for w in [verb, dobj]])
-                engine.emit(proposition)
+                prop_id = engine.emit(proposition)
+                prop_ids.append(prop_id)
         else:
             for subj in subjs:
                 if len(dobjs) > 0:
                     for dobj in dobjs:
                         proposition = tuple([w for w in [verb, subj, dobj]])
-                        engine.emit(proposition)
+                        prop_id = engine.emit(proposition)
+                        prop_ids.append(prop_id)
                 else:
-                    engine.emit((verb, subj))
+                    prop_id = engine.emit((verb, subj))
+                    prop_ids.append(prop_id)
+
+        return prop_ids
 
     def handle_be_as_root(self, relations, index, context, engine, info):
 
@@ -305,6 +317,7 @@ class VerbPhraseRuleset(Ruleset):
         self.process_ignorables(relations, index, context, engine, info)
 
         # Emit propositions.
+        prop_ids = []
         if mods != []:
             if subjs[0].lower() == 'it':
                 # 'It' is usually considered a dummy, semantically empty
@@ -313,16 +326,21 @@ class VerbPhraseRuleset(Ruleset):
                 #   in the main proposition.
                 for subj in subjs:
                     for mod in mods:
-                        engine.emit((verb, subj, mod))
+                        prop_id = engine.emit((verb, subj, mod))
+                        prop_ids.append(prop_id)
             else:
                 for subj in subjs:
-                    engine.emit((verb, subj))
+                    prop_id = engine.emit((verb, subj))
+                    prop_ids.append(prop_id)
         else:
             for subj in subjs:
-                engine.emit((verb, subj))
+                prop_id = engine.emit((verb, subj))
+                prop_ids.append(prop_id)
 
         self.subjs = subjs
         self.auxs = auxs
+
+        return None, prop_ids
 
     def handle_action_verb(self, relations, index, context, engine, info):
 
@@ -353,20 +371,21 @@ class VerbPhraseRuleset(Ruleset):
         self.auxs = auxs
 
         # Emit propositions.
+        prop_ids = []
         if relations[index].rel in ('xcomp', 'ccomp', 'pcomp', 'csubj'):
             if relations[index].tag == 'VBG':
                 if comps != []:
-                    self.emit_propositions(verb, subjs, comps, engine,
-                                           relations[index])
-                return relations[index].word
+                    prop_ids = self.emit_propositions(verb, subjs, comps,
+                                                      engine, relations[index])
+                return relations[index].word, prop_ids
             else:
-                self.emit_propositions(verb, subjs, comps, engine,
-                                       relations[index])
-                return None
+                prop_ids = self.emit_propositions(verb, subjs, comps, engine,
+                                                  relations[index])
+                return None, prop_ids
         else:
-            self.emit_propositions(verb, subjs, comps, engine,
-                                   relations[index])
-            return None
+            prop_ids = self.emit_propositions(verb, subjs, comps, engine,
+                                              relations[index])
+            return None, prop_ids
 
     def handle_cop_with_np(self, relations, index, context, engine, info):
 
@@ -388,15 +407,17 @@ class VerbPhraseRuleset(Ruleset):
         # TODO: handle cc/conj and preconj.
         complms = this['return_list']
 
-        self.emitted_prop_ids = []
+        prop_ids = []
         for subj in subjs:
             for compl in complms:
                 # engine.emit((verb, subj, relations[index].word))
                 prop_id = engine.emit((verb, subj, compl))
-                self.emitted_prop_ids.append(prop_id)
+                prop_ids.append(prop_id)
 
         self.subjs = subjs
         self.auxs = auxs
+
+        return None, prop_ids
 
     def handle_cop_with_adjp(self, relations, index, context, engine, info):
 
@@ -418,14 +439,16 @@ class VerbPhraseRuleset(Ruleset):
         this = AdjectivalPhraseRuleset.extract(self, relations, index, context,
                                                engine, info)
 
-        self.emitted_prop_ids = []
+        prop_ids = []
         for subj in subjs:
             for word in this:
                 prop_id = engine.emit((verb, subj, word))
-                self.emitted_prop_ids.append(prop_id)
+                prop_ids.append(prop_id)
 
         self.subjs = subjs
         self.auxs = auxs
+
+        return None, prop_ids
 
     def extract(self, relations, index, context, engine, info={}):
         # Process discourse markers.
@@ -452,7 +475,8 @@ class VerbPhraseRuleset(Ruleset):
 
         # Process conjunctions.
         VerbPhraseRuleset.process_conjs(relations, index, context, engine,
-                                        info, self.subjs, self.auxs, [])
+                                        info, self.subjs, self.auxs,
+                                        return_value[1])
 
         return return_value
 

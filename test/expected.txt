@@ -73,3 +73,4 @@
 [("n't",), ('did eat', 'The cat', 'the turtle')]
 [('no longer',), ('eats', 'The cat', 'turtles')]
 [('Yes',), ('did fall', 'it')]
+[('may get lost', 'The dog'), ('by a biker',), ('may get hit', '(The dog)'), ('or', 1, 3)]
