@@ -709,39 +709,28 @@
 8	n't	_	RB	RB	_	7	neg	_	_
 9	.	_	.	.	_	4	punct	_	_
 
-1	I	_	PRP	PRP	_	2	nsubj	_	_
-2	feel	_	VBP	VBP	_	0	null	_	_
-3	more	_	JJR	JJR	_	2	dobj	_	_
-4	a	_	DT	DT	_	5	det	_	_
-5	Sacramentan	_	NNP	NNP	_	3	dep	_	_
-6	than	_	IN	IN	_	5	prep	_	_
-7	an	_	DT	DT	_	9	det	_	_
-8	Oakland	_	NNP	NNP	_	9	nn	_	_
-9	girl	_	NN	NN	_	6	pobj	_	_
-10	.	_	.	.	_	2	punct	_	_
-
 1	It	_	PRP	PRP	_	3	nsubj	_	_
 2	was	_	VBD	VBD	_	3	cop	_	_
 3	6	_	CD	CD	_	0	null	_	_
 4	o'clock	_	JJ	JJ	_	3	amod	_	_
-5	at	_	IN	IN	_	4	prep	_	_
+5	at	_	IN	IN	_	3	prep	_	_
 6	night	_	NN	NN	_	5	pobj	_	_
 7	on	_	IN	IN	_	3	prep	_	_
 8	March	_	NNP	NNP	_	7	pobj	_	_
-9	either	_	CC	CC	_	12	dep	_	_
-10	3rd	_	CD	CD	_	12	number	_	_
-11	or	_	CC	CC	_	12	cc	_	_
-12	10th	_	CD	CD	_	8	num	_	_
+9	either	_	CC	CC	_	10	preconj	_	_
+10	3rd	_	CD	CD	_	8	num	_	_
+11	or	_	CC	CC	_	10	cc	_	_
+12	10th	_	CD	CD	_	10	conj	_	_
 13	.	_	.	.	_	3	punct	_	_
 
 1	The	_	DT	DT	_	2	det	_	_
-2	cat	_	NN	NN	_	0	null	_	_
+2	cat	_	NN	NN	_	7	nsubj	_	_
 3	that	_	WDT	WDT	_	4	nsubj	_	_
 4	likes	_	VBZ	VBZ	_	2	rcmod	_	_
-5	chicken	_	NN	NN	_	7	nsubj	_	_
+5	chicken	_	NN	NN	_	4	dobj	_	_
 6	is	_	VBZ	VBZ	_	7	cop	_	_
-7	fluffy	_	JJ	JJ	_	4	xcomp	_	_
-8	.	_	.	.	_	2	punct	_	_
+7	fluffy	_	JJ	JJ	_	0	null	_	_
+8	.	_	.	.	_	7	punct	_	_
 
 1	That	_	DT	DT	_	8	nsubj	_	_
 2	was	_	VBD	VBD	_	8	aux	_	_
@@ -1476,3 +1465,14 @@
 4	a	_	DT	DT	_	5	det	_	_
 5	baby	_	NN	NN	_	2	xcomp	_	_
 6	.	_	.	.	_	2	punct	_	_
+
+1	I	_	PRP	PRP	_	2	nsubj	_	_
+2	feel	_	VBP	VBP	_	0	null	_	_
+3	more	_	RBR	RBR	_	2	advmod	_	_
+4	a	_	DT	DT	_	5	det	_	_
+5	Sacramentan	_	NNP	NNP	_	3	pobj	_	_
+6	than	_	IN	IN	_	2	prep	_	_
+7	an	_	DT	DT	_	9	det	_	_
+8	Oakland	_	NNP	NNP	_	9	nn	_	_
+9	girl	_	NN	NN	_	6	pobj	_	_
+10	.	_	.	.	_	2	punct	_	_

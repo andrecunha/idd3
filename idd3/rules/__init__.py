@@ -54,6 +54,7 @@ all_rulesets = [TopRuleset(),
                 CsubjRuleset(),
                 VmodRuleset(),
                 AdvclRuleset(),
+                RcmodRuleset(),
                 # Adjectival-Phrase rulesets
                 AcompRuleset(),
                 AmodRuleset(),

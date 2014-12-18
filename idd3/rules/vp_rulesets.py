@@ -551,3 +551,10 @@ class AdvclRuleset(VerbPhraseRuleset):
             marker = 'NO_MARKER'
 
         return status, prop_ids, marker
+
+
+class RcmodRuleset(VerbPhraseRuleset):
+
+    """A ruleset that processes the 'rcmod' relation."""
+
+    rel = 'rcmod'

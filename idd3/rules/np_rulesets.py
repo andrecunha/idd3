@@ -74,9 +74,9 @@ class NounPhraseRuleset(Ruleset):
         """TODO: Docstring for process_preps."""
 
         # VP modifiers
-        prep_index = Relation.get_children_with_dep('prep', relations, index)
-        if prep_index != []:
-            engine.analyze(relations, prep_index[0], context + [index])
+        prep_indices = Relation.get_children_with_dep('prep', relations, index)
+        for i in prep_indices:
+            engine.analyze(relations, i, context + [index])
 
     @staticmethod
     def process_modifiers(relations, index, context, engine, info={}):
@@ -123,6 +123,16 @@ class NounPhraseRuleset(Ruleset):
         for i in vmod_indices:
             engine.analyze(relations, i, context + [index],
                            {'subj': ['NO_SUBJ']})
+
+    @staticmethod
+    def process_rcmod(relations, index, context, engine, info={}):
+
+        """TODO: Docstring for process_rcmod."""
+
+        rcmod_indices = Relation.get_children_with_dep('rcmod', relations,
+                                                       index)
+        for i in rcmod_indices:
+            engine.analyze(relations, i, context + [index])
 
     @staticmethod
     def assemble_return_list(det, poss, nns, conjs):
@@ -202,6 +212,8 @@ class NounPhraseRuleset(Ruleset):
                                                    context, engine, info)
 
         NounPhraseRuleset.process_vmod(relations, index, context, engine, info)
+
+        NounPhraseRuleset.process_rcmod(relations, index, context, engine, info)
 
         return_list, ids_for_preconj = NounPhraseRuleset.\
             assemble_return_list(det, poss, nns, conjs)
