@@ -253,6 +253,13 @@ class VerbPhraseRuleset(Ruleset):
             conjunction = engine.analyze(relations, cc_indices[0],
                                          context + [index])
 
+            preconj_indices = Relation.get_children_with_dep('preconj',
+                                                             relations, index)
+            if preconj_indices != []:
+                preconj = engine.analyze(relations, preconj_indices[0],
+                                         context + [index])
+                conjunction = preconj + '_' + conjunction
+
             conj_indices = Relation.get_children_with_dep('conj', relations,
                                                           index)
 

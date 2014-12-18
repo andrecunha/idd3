@@ -89,3 +89,4 @@
 [('to raise', '(I)', 'my brothers'), ('to raise', '(I)', 'my sisters'), ('So',), ('helped', 'I')] 
 [('with Tammy',), ('with Dionne',), ('ate', 'I', 'dinner')]
 [('swam', 'I'), ('daily',), ('ran', '(I)'), ('and', 1, 3)]
+[('sleeps', 'the cat'), ("n't",), ('does', 'she'), ('Either_or', 1, 3)]
