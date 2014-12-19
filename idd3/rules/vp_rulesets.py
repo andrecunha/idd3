@@ -274,6 +274,14 @@ class VerbPhraseRuleset(Ruleset):
             conj_prop = tuple([conjunction] + prop_ids)
             engine.emit(conj_prop)
 
+    @staticmethod
+    def process_parataxes(relations, index, context, engine, info):
+        parataxis_indices = Relation.get_children_with_dep('parataxis',
+                                                           relations, index)
+
+        for i in parataxis_indices:
+            engine.analyze(relations, i, context + [index])
+
     def emit_propositions(self, verb, subjs, dobjs, engine, relation):
 
         """TODO: Docstring for emit_propositions."""
@@ -490,6 +498,10 @@ class VerbPhraseRuleset(Ruleset):
                                         info, self.subjs, self.auxs,
                                         return_value[1])
 
+        # Process parataxical clauses.
+        VerbPhraseRuleset.process_parataxes(relations, index, context, engine,
+                                            info)
+
         return return_value + (self.subjs,)
 
 
@@ -560,3 +572,10 @@ class RcmodRuleset(VerbPhraseRuleset):
     """A ruleset that processes the 'rcmod' relation."""
 
     rel = 'rcmod'
+
+
+class ParataxisRuleset(VerbPhraseRuleset):
+
+    """A ruleset that processes the 'parataxis' relation."""
+
+    rel = 'parataxis'
