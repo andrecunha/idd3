@@ -84,6 +84,22 @@ class JoinBecauseOf(Transformation):
                 relations[i].rel = 'mwe'
 
 
+class JoinUpTo(Transformation):
+
+    """Joins 'up to'."""
+
+    def transform(self, relations):
+        indices_to_delete = []
+        for i in range(len(relations)):
+            if relations[i].word == 'up'\
+                    and i + 1 < len(relations)\
+                    and relations[i + 1].word == 'to':
+                relations[i].word = 'up to'
+                indices_to_delete.append(i + 1)
+
+        delete_indices(relations, indices_to_delete)
+
+
 class JoinMultiWordExpressions(Transformation):
     """Joins multi-word expressions in a single node. """
 
@@ -251,6 +267,7 @@ all_transformations = [RemovePunctuation(),
                        RemoveUtteranceInitialConjunction(),
                        JoinNoLonger(),
                        JoinBecauseOf(),
+                       JoinUpTo(),
                        JoinMultiWordExpressions(),
                        JoinPhrasalModifiers(),
                        JoinDoublePrepositions(),
