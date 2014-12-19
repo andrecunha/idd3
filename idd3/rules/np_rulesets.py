@@ -139,9 +139,18 @@ class NounPhraseRuleset(Ruleset):
         wdt = None
         for i in rcmod_indices:
             _, ids, wdt = engine.analyze(relations, i, context + [index])
-            logger.debug('These are the ids: %s, wdt: %s', ids, wdt)
 
         return ids, wdt
+
+    @staticmethod
+    def process_negs(relations, index, context, engine, info):
+
+        """TODO: Docstring for process_negs."""
+
+        # neg
+        neg_indices = Relation.get_children_with_dep('neg', relations, index)
+        for i in neg_indices:
+            engine.analyze(relations, i, context + [index])
 
     @staticmethod
     def assemble_return_list(det, poss, nns, conjs):
@@ -224,6 +233,8 @@ class NounPhraseRuleset(Ruleset):
 
         ids, wdt = NounPhraseRuleset.process_rcmod(relations, index, context,
                                                    engine, info)
+
+        NounPhraseRuleset.process_negs(relations, index, context, engine, info)
 
         return_list, ids_for_preconj = NounPhraseRuleset.\
             assemble_return_list(det, poss, nns, conjs)

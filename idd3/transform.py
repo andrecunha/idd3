@@ -74,6 +74,16 @@ class JoinNoLonger(Transformation):
                 relations[i + 1].rel = 'neg'
 
 
+class JoinBecauseOf(Transformation):
+
+    """Joins 'because of' as a multiword expression."""
+
+    def transform(self, relations):
+        for i in range(len(relations)):
+            if relations[i].word == 'because' and relations[i + 1].word == 'of':
+                relations[i].rel = 'mwe'
+
+
 class JoinMultiWordExpressions(Transformation):
     """Joins multi-word expressions in a single node. """
 
@@ -240,6 +250,7 @@ all_transformations = [RemovePunctuation(),
                        RemoveParataxisFillers(),
                        RemoveUtteranceInitialConjunction(),
                        JoinNoLonger(),
+                       JoinBecauseOf(),
                        JoinMultiWordExpressions(),
                        JoinPhrasalModifiers(),
                        JoinDoublePrepositions(),

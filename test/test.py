@@ -7,6 +7,9 @@ sys.path.append('..')
 import idd3
 import nltk
 
+import logging
+logging.basicConfig(level=logging.DEBUG)
+
 
 def test():
     with open('expected.txt', mode='r') as expected_file:
