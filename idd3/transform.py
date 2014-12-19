@@ -153,7 +153,9 @@ class JoinDoublePrepositions(Transformation):
                     for j in range(i + 1, len(relations)):
                         if relations[j].head == i + 1:
                             relations[j].head = i
+                            relations[i].deps.append(j)
 
+                    relations[i].deps.sort()
                     indices_to_delete.append(i + 1)
 
         delete_indices(relations, indices_to_delete)
