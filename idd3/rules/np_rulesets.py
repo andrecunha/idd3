@@ -2,6 +2,9 @@
 from __future__ import print_function, unicode_literals, division
 from idd3 import Relation, Ruleset
 
+import logging
+logger = logging.getLogger(__name__)
+
 
 class NounPhraseRuleset(Ruleset):
 
@@ -131,8 +134,14 @@ class NounPhraseRuleset(Ruleset):
 
         rcmod_indices = Relation.get_children_with_dep('rcmod', relations,
                                                        index)
+
+        ids = []
+        wdt = None
         for i in rcmod_indices:
-            engine.analyze(relations, i, context + [index])
+            _, ids, wdt = engine.analyze(relations, i, context + [index])
+            logger.debug('These are the ids: %s, wdt: %s', ids, wdt)
+
+        return ids, wdt
 
     @staticmethod
     def assemble_return_list(det, poss, nns, conjs):
@@ -213,7 +222,8 @@ class NounPhraseRuleset(Ruleset):
 
         NounPhraseRuleset.process_vmod(relations, index, context, engine, info)
 
-        NounPhraseRuleset.process_rcmod(relations, index, context, engine, info)
+        ids, wdt = NounPhraseRuleset.process_rcmod(relations, index, context,
+                                                   engine, info)
 
         return_list, ids_for_preconj = NounPhraseRuleset.\
             assemble_return_list(det, poss, nns, conjs)
@@ -228,7 +238,9 @@ class NounPhraseRuleset(Ruleset):
 
         return {'return_list': return_list,
                 'preconj': preconj,
-                'ids_for_preconj': ids_for_preconj}
+                'ids_for_preconj': ids_for_preconj,
+                'rcmod_wdt': wdt,
+                'rcmod_ids': ids}
 
 
 class NsubjRuleset(NounPhraseRuleset):

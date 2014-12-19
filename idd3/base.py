@@ -2,7 +2,6 @@
 from __future__ import print_function, unicode_literals, division
 
 import logging
-logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 

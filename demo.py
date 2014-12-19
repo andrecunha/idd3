@@ -5,6 +5,9 @@ from idd3 import Relation, Engine, rules, transform
 import nltk
 from sys import argv
 
+import logging
+logging.basicConfig(level=logging.DEBUG)
+
 try:
     from termcolor import colored
 except ImportError:

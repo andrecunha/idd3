@@ -264,10 +264,11 @@ class VerbPhraseRuleset(Ruleset):
                                                           index)
 
             for i in conj_indices:
-                _, _prop_ids = engine.analyze(relations, i, context + [index],
-                                              info={'class': 'VP',
-                                                    'subj': subjs,
-                                                    'aux': auxs})
+                _, _prop_ids, _ = engine.analyze(relations, i,
+                                                 context + [index],
+                                                 info={'class': 'VP',
+                                                       'subj': subjs,
+                                                       'aux': auxs})
                 prop_ids.extend(_prop_ids)
 
             conj_prop = tuple([conjunction] + prop_ids)
@@ -478,6 +479,7 @@ class VerbPhraseRuleset(Ruleset):
                                                      engine, info)
         else:
             print('VP: cannot handle', relations[index].tag, 'yet.')
+            return_value = None
 
         # Process adverbial clauses.
         VerbPhraseRuleset.process_advcl(relations, index, context, engine,
@@ -488,14 +490,14 @@ class VerbPhraseRuleset(Ruleset):
                                         info, self.subjs, self.auxs,
                                         return_value[1])
 
-        return return_value
+        return return_value + (self.subjs,)
 
 
 class RootRuleset(VerbPhraseRuleset):
 
     """A ruleset that processes the 'ROOT' relation."""
 
-    rel = 'null'
+    rel = 'root'
 
 
 class XcompRuleset(VerbPhraseRuleset):
@@ -540,8 +542,8 @@ class AdvclRuleset(VerbPhraseRuleset):
     rel = 'advcl'
 
     def extract(self, relations, index, context, engine, info={}):
-        status, prop_ids = VerbPhraseRuleset.extract(self, relations, index,
-                                                     context, engine, info)
+        status, prop_ids, _ = VerbPhraseRuleset.extract(self, relations, index,
+                                                        context, engine, info)
 
         mark_index = Relation.get_children_with_dep('mark', relations, index)
 

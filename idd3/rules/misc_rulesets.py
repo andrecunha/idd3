@@ -5,7 +5,6 @@ from idd3.rules.np_rulesets import NounPhraseRuleset
 from idd3.rules.vp_rulesets import VerbPhraseRuleset
 
 import logging
-logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
 
