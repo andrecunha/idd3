@@ -46,6 +46,7 @@ all_rulesets = [TopRuleset(),
                 PossRuleset(),
                 NpadvmodRuleset(),
                 TmodRuleset(),
+                ApposRuleset(),
                 # Verb-Phrase rulesets.
                 RootRuleset(),
                 XcompRuleset(),

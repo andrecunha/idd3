@@ -164,6 +164,16 @@ class NounPhraseRuleset(Ruleset):
             engine.emit((mod,))
 
     @staticmethod
+    def process_appos(relations, index, context, engine, info):
+
+        """TODO: Docstring for process_appos."""
+
+        appos_indices = Relation.get_children_with_dep('appos',
+                                                       relations, index)
+        for i in appos_indices:
+            engine.analyze(relations, i, context + [index], info)
+
+    @staticmethod
     def assemble_return_list(det, poss, nns, conjs):
 
         """TODO: Docstring for assemble_return_list."""
@@ -252,6 +262,9 @@ class NounPhraseRuleset(Ruleset):
 
         return_list, ids_for_preconj = NounPhraseRuleset.\
             assemble_return_list(det, poss, nns, conjs)
+
+        NounPhraseRuleset.process_appos(relations, index, context,
+                                        engine, {'subjs': return_list})
 
         # Emit propositions for modifiers
         for amod in mods:
@@ -515,3 +528,19 @@ class TmodRuleset(NounPhraseRuleset):
         this = NounPhraseRuleset.extract(self, relations, index, context,
                                          engine, info)['return_list'][0]
         engine.emit((this, ))
+
+
+class ApposRuleset(NounPhraseRuleset):
+
+    """A ruleset that processes the 'appos' relation."""
+
+    rel = 'appos'
+
+    def extract(self, relations, index, context, engine, info={}):
+        """extract(relations, index, context, engine, info) -> None
+        TODO
+        """
+        this = NounPhraseRuleset.extract(self, relations, index, context,
+                                         engine, info)['return_list'][0]
+        for subj in info['subjs']:
+            engine.emit(('(is)', subj, this))
