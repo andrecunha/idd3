@@ -138,6 +138,27 @@ class JoinPhrasalModifiers(Transformation):
                     relations[index].deps = sorted(relations[index].deps)
 
 
+class JoinDoublePrepositions(Transformation):
+
+    """Handles double prepositions, as in 'As of 2014'."""
+
+    def transform(self, relations):
+        indices_to_delete = []
+
+        for i in range(len(relations)):
+            if relations[i].tag == "IN":
+                if i + 1 < len(relations) and relations[i + 1].tag == "IN":
+                    relations[i].word += ' ' + relations[i + 1].word
+
+                    for j in range(i + 1, len(relations)):
+                        if relations[j].head == i + 1:
+                            relations[j].head = i
+
+                    indices_to_delete.append(i + 1)
+
+        delete_indices(relations, indices_to_delete)
+
+
 class FixAdjectiveRepetition(Transformation):
 
     """Handles adjective repetition as intensifier (e.g., she was gone a long
@@ -203,6 +224,7 @@ all_transformations = [RemovePunctuation(),
                        JoinNoLonger(),
                        JoinMultiWordExpressions(),
                        JoinPhrasalModifiers(),
+                       JoinDoublePrepositions(),
                        FixAdjectiveRepetition(),
                        FixAdverbRepetition(),
                        FixReflexivePronouns()]
