@@ -153,6 +153,17 @@ class NounPhraseRuleset(Ruleset):
             engine.analyze(relations, i, context + [index])
 
     @staticmethod
+    def process_npadvmods(relations, index, context, engine, info):
+
+        """TODO: Docstring for process_npadvmods."""
+
+        npadvmod_indices = Relation.get_children_with_dep('npadvmod',
+                                                          relations, index)
+        for i in npadvmod_indices:
+            mod = engine.analyze(relations, i, context + [index])
+            engine.emit((mod,))
+
+    @staticmethod
     def assemble_return_list(det, poss, nns, conjs):
 
         """TODO: Docstring for assemble_return_list."""
@@ -235,6 +246,9 @@ class NounPhraseRuleset(Ruleset):
                                                    engine, info)
 
         NounPhraseRuleset.process_negs(relations, index, context, engine, info)
+
+        NounPhraseRuleset.process_npadvmods(relations, index, context,
+                                            engine, info)
 
         return_list, ids_for_preconj = NounPhraseRuleset.\
             assemble_return_list(det, poss, nns, conjs)
