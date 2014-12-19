@@ -161,6 +161,22 @@ class JoinDoublePrepositions(Transformation):
         delete_indices(relations, indices_to_delete)
 
 
+class JoinExpletives(Transformation):
+
+    """Handles expletives, as in 'there is', or 'there are'."""
+
+    def transform(self, relations):
+        indices_to_delete = []
+
+        for i in range(len(relations)):
+            if relations[i].tag == "EX":
+                relations[i + 1].word = relations[i].word +\
+                    ' ' + relations[i + 1].word
+                indices_to_delete.append(i)
+
+        delete_indices(relations, indices_to_delete)
+
+
 class FixAdjectiveRepetition(Transformation):
 
     """Handles adjective repetition as intensifier (e.g., she was gone a long
@@ -227,6 +243,7 @@ all_transformations = [RemovePunctuation(),
                        JoinMultiWordExpressions(),
                        JoinPhrasalModifiers(),
                        JoinDoublePrepositions(),
+                       JoinExpletives(),
                        FixAdjectiveRepetition(),
                        FixAdverbRepetition(),
                        FixReflexivePronouns()]
