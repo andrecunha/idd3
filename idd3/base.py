@@ -87,8 +87,9 @@ class Proposition(object):
     def __init__(self, content, kind):
         """Form a proposition
 
-        :content: TODO
-        :kind: TODO
+        :content: the content of the proposition. E.g.: (ran, the cat).
+        :kind: the kind of the proposition. E.g., P (predication),
+        M (modification), C (connection), and so on.
 
         """
         self.content = content
