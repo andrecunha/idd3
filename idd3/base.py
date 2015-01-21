@@ -33,7 +33,7 @@ class Relation(object):
             corresponding word.
         :head: the head of this relation (None, in case of ROOT).
         :rel: the relation label (e.g., nsubj, det. 'TOP' in case of ROOT;
-            'null' in case of element pointed to by ROOT).
+            'null' or 'root' in case of element pointed to by ROOT).
         :tag: PoS-tag of the corresponding word ('TOP' in case of ROOT).
         :word: the corresponding word (None in case of ROOT).
         """
