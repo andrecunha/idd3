@@ -80,6 +80,32 @@ class Relation(object):
         return string
 
 
+class Proposition(object):
+
+    """Represents a proposition, with its content and type."""
+
+    def __init__(self, content, kind):
+        """Form a proposition
+
+        :content: TODO
+        :kind: TODO
+
+        """
+        self.content = content
+        self.kind = kind
+
+    def __repr__(self):
+        _prop = []
+        for w in self.content:
+            if isinstance(w, str):
+                _prop.append(w)
+            else:
+                _prop.append(str(w))
+
+        content = ', '.join(_prop)
+        return '{0} [{1}]'.format(content, self.kind)
+
+
 class Transformation(object):
     """Transforms a given dependency tree to facilitate its processing."""
 
@@ -152,13 +178,13 @@ class Engine(object):
 
             self._rulesets_dict[relation.rel] = ruleset
 
-    def emit(self, prop):
+    def emit(self, prop, kind='PROP'):
         """Emit a new proposition, storing it in this instance's
             'props' attribute.
 
         :prop: the proposition to be emitted.
         """
-        self.props.append(prop)
+        self.props.append(Proposition(prop, kind))
         return len(self.props)
 
     @staticmethod

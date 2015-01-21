@@ -70,14 +70,7 @@ def process_graphs(sents, graphs):
         print(colored('Propositions:', 'white', attrs=['bold']))
         engine.analyze(relations)
         for i, prop in enumerate(engine.props):
-            _prop = []
-            for w in prop:
-                if isinstance(w, str):
-                    _prop.append(w)
-                else:
-                    _prop.append(str(w))
-
-            print(str(i + 1) + ' ' + ', '.join(_prop))
+            print(str(i + 1) + ' ' + str(prop))
 
     print('-' * int(columns))
 
