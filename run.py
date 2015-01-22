@@ -30,6 +30,7 @@ _, columns = os.popen('stty size', 'r').read().split()
 
 try:
     from termcolor import colored
+    raise ImportError
 except ImportError:
     def colored(string, color, attrs):
         return string
@@ -46,7 +47,7 @@ except ImportError:
 
 # Change this variable to the path on your system
 stanford_path = os.path.expanduser('~') + \
-    "/Develop/stanford_tools/stanford-parser-full-2014-06-16"
+    "/Develop/stanford_tools/stanford-parser"
 stanford_run_cmd = 'java -mx150m -cp ' + stanford_path + \
     '/*: edu.stanford.nlp.parser.lexparser.LexicalizedParser ' + \
     '-outputFormat penn edu/stanford/nlp/models/lexparser/englishPCFG.ser.gz'

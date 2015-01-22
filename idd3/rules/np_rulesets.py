@@ -177,7 +177,7 @@ class NounPhraseRuleset(Ruleset):
                                                           relations, index)
         for i in npadvmod_indices:
             mod = engine.analyze(relations, i, context + [index])
-            engine.emit((mod,))
+            engine.emit((mod,), 'ADVMOD')
 
     @staticmethod
     def process_appos(relations, index, context, engine, info):
@@ -236,7 +236,7 @@ class NounPhraseRuleset(Ruleset):
 
         for noun in pobj_return_value['return_list']:
             engine.emit((noun, relations[index].word + ' ' +
-                         relations[prep_index].word))
+                         relations[prep_index].word), 'M')
 
         engine.mark_processed(relations, prep_index)
 
@@ -285,7 +285,7 @@ class NounPhraseRuleset(Ruleset):
         # Emit propositions for modifiers
         for amod in mods:
             for noun in return_list:
-                engine.emit((noun, amod))
+                engine.emit((noun, amod), 'M')
 
         preconj = NounPhraseRuleset.process_preconj(relations, index, context,
                                                     engine, info)
@@ -426,7 +426,7 @@ class IobjRuleset(NounPhraseRuleset):
                                       engine)
         if d['ids_for_preconj'] == []:
             for value in d['return_list']:
-                engine.emit(('(to) ' + value,))
+                engine.emit(('(to) ' + value,), 'PREP')
 
 
 class PossRuleset(NounPhraseRuleset):
@@ -470,7 +470,7 @@ class PossRuleset(NounPhraseRuleset):
 
                 referent = relations[context[-1]].word
                 for item in this:
-                    engine.emit((referent, item + "'s"))
+                    engine.emit((referent, item + "'s"), 'M')
 
                 # TODO: handle multiple items.
                 return None
@@ -543,7 +543,7 @@ class TmodRuleset(NounPhraseRuleset):
         """
         this = NounPhraseRuleset.extract(self, relations, index, context,
                                          engine, info)['return_list'][0]
-        engine.emit((this, ))
+        engine.emit((this, ), 'TMOD')
 
 
 class ApposRuleset(NounPhraseRuleset):
@@ -559,4 +559,4 @@ class ApposRuleset(NounPhraseRuleset):
         this = NounPhraseRuleset.extract(self, relations, index, context,
                                          engine, info)['return_list'][0]
         for subj in info['subjs']:
-            engine.emit(('(is)', subj, this))
+            engine.emit(('(is)', subj, this), 'P')

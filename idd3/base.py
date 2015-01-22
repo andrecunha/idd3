@@ -82,7 +82,7 @@ class Relation(object):
 
 class Proposition(object):
 
-    """Represents a proposition, with its content and type."""
+    """Represents a proposition, with its content and kind."""
 
     def __init__(self, content, kind):
         """Form a proposition

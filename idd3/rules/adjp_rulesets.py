@@ -59,7 +59,7 @@ class AdjectivalPhraseRuleset(Ruleset):
 
         for advmod in advmods:
             for word in this:
-                engine.emit((word, advmod))
+                engine.emit((word, advmod), 'M')
 
         return this
 

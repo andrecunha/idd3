@@ -44,15 +44,22 @@ def test():
             relations.append(idd3.Relation(**relation))
 
         engine.analyze(relations)
-        props = engine.props
+        props = [prop.content for prop in engine.props]
 
         exp = eval(expected[i])
 
+        # Propositions should be equal to their expected values.
         assert props == exp
 
         unprocessed_relations = engine.get_unprocessed_relations(relations)
 
+        # No relation should be left unprocessed.
         assert unprocessed_relations == []
+
+        kinds = [prop.kind for prop in engine.props]
+
+        # Relations must have a specific kind.
+        assert 'PROP' not in kinds
 
 if __name__ == '__main__':
     test()

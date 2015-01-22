@@ -183,7 +183,7 @@ class VerbPhraseRuleset(Ruleset):
                 for i in npadvmod_indices]
 
         for mod in mods:
-            engine.emit((relations[index].word, mod))
+            engine.emit((relations[index].word, mod), 'M')
 
     @staticmethod
     def process_pp_when_be_is_root(relations, index, context, engine, info,
@@ -258,7 +258,7 @@ class VerbPhraseRuleset(Ruleset):
                                                   context + [index])
             for p in prop_ids:
                 prop = tuple([marker, p] + _prop_ids)
-                engine.emit(prop)
+                engine.emit(prop, 'C')
 
     @staticmethod
     def process_conjs(relations, index, context, engine, info, subjs, auxs,
@@ -288,7 +288,7 @@ class VerbPhraseRuleset(Ruleset):
                 prop_ids.extend(_prop_ids)
 
             conj_prop = tuple([conjunction] + prop_ids)
-            engine.emit(conj_prop)
+            engine.emit(conj_prop, 'C')
 
     @staticmethod
     def process_parataxes(relations, index, context, engine, info):
@@ -308,17 +308,17 @@ class VerbPhraseRuleset(Ruleset):
                                                           'conj'):
             for dobj in dobjs:
                     proposition = tuple([w for w in [verb, dobj]])
-                    prop_id = engine.emit(proposition)
+                    prop_id = engine.emit(proposition, 'P')
                     prop_ids.append(prop_id)
         else:
             for subj in subjs:
                 if len(dobjs) > 0:
                     for dobj in dobjs:
                         proposition = tuple([w for w in [verb, subj, dobj]])
-                        prop_id = engine.emit(proposition)
+                        prop_id = engine.emit(proposition, 'P')
                         prop_ids.append(prop_id)
                 else:
-                    prop_id = engine.emit((verb, subj))
+                    prop_id = engine.emit((verb, subj), 'P')
                     prop_ids.append(prop_id)
 
         return prop_ids
@@ -361,15 +361,15 @@ class VerbPhraseRuleset(Ruleset):
                 #   in the main proposition.
                 for subj in subjs:
                     for mod in mods:
-                        prop_id = engine.emit((verb, subj, mod))
+                        prop_id = engine.emit((verb, subj, mod), 'P')
                         prop_ids.append(prop_id)
             else:
                 for subj in subjs:
-                    prop_id = engine.emit((verb, subj))
+                    prop_id = engine.emit((verb, subj), 'P')
                     prop_ids.append(prop_id)
         else:
             for subj in subjs:
-                prop_id = engine.emit((verb, subj))
+                prop_id = engine.emit((verb, subj), 'P')
                 prop_ids.append(prop_id)
 
         self.subjs = subjs
@@ -446,7 +446,7 @@ class VerbPhraseRuleset(Ruleset):
         for subj in subjs:
             for compl in complms:
                 # engine.emit((verb, subj, relations[index].word))
-                prop_id = engine.emit((verb, subj, compl))
+                prop_id = engine.emit((verb, subj, compl), 'P')
                 prop_ids.append(prop_id)
 
         self.subjs = subjs
@@ -477,7 +477,7 @@ class VerbPhraseRuleset(Ruleset):
         prop_ids = []
         for subj in subjs:
             for word in this:
-                prop_id = engine.emit((verb, subj, word))
+                prop_id = engine.emit((verb, subj, word), 'P')
                 prop_ids.append(prop_id)
 
         self.subjs = subjs
