@@ -58,6 +58,10 @@ class VerbPhraseRuleset(Ruleset):
             subj = [engine.analyze(relations, subj_index[0],
                                    context + [index])['return_value']]
 
+        # Resolve relative pronouns in subordinate clauses.
+        if subj[0] in ('that', 'which', 'who') and 'subj' in info:
+            subj[0] += '(={0})'.format(info['subj'][0])
+
         return subj
 
     @staticmethod

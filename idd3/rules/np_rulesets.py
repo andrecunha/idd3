@@ -154,7 +154,10 @@ class NounPhraseRuleset(Ruleset):
         ids = []
         wdt = None
         for i in rcmod_indices:
-            _, ids, wdt = engine.analyze(relations, i, context + [index])
+            # _, ids, wdt = engine.analyze(relations, i, context + [index])
+            ret = engine.analyze(relations, i, context + [index], info)
+            ids = ret['prop_ids']
+            wdt = ret['subjs']
 
         return ids, wdt
 
@@ -268,9 +271,6 @@ class NounPhraseRuleset(Ruleset):
 
         NounPhraseRuleset.process_vmod(relations, index, context, engine, info)
 
-        ids, wdt = NounPhraseRuleset.process_rcmod(relations, index, context,
-                                                   engine, info)
-
         NounPhraseRuleset.process_negs(relations, index, context, engine, info)
 
         NounPhraseRuleset.process_npadvmods(relations, index, context,
@@ -289,6 +289,10 @@ class NounPhraseRuleset(Ruleset):
 
         preconj = NounPhraseRuleset.process_preconj(relations, index, context,
                                                     engine, info)
+
+        ids, wdt = NounPhraseRuleset.process_rcmod(relations, index, context,
+                                                   engine,
+                                                   {'subj': return_list})
 
         return {'return_list': return_list,
                 'preconj': preconj,
