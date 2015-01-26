@@ -138,7 +138,8 @@ class DetRuleset(Ruleset):
             return relations[index].word
         else:
             # TODO: maybe get the subject from info.
-            engine.emit((relations[context[-1]].word, relations[index].word), 'M')
+            engine.emit((relations[context[-1]].word, relations[index].word),
+                        'M')
             return None
 
 
@@ -180,7 +181,8 @@ class PrepRuleset(Ruleset):
 
             emitted_prop_ids = []
             for pobj in pobjs['return_list']:
-                prop_id = engine.emit((relations[index].word + ' ' + pobj,), 'PREP')
+                prop_id = engine.emit((relations[index].word + ' ' + pobj,),
+                                      'PREP')
                 emitted_prop_ids.append(prop_id)
 
             if pobjs['ids_for_preconj'] != []:
@@ -193,7 +195,7 @@ class PrepRuleset(Ruleset):
         pcomp_index = Relation.get_children_with_dep('pcomp', relations, index)
         if pcomp_index != []:
             pcomp = engine.analyze(relations, pcomp_index[0],
-                                   context + [index])[0]
+                                   context + [index])['return_value']
             if pcomp is not None:
                 engine.emit((relations[index].word + ' ' + pcomp,), 'PREP')
             # TODO: check the 'else' condition.

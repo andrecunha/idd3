@@ -19,7 +19,10 @@ from __future__ import print_function, unicode_literals, division
 from idd3 import Relation, Ruleset
 from idd3.rules.adjp_rulesets import AdjectivalPhraseRuleset
 from idd3.rules.np_rulesets import NounPhraseRuleset
+import logging
 
+
+logger = logging.getLogger(__name__)
 
 be_forms = ['am', 'are', 'is', 'being', 'was', 'were', 'been']
 
@@ -53,7 +56,7 @@ class VerbPhraseRuleset(Ruleset):
         subj_index = Relation.get_children_with_dep('csubj', relations, index)
         if subj_index != []:
             subj = [engine.analyze(relations, subj_index[0],
-                                   context + [index])[0]]
+                                   context + [index])['return_value']]
 
         return subj
 
@@ -103,8 +106,8 @@ class VerbPhraseRuleset(Ruleset):
 
         comps = []
         for comp in _comps:
-            if isinstance(comp, tuple):
-                comp = comp[0]
+            if isinstance(comp, dict):
+                comp = comp['return_value']
 
             if isinstance(comp, list):
                 comps.extend(comp)
@@ -254,10 +257,9 @@ class VerbPhraseRuleset(Ruleset):
                                                        relations, index)
 
         for i in advcl_indices:
-            _, _prop_ids, marker = engine.analyze(relations, i,
-                                                  context + [index])
+            ret = engine.analyze(relations, i, context + [index])
             for p in prop_ids:
-                prop = tuple([marker, p] + _prop_ids)
+                prop = tuple([ret['marker'], p] + ret['prop_ids'])
                 engine.emit(prop, 'C')
 
     @staticmethod
@@ -280,12 +282,11 @@ class VerbPhraseRuleset(Ruleset):
                                                           index)
 
             for i in conj_indices:
-                _, _prop_ids, _ = engine.analyze(relations, i,
-                                                 context + [index],
-                                                 info={'class': 'VP',
-                                                       'subj': subjs,
-                                                       'aux': auxs})
-                prop_ids.extend(_prop_ids)
+                ret = engine.analyze(relations, i, context + [index],
+                                     info={'class': 'VP',
+                                           'subj': subjs,
+                                           'aux': auxs})
+                prop_ids.extend(ret['prop_ids'])
 
             conj_prop = tuple([conjunction] + prop_ids)
             engine.emit(conj_prop, 'C')
@@ -375,7 +376,7 @@ class VerbPhraseRuleset(Ruleset):
         self.subjs = subjs
         self.auxs = auxs
 
-        return None, prop_ids
+        return {'return_value': None, 'prop_ids': prop_ids}
 
     def handle_action_verb(self, relations, index, context, engine, info):
 
@@ -412,15 +413,16 @@ class VerbPhraseRuleset(Ruleset):
                 if comps != []:
                     prop_ids = self.emit_propositions(verb, subjs, comps,
                                                       engine, relations[index])
-                return relations[index].word, prop_ids
+                return {'return_value': relations[index].word,
+                        'prop_ids': prop_ids}
             else:
                 prop_ids = self.emit_propositions(verb, subjs, comps, engine,
                                                   relations[index])
-                return None, prop_ids
+                return {'return_value': None, 'prop_ids': prop_ids}
         else:
             prop_ids = self.emit_propositions(verb, subjs, comps, engine,
                                               relations[index])
-            return None, prop_ids
+            return {'return_value': None, 'prop_ids': prop_ids}
 
     def handle_cop_with_np(self, relations, index, context, engine, info):
 
@@ -452,7 +454,7 @@ class VerbPhraseRuleset(Ruleset):
         self.subjs = subjs
         self.auxs = auxs
 
-        return None, prop_ids
+        return {'return_value': None, 'prop_ids': prop_ids}
 
     def handle_cop_with_adjp(self, relations, index, context, engine, info):
 
@@ -483,7 +485,7 @@ class VerbPhraseRuleset(Ruleset):
         self.subjs = subjs
         self.auxs = auxs
 
-        return None, prop_ids
+        return {'return_value': None, 'prop_ids': prop_ids}
 
     def extract(self, relations, index, context, engine, info={}):
         # Process discourse markers.
@@ -491,35 +493,37 @@ class VerbPhraseRuleset(Ruleset):
                                                     engine, info)
 
         if relations[index].word in be_forms:
-            return_value = self.handle_be_as_root(relations, index, context,
-                                                  engine, info)
+            return_dict = self.handle_be_as_root(relations, index, context,
+                                                 engine, info)
         elif relations[index].tag in ('VBZ', 'VBD', 'VBN', 'VB', 'VBG', 'VBP'):
-            return_value = self.handle_action_verb(relations, index, context,
-                                                   engine, info)
+            return_dict = self.handle_action_verb(relations, index, context,
+                                                  engine, info)
         elif relations[index].tag in ('NN', 'NNS', 'NNP', 'NNPS', 'CD', 'WP'):
-            return_value = self.handle_cop_with_np(relations, index, context,
-                                                   engine, info)
+            return_dict = self.handle_cop_with_np(relations, index, context,
+                                                  engine, info)
         elif relations[index].tag in ('JJ'):
-            return_value = self.handle_cop_with_adjp(relations, index, context,
-                                                     engine, info)
+            return_dict = self.handle_cop_with_adjp(relations, index, context,
+                                                    engine, info)
         else:
             print('VP: cannot handle', relations[index].tag, 'yet.')
-            return_value = None
+            return_dict = None
 
         # Process adverbial clauses.
         VerbPhraseRuleset.process_advcl(relations, index, context, engine,
-                                        info, return_value[1])
+                                        info, return_dict['prop_ids'])
 
         # Process conjunctions.
         VerbPhraseRuleset.process_conjs(relations, index, context, engine,
                                         info, self.subjs, self.auxs,
-                                        return_value[1])
+                                        return_dict['prop_ids'])
 
         # Process parataxical clauses.
         VerbPhraseRuleset.process_parataxes(relations, index, context, engine,
                                             info)
 
-        return return_value + (self.subjs,)
+        return_dict['subjs'] = self.subjs
+
+        return return_dict
 
 
 class RootRuleset(VerbPhraseRuleset):
@@ -571,8 +575,8 @@ class AdvclRuleset(VerbPhraseRuleset):
     rel = 'advcl'
 
     def extract(self, relations, index, context, engine, info={}):
-        status, prop_ids, _ = VerbPhraseRuleset.extract(self, relations, index,
-                                                        context, engine, info)
+        ret = VerbPhraseRuleset.extract(self, relations, index, context,
+                                        engine, info)
 
         mark_index = Relation.get_children_with_dep('mark', relations, index)
 
@@ -581,7 +585,10 @@ class AdvclRuleset(VerbPhraseRuleset):
         else:
             marker = 'NO_MARKER'
 
-        return status, prop_ids, marker
+        ret['marker'] = marker
+
+        return ret
+        # return status, prop_ids, marker
 
 
 class RcmodRuleset(VerbPhraseRuleset):
