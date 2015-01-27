@@ -21,6 +21,8 @@ from idd3 import Relation, Engine, rules, transform
 import nltk
 from sys import argv
 from subprocess import call
+from collections import defaultdict
+from prettytable import PrettyTable
 
 import logging
 logging.basicConfig(level=logging.INFO)
@@ -58,6 +60,7 @@ stanford_convert_tree_cmd = 'java -mx150m -cp ' + stanford_path + \
 
 def process_graphs(sents, graphs):
     engine = Engine(rules.all_rulesets, transform.all_transformations)
+    stats = defaultdict(int)
 
     for index in range(len(graphs) - 1):
         print('-' * int(columns))
@@ -72,8 +75,23 @@ def process_graphs(sents, graphs):
         engine.analyze(relations)
         for i, prop in enumerate(engine.props):
             print(str(i + 1) + ' ' + str(prop))
+            stats[prop.kind] += 1
 
     print('-' * int(columns))
+    return stats
+
+
+def print_stats(stats):
+    t = PrettyTable(['Kind', '#'])
+    t.align['Kind'] = 'r'
+    t.align['#'] = 'r'
+    t.padding_width = 1
+
+    for kind, n in stats.items():
+        t.add_row([kind, n])
+
+    print('Stats:')
+    print(t)
 
 
 def main():
@@ -106,7 +124,9 @@ def main():
         graphs = nltk.parse.dependencygraph.DependencyGraph.load(
             '/tmp/output.conll')
 
-    process_graphs(sents, graphs)
+    stats = process_graphs(sents, graphs)
+    print_stats(stats)
+
 
 if __name__ == '__main__':
     main()

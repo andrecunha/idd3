@@ -64,7 +64,7 @@ class AdverbialPhraseRuleset(Ruleset):
         self.process_preps(relations, index, context, engine, info)
 
         if 'no_emit' not in info:
-            engine.emit((relations[index].word,), 'ADVMOD')
+            engine.emit((relations[index].word,), 'M')
 
         return (relations[index].word)
 

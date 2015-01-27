@@ -33,9 +33,9 @@ class NegRuleset(AtomicEmittingRuleset):
     """A ruleset that processes the 'neg' relation."""
 
     rel = 'neg'
-    
+
     def extract(self, relations, index, context, engine, info={}):
-        engine.emit((relations[index].word,), 'NEG')
+        engine.emit((relations[index].word,), 'M')
 
 
 class DiscourseRuleset(AtomicEmittingRuleset):
@@ -43,6 +43,6 @@ class DiscourseRuleset(AtomicEmittingRuleset):
     """A ruleset that processes the 'discourse' relation."""
 
     rel = 'discourse'
-    
+
     def extract(self, relations, index, context, engine, info={}):
-        engine.emit((relations[index].word,), 'DISC')
+        engine.emit((relations[index].word,), 'M')

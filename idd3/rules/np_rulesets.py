@@ -180,7 +180,7 @@ class NounPhraseRuleset(Ruleset):
                                                           relations, index)
         for i in npadvmod_indices:
             mod = engine.analyze(relations, i, context + [index])
-            engine.emit((mod,), 'ADVMOD')
+            engine.emit((mod,), 'M')
 
     @staticmethod
     def process_appos(relations, index, context, engine, info):
@@ -547,7 +547,7 @@ class TmodRuleset(NounPhraseRuleset):
         """
         this = NounPhraseRuleset.extract(self, relations, index, context,
                                          engine, info)['return_list'][0]
-        engine.emit((this, ), 'TMOD')
+        engine.emit((this, ), 'M')
 
 
 class ApposRuleset(NounPhraseRuleset):

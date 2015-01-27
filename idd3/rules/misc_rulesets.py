@@ -182,7 +182,7 @@ class PrepRuleset(Ruleset):
             emitted_prop_ids = []
             for pobj in pobjs['return_list']:
                 prop_id = engine.emit((relations[index].word + ' ' + pobj,),
-                                      'PREP')
+                                      'M')
                 emitted_prop_ids.append(prop_id)
 
             if pobjs['ids_for_preconj'] != []:
@@ -197,7 +197,7 @@ class PrepRuleset(Ruleset):
             pcomp = engine.analyze(relations, pcomp_index[0],
                                    context + [index])['return_value']
             if pcomp is not None:
-                engine.emit((relations[index].word + ' ' + pcomp,), 'PREP')
+                engine.emit((relations[index].word + ' ' + pcomp,), 'M')
             # TODO: check the 'else' condition.
 
 
