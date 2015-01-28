@@ -184,6 +184,16 @@ class NounPhraseRuleset(Ruleset):
             engine.emit((mod,), 'M')
 
     @staticmethod
+    def process_advmods(relations, index, context, engine, info):
+
+        """TODO: Docstring for process_advmods."""
+
+        advmod_indices = Relation.get_children_with_dep('advmod',
+                                                        relations, index)
+        for i in advmod_indices:
+            engine.analyze(relations, i, context + [index])
+
+    @staticmethod
     def process_appos(relations, index, context, engine, info):
 
         """TODO: Docstring for process_appos."""
@@ -276,6 +286,9 @@ class NounPhraseRuleset(Ruleset):
 
         NounPhraseRuleset.process_npadvmods(relations, index, context,
                                             engine, info)
+
+        NounPhraseRuleset.process_advmods(relations, index, context,
+                                          engine, info)
 
         return_list, ids_for_preconj = NounPhraseRuleset.\
             assemble_return_list(det, poss, nns, conjs)
