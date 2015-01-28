@@ -34,18 +34,20 @@ def delete_indices(relations, indices):
         del relations[index]
 
         for rel in relations:
-            rel.deps = [dep for dep in rel.deps if dep != index]
-
-            for i, dep in enumerate(rel.deps):
-                if dep > index:
-                    rel.deps[i] -= 1
-
             if rel.head is not None:
-                if rel.head > index:
+                if rel.head >= index:
                     rel.head -= 1
 
     for i, rel in enumerate(relations):
         rel.address = i
+        rel.deps = []
+
+    for i, rel in enumerate(relations):
+        if rel.head is not None:
+            relations[rel.head].deps.append(i)
+
+    for rel in relations:
+        rel.deps.sort()
 
 
 class RemovePunctuation(Transformation):
@@ -177,7 +179,7 @@ class JoinPhrasalModifiers(Transformation):
                             rel.head = index
                             relations[index].deps.append(i)
 
-                    relations[index].deps = sorted(relations[index].deps)
+                    relations[index].deps.sort()
 
 
 class JoinDoublePrepositions(Transformation):
