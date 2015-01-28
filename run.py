@@ -72,10 +72,13 @@ def process_graphs(sents, graphs):
         print('\t' + sents[index])
 
         print(colored('Propositions:', 'white', attrs=['bold']))
-        engine.analyze(relations)
-        for i, prop in enumerate(engine.props):
-            print(str(i + 1) + ' ' + str(prop))
-            stats[prop.kind] += 1
+        try:
+            engine.analyze(relations)
+            for i, prop in enumerate(engine.props):
+                print(str(i + 1) + ' ' + str(prop))
+                stats[prop.kind] += 1
+        except Exception:
+            pass
 
     print('-' * int(columns))
     return stats
