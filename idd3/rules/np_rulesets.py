@@ -121,8 +121,6 @@ class NounPhraseRuleset(Ruleset):
             elif isinstance(mod, list):
                 mods += mod
 
-        logger.debug('These are the modifiers: %s', mods)
-
         return mods
 
     @staticmethod
@@ -210,6 +208,18 @@ class NounPhraseRuleset(Ruleset):
                                                        relations, index)
         for i in appos_indices:
             engine.analyze(relations, i, context + [index], info)
+
+    @staticmethod
+    def process_predets(relations, index, context, engine, info):
+
+        """TODO: Docstring for process_predet."""
+
+        predet_indices = Relation.get_children_with_dep('predet',
+                                                        relations, index)
+        predets = [engine.analyze(relations, i, context + [index], info)
+                   for i in predet_indices]
+
+        return predets
 
     @staticmethod
     def assemble_return_list(det, poss, nns, conjs):
@@ -307,10 +317,18 @@ class NounPhraseRuleset(Ruleset):
                                          {'return_list': return_list,
                                           'rcmod_wdt': None}})
 
+        predets = NounPhraseRuleset.process_predets(relations, index, context,
+                                                    engine, info)
+
         # Emit propositions for modifiers
         for amod in mods:
             for noun in return_list:
                 engine.emit((noun, amod), 'M')
+
+        # Emit propositions for predeterminers.
+        for predet in predets:
+            for noun in return_list:
+                engine.emit((noun, predet), 'M')
 
         preconj = NounPhraseRuleset.process_preconj(relations, index, context,
                                                     engine, info)

@@ -98,3 +98,8 @@ class MarkRuleset(AtomicRuleset):
     rel = 'mark'
 
 
+class PredetRuleset(AtomicRuleset):
+
+    """A ruleset that processes the 'predet' relation."""
+
+    rel = 'predet'
