@@ -50,10 +50,10 @@ except ImportError:
 # Change this variable to the path on your system
 stanford_path = os.path.expanduser('~') + \
     "/Develop/stanford_tools/stanford-parser"
-stanford_run_cmd = 'java -mx150m -cp ' + stanford_path + \
+stanford_run_cmd = 'java -mx1024m -cp ' + stanford_path + \
     '/*: edu.stanford.nlp.parser.lexparser.LexicalizedParser ' + \
     '-outputFormat penn edu/stanford/nlp/models/lexparser/englishPCFG.ser.gz'
-stanford_convert_tree_cmd = 'java -mx150m -cp ' + stanford_path + \
+stanford_convert_tree_cmd = 'java -mx1024m -cp ' + stanford_path + \
     '/*: edu.stanford.nlp.trees.EnglishGrammaticalStructure ' + \
     '-conllx -basic -treeFile'
 
