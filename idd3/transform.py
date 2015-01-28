@@ -118,6 +118,23 @@ class JoinUpTo(Transformation):
         delete_indices(relations, indices_to_delete)
 
 
+class JoinAtAll(Transformation):
+
+    """Joins 'at all'."""
+
+    def transform(self, relations):
+        indices_to_delete = []
+        for i in range(len(relations)):
+            if relations[i].word == 'at'\
+                    and i + 1 < len(relations)\
+                    and relations[i + 1].word == 'all'\
+                    and not relations[i + 1].deps:
+                relations[i].word = 'at all'
+                indices_to_delete.append(i + 1)
+
+        delete_indices(relations, indices_to_delete)
+
+
 class JoinMultiWordExpressions(Transformation):
     """Joins multi-word expressions in a single node. """
 
@@ -324,6 +341,7 @@ all_transformations = [RemovePunctuation(),
                        JoinNoLonger(),
                        JoinBecauseOf(),
                        JoinUpTo(),
+                       JoinAtAll(),
                        JoinMultiWordExpressions(),
                        JoinPhrasalModifiers(),
                        JoinDoublePrepositions(),
