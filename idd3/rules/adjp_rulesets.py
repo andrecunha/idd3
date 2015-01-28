@@ -44,9 +44,10 @@ class AdjectivalPhraseRuleset(Ruleset):
         xcomp_indices = Relation.get_children_with_dep('xcomp', relations,
                                                        index)
         for i in xcomp_indices:
-            engine.analyze(relations, i, context + [index],
-                           {'subj': {'return_list': ['NO_SUBJ'],
-                                     'rcmod_wdt': None}})
+            if 'subj' not in info:
+                info['subj'] = {'return_list': ['NO_SUBJ'],
+                                'rcmod_wdt': None}
+            engine.analyze(relations, i, context + [index], info)
 
     def extract(self, relations, index, context, engine, info={}):
         advmods = AdjectivalPhraseRuleset.process_advmods(relations, index,

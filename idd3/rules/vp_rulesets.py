@@ -310,6 +310,16 @@ class VerbPhraseRuleset(Ruleset):
         for i in parataxis_indices:
             engine.analyze(relations, i, context + [index])
 
+    @staticmethod
+    def process_whats(relations, index, context, engine, info):
+
+        """Processes children with label 'what'."""
+
+        what_indices = Relation.get_children_with_dep('what', relations, index)
+
+        for i in what_indices:
+            engine.analyze(relations, i, context + [index], info)
+
     def emit_propositions(self, verb, subjs, dobjs, engine, relation):
 
         """TODO: Docstring for emit_propositions."""
@@ -437,6 +447,8 @@ class VerbPhraseRuleset(Ruleset):
         self.process_advs(relations, index, context, engine, info)
 
         self.process_ignorables(relations, index, context, engine, info)
+
+        self.process_whats(relations, index, context, engine, {})
 
         self.subjs = subjs
         self.auxs = auxs

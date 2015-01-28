@@ -84,4 +84,5 @@ all_rulesets = [TopRuleset(),
                 DetRuleset(),
                 PrepRuleset(),
                 QuantmodRuleset(),
-                NumRuleset()]
+                NumRuleset(),
+                WhatRuleset()]

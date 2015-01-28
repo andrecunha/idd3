@@ -16,7 +16,7 @@
 # this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from __future__ import print_function, unicode_literals, division
-from idd3 import Relation, Ruleset
+from idd3 import Ruleset
 
 
 class AtomicEmittingRuleset(Ruleset):
@@ -46,3 +46,5 @@ class DiscourseRuleset(AtomicEmittingRuleset):
 
     def extract(self, relations, index, context, engine, info={}):
         engine.emit((relations[index].word,), 'M')
+
+

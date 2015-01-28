@@ -278,6 +278,32 @@ class FixReflexivePronouns(Transformation):
                 relations[i - 1].deps.sort()
 
 
+class FixXcompAttributions(Transformation):
+
+    """Turns xcomp relations with no cop children to 'what'."""
+
+    def transform(self, relations):
+        for index, relation in enumerate(relations):
+            if relation.rel == 'xcomp'\
+                    and relation.tag in ('NN', 'NNS', 'NNP', 'NNPS', 'JJ'):
+                if not Relation.get_children_with_dep('cop', relations, index):
+                    relation.rel = 'what'
+
+                    # The subject of this xcomp should become the direct object
+                    #   of the main verb.
+                    xcomp_subj = Relation.get_children_with_dep('nsubj',
+                                                                relations,
+                                                                index)
+                    if xcomp_subj:
+                        relations[xcomp_subj[0]].head = relations[index].head
+                        relations[xcomp_subj[0]].rel = 'dobj'
+                        relations[relations[index].head].deps.append(
+                            relations[xcomp_subj[0]].address)
+                        relations[relations[index].head].deps.sort()
+                        relations[index].deps.remove(relations[xcomp_subj[0]]
+                                                     .address)
+
+
 all_transformations = [RemovePunctuation(),
                        RemoveParataxisFillers(),
                        RemoveUtteranceInitialConjunction(),
@@ -290,4 +316,5 @@ all_transformations = [RemovePunctuation(),
                        JoinExpletives(),
                        FixAdjectiveRepetition(),
                        FixAdverbRepetition(),
-                       FixReflexivePronouns()]
+                       FixReflexivePronouns(),
+                       FixXcompAttributions()]

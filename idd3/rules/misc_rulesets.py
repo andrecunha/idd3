@@ -19,6 +19,7 @@ from __future__ import print_function, unicode_literals, division
 from idd3 import Relation, Ruleset
 from idd3.rules.np_rulesets import NounPhraseRuleset
 from idd3.rules.vp_rulesets import VerbPhraseRuleset
+from idd3.rules.adjp_rulesets import AdjectivalPhraseRuleset
 
 import logging
 logger = logging.getLogger(__name__)
@@ -276,3 +277,25 @@ class QuantmodRuleset(Ruleset):
                 -> emit((100, about))
         """
         engine.emit((info['num'], relations[index].word), 'M')
+
+
+class WhatRuleset(NounPhraseRuleset, AdjectivalPhraseRuleset):
+
+    """A ruleset that processes the 'what' relation."""
+
+    rel = 'what'
+
+    def extract(self, relations, index, context, engine, info={}):
+        if relations[index].tag in ('NN', 'NNS', 'NNP', 'NNPS'):
+            this = NounPhraseRuleset.extract(self, relations, index, context,
+                                             engine, info)
+            for noun in this['return_list']:
+                engine.emit((noun,), 'WHAT')
+        elif relations[index].tag == 'JJ':
+            this = AdjectivalPhraseRuleset.extract(self, relations, index,
+                                                   context, engine, info)
+            for adj in this:
+                engine.emit((adj,), 'WHAT')
+        else:
+            # In case something weird happens, we just emit the word.
+            engine.emit((relations[index].word,), 'WHAT')
