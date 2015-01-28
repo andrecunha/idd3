@@ -98,8 +98,3 @@ class MarkRuleset(AtomicRuleset):
     rel = 'mark'
 
 
-class NnRuleset(AtomicRuleset):
-
-    """A ruleset that processes the 'nn' relation."""
-
-    rel = 'nn'
