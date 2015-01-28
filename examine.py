@@ -30,7 +30,8 @@ def demo():
 
     print(colored('Propositions:', 'white', attrs=['bold']))
     engine.analyze(relations)
-    pprint.pprint(engine.props)
+    for i, prop in enumerate(engine.props):
+        print(str(i + 1) + ' ' + str(prop))
 
     print(colored('Unprocessed relations:', 'white', attrs=['bold']))
     for relation in engine.get_unprocessed_relations(relations):
