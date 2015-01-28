@@ -340,13 +340,21 @@ class VerbPhraseRuleset(Ruleset):
 
         """Emits propositions for rcmods."""
 
-        logger.info('This is return_dict: %s', return_dict)
-
         if return_dict['subjs']['rcmod_wdt']:
             for main_prop_id in return_dict['prop_ids']:
                 for rcmod_prop_id in return_dict['subjs']['rcmod_ids']:
                     engine.emit(
                         (return_dict['subjs']['rcmod_wdt']['return_list'][0],
+                         main_prop_id,
+                         rcmod_prop_id),
+                        'C')
+
+        if 'this' in return_dict:
+            # Emit propositions for copula + NP.
+            for main_prop_id in return_dict['prop_ids']:
+                for rcmod_prop_id in return_dict['this']['rcmod_ids']:
+                    engine.emit(
+                        (return_dict['this']['rcmod_wdt']['return_list'][0],
                          main_prop_id,
                          rcmod_prop_id),
                         'C')
@@ -468,6 +476,7 @@ class VerbPhraseRuleset(Ruleset):
 
         this = NounPhraseRuleset.extract(self, relations, index, context,
                                          engine, info)
+
         # TODO: handle cc/conj and preconj.
         complms = this['return_list']
 
@@ -481,7 +490,7 @@ class VerbPhraseRuleset(Ruleset):
         self.subjs = subjs
         self.auxs = auxs
 
-        return {'return_value': None, 'prop_ids': prop_ids}
+        return {'return_value': None, 'prop_ids': prop_ids, 'this': this}
 
     def handle_cop_with_adjp(self, relations, index, context, engine, info):
 
