@@ -304,6 +304,18 @@ class FixXcompAttributions(Transformation):
                                                      .address)
 
 
+class TransformNnJoin(Transformation):
+
+    """Transforms NN into NN-join if both words start with capital letters."""
+
+    def transform(self, relations):
+        for relation in relations:
+            if relation.rel == 'nn':
+                if relation.word[0].isupper()\
+                        and relations[relation.head].word[0].isupper():
+                    relation.rel = 'nn-join'
+
+
 all_transformations = [RemovePunctuation(),
                        RemoveParataxisFillers(),
                        RemoveUtteranceInitialConjunction(),
@@ -317,4 +329,5 @@ all_transformations = [RemovePunctuation(),
                        FixAdjectiveRepetition(),
                        FixAdverbRepetition(),
                        FixReflexivePronouns(),
-                       FixXcompAttributions()]
+                       FixXcompAttributions(),
+                       TransformNnJoin()]

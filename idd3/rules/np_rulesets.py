@@ -57,9 +57,10 @@ class NounPhraseRuleset(Ruleset):
 
         """TODO: Docstring for process_noun_modifiers."""
 
-        nn_indices = Relation.get_children_with_dep('nn', relations, index)
+        nnjoin_indices = Relation.get_children_with_dep('nn-join', relations,
+                                                        index)
         nns = [engine.analyze(relations, i, context + [index])
-               for i in nn_indices]
+               for i in nnjoin_indices]
 
         return nns
 
@@ -105,8 +106,9 @@ class NounPhraseRuleset(Ruleset):
         # ADJP modifiers
         amod_indices = Relation.get_children_with_dep('amod', relations, index)
         num_indices = Relation.get_children_with_dep('num', relations, index)
+        nn_indices = Relation.get_children_with_dep('nn', relations, index)
 
-        mods_indices = sorted(amod_indices + num_indices)
+        mods_indices = sorted(amod_indices + num_indices + nn_indices)
         mods = []
         for m in mods_indices:
             mod = engine.analyze(relations, m, context + [index])

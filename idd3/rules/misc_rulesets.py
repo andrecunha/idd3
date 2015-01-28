@@ -71,11 +71,11 @@ class ConjRuleset(NounPhraseRuleset, VerbPhraseRuleset):
             return d
 
 
-class NnRuleset(Ruleset):
+class NnJoinRuleset(Ruleset):
 
-    """A ruleset that processes the 'nn' relation."""
+    """A ruleset that processes the 'nn-join' relation."""
 
-    rel = 'nn'
+    rel = 'nn-join'
 
     def extract(self, relations, index, context, engine, info={}):
         """extract(relations, index, context, engine, info) -> str | list(str)
