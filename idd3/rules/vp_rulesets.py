@@ -276,11 +276,17 @@ class VerbPhraseRuleset(Ruleset):
     @staticmethod
     def process_conjs(relations, index, context, engine, info, subjs, auxs,
                       prop_ids):
-        cc_indices = Relation.get_children_with_dep('cc', relations, index)
+        conj_indices = Relation.get_children_with_dep('conj', relations,
+                                                      index)
 
-        if cc_indices != []:
-            conjunction = engine.analyze(relations, cc_indices[0],
-                                         context + [index])
+        if conj_indices != []:
+            cc_indices = Relation.get_children_with_dep('cc', relations, index)
+
+            if cc_indices:
+                conjunction = engine.analyze(relations, cc_indices[0],
+                                             context + [index])
+            else:
+                conjunction = None
 
             preconj_indices = Relation.get_children_with_dep('preconj',
                                                              relations, index)
@@ -289,9 +295,6 @@ class VerbPhraseRuleset(Ruleset):
                                          context + [index])
                 conjunction = preconj + '_' + conjunction
 
-            conj_indices = Relation.get_children_with_dep('conj', relations,
-                                                          index)
-
             for i in conj_indices:
                 ret = engine.analyze(relations, i, context + [index],
                                      info={'class': 'VP',
@@ -299,8 +302,9 @@ class VerbPhraseRuleset(Ruleset):
                                            'aux': auxs})
                 prop_ids.extend(ret['prop_ids'])
 
-            conj_prop = tuple([conjunction] + prop_ids)
-            engine.emit(conj_prop, 'C')
+            if conjunction:
+                conj_prop = tuple([conjunction] + prop_ids)
+                engine.emit(conj_prop, 'C')
 
     @staticmethod
     def process_parataxes(relations, index, context, engine, info):

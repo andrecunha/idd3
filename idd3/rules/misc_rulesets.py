@@ -93,12 +93,15 @@ class NnJoinRuleset(Ruleset):
                 conj(East, West)
                 -> return ["East", "West"]
         """
-        cc_indices = Relation.get_children_with_dep('cc', relations, index)
+        conj_indices = Relation.get_children_with_dep('conj', relations,
+                                                      index)
 
-        if cc_indices != []:
-            engine.analyze(relations, cc_indices[0], context + [index])
-            conj_indices = Relation.get_children_with_dep('conj', relations,
-                                                          index)
+        if conj_indices != []:
+            # Consume the conjunction.
+            cc_indices = Relation.get_children_with_dep('cc', relations, index)
+            for i in cc_indices:
+                engine.analyze(relations, cc_indices[0], context + [index])
+
             conjs = [engine.analyze(relations, i, context + [index],
                                     info={'class': 'NP'})
                      for i in conj_indices]

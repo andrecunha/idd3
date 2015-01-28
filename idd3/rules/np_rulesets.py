@@ -71,14 +71,18 @@ class NounPhraseRuleset(Ruleset):
 
         # Composite NP with conjunction
 
-        cc_index = Relation.get_children_with_dep('cc', relations, index)
-        if cc_index != []:
-            engine.analyze(relations, cc_index[0], context + [index])
-            conj_index = Relation.get_children_with_dep('conj', relations,
-                                                        index)
+        conj_indices = Relation.get_children_with_dep('conj', relations, index)
+
+        if conj_indices != []:
+            # Consume the cc.
+            cc_indices = Relation.get_children_with_dep('cc', relations, index)
+            for i in cc_indices:
+                engine.analyze(relations, i, context + [index])
+
+            # Get the conjs.
             conjs = [engine.analyze(relations, i, context + [index],
                                     info={'class': 'NP'})
-                     for i in conj_index]
+                     for i in conj_indices]
             # TODO: check if this makes sense.
             conjs = [c[0] for c in conjs]
         else:
