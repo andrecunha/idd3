@@ -40,9 +40,12 @@ class VerbPhraseRuleset(Ruleset):
         subj_index = Relation.get_children_with_dep('nsubj', relations, index)
         if subj_index == []:
             if 'subj' in info:
-                subj = ['(%s)' % s for s in info['subj']]
+                subj = {'return_list': ['(%s)' % s
+                                        for s in info['subj']['return_list']],
+                        'rcmod_wdt': None}
             else:
-                subj = ['(NO_SUBJ)']  # TODO: remove.
+                subj = {'return_list': ['(NO_SUBJ)'], 'rcmod_wdt': None}
+                # TODO: remove.
         else:
             subj = engine.analyze(relations, subj_index[0], context + [index])
 
@@ -55,12 +58,16 @@ class VerbPhraseRuleset(Ruleset):
         # csubj
         subj_index = Relation.get_children_with_dep('csubj', relations, index)
         if subj_index != []:
-            subj = [engine.analyze(relations, subj_index[0],
-                                   context + [index])['return_value']]
+            subj = {'return_list': [engine.analyze(relations, subj_index[0],
+                                                   context + [index])
+                                    ['return_value']],
+                    'rcmod_wdt': None}
 
         # Resolve relative pronouns in subordinate clauses.
-        if subj[0] in ('that', 'which', 'who') and 'subj' in info:
-            subj[0] += '(={0})'.format(info['subj'][0])
+        if subj['return_list'][0] in ('that', 'which', 'who')\
+                and 'subj' in info:
+            subj['return_list'][0] += '(={0})'.format(
+                info['subj']['return_list'][0])
 
         return subj
 
@@ -203,7 +210,7 @@ class VerbPhraseRuleset(Ruleset):
         if prep_indices == []:
             return []
 
-        if subjs[0].lower() == 'it':
+        if subjs['return_list'][0].lower() == 'it':
             prep_index = prep_indices[0]
             pobj_index = Relation.get_children_with_dep('pobj', relations,
                                                         prep_index)[0]
@@ -232,7 +239,7 @@ class VerbPhraseRuleset(Ruleset):
         advmod_indices = Relation.get_children_with_dep('advmod', relations,
                                                         index)
         if advmod_indices != []:
-            if subjs[0].lower() == 'it':
+            if subjs['return_list'][0].lower() == 'it':
                 _info = {'no_emit': True}
             else:
                 _info = {}
@@ -316,7 +323,7 @@ class VerbPhraseRuleset(Ruleset):
                     prop_id = engine.emit(proposition, 'P')
                     prop_ids.append(prop_id)
         else:
-            for subj in subjs:
+            for subj in subjs['return_list']:
                 if len(dobjs) > 0:
                     for dobj in dobjs:
                         proposition = tuple([w for w in [verb, subj, dobj]])
@@ -327,6 +334,22 @@ class VerbPhraseRuleset(Ruleset):
                     prop_ids.append(prop_id)
 
         return prop_ids
+
+    @staticmethod
+    def emit_propositions_rcmods(return_dict, engine):
+
+        """Emits propositions for rcmods."""
+
+        logger.info('This is return_dict: %s', return_dict)
+
+        if return_dict['subjs']['rcmod_wdt']:
+            for main_prop_id in return_dict['prop_ids']:
+                for rcmod_prop_id in return_dict['subjs']['rcmod_ids']:
+                    engine.emit(
+                        (return_dict['subjs']['rcmod_wdt']['return_list'][0],
+                         main_prop_id,
+                         rcmod_prop_id),
+                        'C')
 
     def handle_be_as_root(self, relations, index, context, engine, info):
 
@@ -359,21 +382,21 @@ class VerbPhraseRuleset(Ruleset):
         # Emit propositions.
         prop_ids = []
         if mods != []:
-            if subjs[0].lower() == 'it':
+            if subjs['return_list'][0].lower() == 'it':
                 # 'It' is usually considered a dummy, semantically empty
                 #   subject, so we join the adverbial and prepositional
                 #   modifiers (usually a date, an age, or something similar)
                 #   in the main proposition.
-                for subj in subjs:
+                for subj in subjs['return_list']:
                     for mod in mods:
                         prop_id = engine.emit((verb, subj, mod), 'P')
                         prop_ids.append(prop_id)
             else:
-                for subj in subjs:
+                for subj in subjs['return_list']:
                     prop_id = engine.emit((verb, subj), 'P')
                     prop_ids.append(prop_id)
         else:
-            for subj in subjs:
+            for subj in subjs['return_list']:
                 prop_id = engine.emit((verb, subj), 'P')
                 prop_ids.append(prop_id)
 
@@ -449,7 +472,7 @@ class VerbPhraseRuleset(Ruleset):
         complms = this['return_list']
 
         prop_ids = []
-        for subj in subjs:
+        for subj in subjs['return_list']:
             for compl in complms:
                 # engine.emit((verb, subj, relations[index].word))
                 prop_id = engine.emit((verb, subj, compl), 'P')
@@ -481,7 +504,7 @@ class VerbPhraseRuleset(Ruleset):
                                                engine, info)
 
         prop_ids = []
-        for subj in subjs:
+        for subj in subjs['return_list']:
             for word in this:
                 prop_id = engine.emit((verb, subj, word), 'P')
                 prop_ids.append(prop_id)
@@ -526,6 +549,9 @@ class VerbPhraseRuleset(Ruleset):
                                             info)
 
         return_dict['subjs'] = self.subjs
+
+        # Process rcmods.
+        VerbPhraseRuleset.emit_propositions_rcmods(return_dict, engine)
 
         return return_dict
 

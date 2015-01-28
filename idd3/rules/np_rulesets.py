@@ -141,7 +141,8 @@ class NounPhraseRuleset(Ruleset):
                                                       index)
         for i in vmod_indices:
             engine.analyze(relations, i, context + [index],
-                           {'subj': ['NO_SUBJ']})
+                           {'subj': {'return_list': ['NO_SUBJ'],
+                                     'rcmod_wdt': None}})
 
     @staticmethod
     def process_rcmod(relations, index, context, engine, info={}):
@@ -280,7 +281,10 @@ class NounPhraseRuleset(Ruleset):
             assemble_return_list(det, poss, nns, conjs)
 
         NounPhraseRuleset.process_appos(relations, index, context,
-                                        engine, {'subjs': return_list})
+                                        engine,
+                                        {'subj':
+                                         {'return_list': return_list,
+                                          'rcmod_wdt': None}})
 
         # Emit propositions for modifiers
         for amod in mods:
@@ -292,7 +296,9 @@ class NounPhraseRuleset(Ruleset):
 
         ids, wdt = NounPhraseRuleset.process_rcmod(relations, index, context,
                                                    engine,
-                                                   {'subj': return_list})
+                                                   {'subj':
+                                                    {'return_list': return_list,
+                                                     'rcmod_wdt': None}})
 
         return {'return_list': return_list,
                 'preconj': preconj,
@@ -309,6 +315,7 @@ class NsubjRuleset(NounPhraseRuleset):
 
     def extract(self, relations, index, context, engine, info={}):
         """extract(relations, index, context, engine, info) -> list(str)
+        OUTDATED
 
         This ruleset returns a list of strings, corresponding to the
             return_list value of NounPhraseRuleset.
@@ -328,8 +335,7 @@ class NsubjRuleset(NounPhraseRuleset):
         """
         d = NounPhraseRuleset.extract(self, relations, index, context, engine,
                                       info)
-        if d['ids_for_preconj'] == []:
-            return d['return_list']
+        return d
 
 
 class NsubjpassRuleset(NounPhraseRuleset):
@@ -340,6 +346,7 @@ class NsubjpassRuleset(NounPhraseRuleset):
 
     def extract(self, relations, index, context, engine, info={}):
         """extract(relations, index, context, engine, info) -> list(str)
+        OUTDATED
 
         This ruleset returns a list of strings, corresponding to the
             return_list value of NounPhraseRuleset.
@@ -359,8 +366,7 @@ class NsubjpassRuleset(NounPhraseRuleset):
         """
         d = NounPhraseRuleset.extract(self, relations, index, context, engine,
                                       info)
-        if d['ids_for_preconj'] == []:
-            return d['return_list']
+        return d
 
 
 class DobjRuleset(NounPhraseRuleset):
@@ -562,5 +568,5 @@ class ApposRuleset(NounPhraseRuleset):
         """
         this = NounPhraseRuleset.extract(self, relations, index, context,
                                          engine, info)['return_list'][0]
-        for subj in info['subjs']:
+        for subj in info['subj']:
             engine.emit(('(is)', subj, this), 'P')
