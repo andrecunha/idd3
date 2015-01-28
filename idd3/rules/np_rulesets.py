@@ -117,6 +117,8 @@ class NounPhraseRuleset(Ruleset):
             elif isinstance(mod, list):
                 mods += mod
 
+        logger.debug('These are the modifiers: %s', mods)
+
         return mods
 
     @staticmethod

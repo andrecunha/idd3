@@ -50,7 +50,6 @@ all_rulesets = [TopRuleset(),
                 NumberRuleset(),
                 PreconjRuleset(),
                 MarkRuleset(),
-                NnRuleset(),
                 # Atomic emitting rulesets.
                 NegRuleset(),
                 DiscourseRuleset(),
@@ -86,4 +85,5 @@ all_rulesets = [TopRuleset(),
                 PrepRuleset(),
                 QuantmodRuleset(),
                 NumRuleset(),
-                WhatRuleset()]
+                WhatRuleset(),
+                NnRuleset()]

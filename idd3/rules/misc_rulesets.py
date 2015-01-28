@@ -299,3 +299,26 @@ class WhatRuleset(NounPhraseRuleset, AdjectivalPhraseRuleset):
         else:
             # In case something weird happens, we just emit the word.
             engine.emit((relations[index].word,), 'WHAT')
+
+
+class NnRuleset(Ruleset):
+
+    """A ruleset that processes the 'nn' relation."""
+
+    rel = 'nn'
+
+    def extract(self, relations, index, context, engine, info={}):
+        cc_indices = Relation.get_children_with_dep('cc', relations, index)
+
+        if cc_indices != []:
+            engine.analyze(relations, cc_indices[0], context + [index])
+            conj_indices = Relation.get_children_with_dep('conj', relations,
+                                                          index)
+            conjs = [engine.analyze(relations, i, context + [index],
+                                    info={'class': 'NP'})
+                     for i in conj_indices]
+            conjs = [c[0] for c in conjs]  # TODO: check if this makes sense.
+
+            return [relations[index].word] + conjs
+        else:
+            return [relations[index].word]
