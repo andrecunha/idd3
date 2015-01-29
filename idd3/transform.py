@@ -136,6 +136,60 @@ class JoinAtAll(Transformation):
         delete_indices(relations, indices_to_delete)
 
 
+class JoinACoupleOf(Transformation):
+
+    """Joins 'a couple of' into a single node."""
+
+    def transform(self, relations):
+        for i, relation in enumerate(relations):
+            if relation.word\
+                    and relation.word.lower() == 'a'\
+                    and i + 2 < len(relations)\
+                    and relations[i + 1].word == 'couple'\
+                    and relations[i + 2].word == 'of':
+
+                k = Relation.get_children_with_dep('pobj', relations, i + 2)[0]
+
+                relations[i].head = k
+                relations[i].word = 'a couple of'
+
+                relations[k].head = relations[i + 1].head
+                relations[k].rel = relations[i + 1].rel
+
+                for j in range(i + 4, len(relations)):
+                    if relations[j].head == i + 1:
+                        relations[j].head = k
+
+                delete_indices(relations, [i + 1, i + 2])
+
+
+class JoinANumberOf(Transformation):
+
+    """Joins 'a number of' into a single node."""
+
+    def transform(self, relations):
+        for i, relation in enumerate(relations):
+            if relation.word\
+                    and relation.word.lower() == 'a'\
+                    and i + 2 < len(relations)\
+                    and relations[i + 1].word == 'number'\
+                    and relations[i + 2].word == 'of':
+
+                k = Relation.get_children_with_dep('pobj', relations, i + 2)[0]
+
+                relations[i].head = k
+                relations[i].word = 'a number of'
+
+                relations[k].head = relations[i + 1].head
+                relations[k].rel = relations[i + 1].rel
+
+                for j in range(i + 4, len(relations)):
+                    if relations[j].head == i + 1:
+                        relations[j].head = k
+
+                delete_indices(relations, [i + 1, i + 2])
+
+
 class JoinMultiWordExpressions(Transformation):
     """Joins multi-word expressions in a single node. """
 
@@ -343,6 +397,8 @@ all_transformations = [RemovePunctuation(),
                        JoinBecauseOf(),
                        JoinUpTo(),
                        JoinAtAll(),
+                       JoinACoupleOf(),
+                       JoinANumberOf(),
                        JoinMultiWordExpressions(),
                        JoinPhrasalModifiers(),
                        JoinDoublePrepositions(),
