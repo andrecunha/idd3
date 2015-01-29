@@ -324,6 +324,16 @@ class VerbPhraseRuleset(Ruleset):
         for i in what_indices:
             engine.analyze(relations, i, context + [index], info)
 
+    @staticmethod
+    def process_vmods(relations, index, context, engine, info):
+
+        """Processes children with label 'vmod'."""
+
+        vmod_indices = Relation.get_children_with_dep('vmod', relations, index)
+
+        for i in vmod_indices:
+            engine.analyze(relations, i, context + [index], info)
+
     def emit_propositions(self, verb, subjs, dobjs, engine, relation):
 
         """TODO: Docstring for emit_propositions."""
@@ -401,6 +411,8 @@ class VerbPhraseRuleset(Ruleset):
 
         self.process_ignorables(relations, index, context, engine, info)
 
+        self.process_vmods(relations, index, context, engine, info)
+
         # Emit propositions.
         prop_ids = []
         if mods != []:
@@ -453,6 +465,8 @@ class VerbPhraseRuleset(Ruleset):
         self.process_ignorables(relations, index, context, engine, info)
 
         self.process_whats(relations, index, context, engine, {})
+
+        self.process_vmods(relations, index, context, engine, info)
 
         self.subjs = subjs
         self.auxs = auxs
@@ -550,7 +564,8 @@ class VerbPhraseRuleset(Ruleset):
         elif relations[index].tag in ('VBZ', 'VBD', 'VBN', 'VB', 'VBG', 'VBP'):
             return_dict = self.handle_action_verb(relations, index, context,
                                                   engine, info)
-        elif relations[index].tag in ('NN', 'NNS', 'NNP', 'NNPS', 'CD', 'WP'):
+        elif relations[index].tag in ('NN', 'NNS', 'NNP', 'NNPS', 'CD', 'WP',
+                                      'PRP'):
             return_dict = self.handle_cop_with_np(relations, index, context,
                                                   engine, info)
         elif relations[index].tag in ('JJ'):

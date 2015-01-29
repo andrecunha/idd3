@@ -213,14 +213,18 @@ class Engine(object):
             for transformation in self.transformations:
                 transformation.transform(relations)
 
+            from pprint import pformat
+            logger.debug('After transformations:\n%s', pformat(relations))
+
             self.props = []
             for relation in relations:
                 relation.processed = False
             self._build_rulesets_dict(relations)
 
-        logger.debug('Will call ruleset %s',
+        logger.debug('Will call ruleset %s from caller %d',
                      self._rulesets_dict[relations[index].rel]
-                     .__class__.__name__)
+                     .__class__.__name__,
+                     context[-1] if len(context) > 0 else -1)
 
         value = self._rulesets_dict[relations[index].rel]\
             .extract(relations, index, context, self, info)

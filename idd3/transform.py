@@ -113,6 +113,7 @@ class JoinUpTo(Transformation):
                     and i + 1 < len(relations)\
                     and relations[i + 1].word == 'to':
                 relations[i].word = 'up to'
+                relations[i].tag = 'RB'
                 indices_to_delete.append(i + 1)
 
         delete_indices(relations, indices_to_delete)
@@ -192,7 +193,7 @@ class JoinPhrasalModifiers(Transformation):
                     # Change head of relations pointing to xcomp to point to
                     #   the main verb.
                     for i, rel in enumerate(relations):
-                        if rel.head == xcomp_index:
+                        if rel.head == xcomp_index - 2:
                             rel.head = index
                             relations[index].deps.append(i)
 
