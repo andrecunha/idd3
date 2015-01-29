@@ -341,11 +341,15 @@ class VerbPhraseRuleset(Ruleset):
         prop_ids = []
 
         if relation.tag == 'VBG' and relation.rel not in ('null', 'root',
-                                                          'conj'):
-            for dobj in dobjs:
-                    proposition = tuple([w for w in [verb, dobj]])
-                    prop_id = engine.emit(proposition, 'P')
+                                                          'conj', 'vmod'):
+            if not dobjs:
+                    prop_id = engine.emit((verb,), 'P')
                     prop_ids.append(prop_id)
+            else:
+                for dobj in dobjs:
+                        proposition = tuple([w for w in [verb, dobj]])
+                        prop_id = engine.emit(proposition, 'P')
+                        prop_ids.append(prop_id)
         else:
             for subj in subjs['return_list']:
                 if len(dobjs) > 0:
@@ -354,7 +358,10 @@ class VerbPhraseRuleset(Ruleset):
                         prop_id = engine.emit(proposition, 'P')
                         prop_ids.append(prop_id)
                 else:
-                    prop_id = engine.emit((verb, subj), 'P')
+                    if relation.rel == 'vmod':
+                        prop_id = engine.emit((verb,), 'P')
+                    else:
+                        prop_id = engine.emit((verb, subj), 'P')
                     prop_ids.append(prop_id)
 
         return prop_ids
