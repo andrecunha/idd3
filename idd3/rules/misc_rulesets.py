@@ -118,7 +118,7 @@ class DetRuleset(Ruleset):
 
     rel = 'det'
 
-    non_emitted_dets = ('the', 'a', 'an', 'this', 'these')
+    non_emitted_dets = ('the', 'a', 'an', 'this', 'these', 'that', 'those')
 
     def extract(self, relations, index, context, engine, info={}):
         """extract(relations, index, context, engine, info) -> str | None
