@@ -270,8 +270,9 @@ class VerbPhraseRuleset(Ruleset):
         for i in advcl_indices:
             ret = engine.analyze(relations, i, context + [index])
             for p in prop_ids:
-                prop = tuple([ret['marker'], p] + ret['prop_ids'])
-                engine.emit(prop, 'C')
+                if ret['marker']:
+                    prop = tuple([ret['marker'], p] + ret['prop_ids'])
+                    engine.emit(prop, 'C')
 
     @staticmethod
     def process_conjs(relations, index, context, engine, info, subjs, auxs,
@@ -660,7 +661,7 @@ class AdvclRuleset(VerbPhraseRuleset):
         if mark_index != []:
             marker = engine.analyze(relations, mark_index[0], context + [index])
         else:
-            marker = 'NO_MARKER'
+            marker = None
 
         ret['marker'] = marker
 
