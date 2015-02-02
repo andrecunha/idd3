@@ -190,6 +190,18 @@ class JoinANumberOf(Transformation):
                 delete_indices(relations, [i + 1, i + 2])
 
 
+class JoinOneDay(Transformation):
+
+    """Join 'one day' as temporal modifier."""
+
+    def transform(self, relations):
+        for i, relation in enumerate(relations):
+            if relation.word == 'day' and relation.rel == 'tmod'\
+                    and i - 1 >= 0 and relations[i - 1].word.lower() == 'one':
+                relation.word = relations[i - 1].word + ' ' + relation.word
+                delete_indices(relations, [i - 1])
+
+
 class JoinMultiWordExpressions(Transformation):
     """Joins multi-word expressions in a single node. """
 
@@ -399,6 +411,7 @@ all_transformations = [RemovePunctuation(),
                        JoinAtAll(),
                        JoinACoupleOf(),
                        JoinANumberOf(),
+                       JoinOneDay(),
                        JoinMultiWordExpressions(),
                        JoinPhrasalModifiers(),
                        JoinDoublePrepositions(),
