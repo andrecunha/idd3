@@ -49,11 +49,23 @@ class AdjectivalPhraseRuleset(Ruleset):
                                 'rcmod_wdt': None}
             engine.analyze(relations, i, context + [index], info)
 
+    @staticmethod
+    def process_preps(relations, index, context, engine, info):
+
+        """TODO: Docstring for process_preps."""
+
+        prep_indices = Relation.get_children_with_dep('prep', relations, index)
+        for prep_index in prep_indices:
+            engine.analyze(relations, prep_index, context + [index])
+
     def extract(self, relations, index, context, engine, info={}):
         advmods = AdjectivalPhraseRuleset.process_advmods(relations, index,
                                                           context, engine, info)
 
         AdjectivalPhraseRuleset.process_xcomp(relations, index,
+                                              context, engine, info)
+
+        AdjectivalPhraseRuleset.process_preps(relations, index,
                                               context, engine, info)
 
         # TODO: Add cc/conj handling.
