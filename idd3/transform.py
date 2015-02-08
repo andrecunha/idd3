@@ -231,14 +231,14 @@ class JoinPhrasalModifiers(Transformation):
 
     def transform(self, relations):
         for index, relation in enumerate(relations):
-            if relation.rel in ('null', 'root', 'xcomp')\
+            if relation.rel in ('null', 'root', 'xcomp', 'rcmod')\
                     and relation.tag in ('VBZ', 'VBD', 'VBP', 'VB')\
                     and relation.word in self.verb_forms:
                 xcomp_indices = Relation.get_children_with_dep('xcomp',
                                                                relations,
                                                                index)
                 if xcomp_indices == []:
-                    return
+                    continue
                 else:
                     xcomp_index = xcomp_indices[0]
 
