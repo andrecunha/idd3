@@ -202,6 +202,22 @@ class JoinOneDay(Transformation):
                 delete_indices(relations, [i - 1])
 
 
+class JoinFirstOfAll(Transformation):
+
+    """Joins 'first of all' into a single node."""
+
+    def transform(self, relations):
+        for i, relation in enumerate(relations):
+            if relation.word\
+                    and relation.word.lower() == 'first'\
+                    and i + 2 < len(relations)\
+                    and relations[i + 1].word == 'of'\
+                    and relations[i + 2].word == 'all':
+                relation.word += ' of all'
+                relation.rel = 'advmod'
+                delete_indices(relations, [i + 1, i + 2])
+
+
 class JoinMultiWordExpressions(Transformation):
     """Joins multi-word expressions in a single node. """
 
@@ -412,6 +428,7 @@ all_transformations = [RemovePunctuation(),
                        JoinACoupleOf(),
                        JoinANumberOf(),
                        JoinOneDay(),
+                       JoinFirstOfAll(),
                        JoinMultiWordExpressions(),
                        JoinPhrasalModifiers(),
                        JoinDoublePrepositions(),
