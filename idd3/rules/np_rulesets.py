@@ -475,7 +475,7 @@ class IobjRuleset(NounPhraseRuleset):
                                       engine)
         if d['ids_for_preconj'] == []:
             for value in d['return_list']:
-                engine.emit(('(to) ' + value,), 'PREP')
+                engine.emit(('(to) ' + value,), 'M')
 
 
 class PossRuleset(NounPhraseRuleset):
