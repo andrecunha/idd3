@@ -321,6 +321,23 @@ class JoinExpletives(Transformation):
         delete_indices(relations, indices_to_delete)
 
 
+class JoinThereModifiers(Transformation):
+
+    """Handles phrases like 'up there', 'down there', and 'right there'."""
+
+    def transform(self, relations):
+        indices_to_delete = []
+
+        for i in range(1, len(relations)):
+            if relations[i].word.lower() in ('up', 'down', 'right')\
+                    and relations[i + 1].word == 'there':
+                relations[i + 1].word = relations[i].word +\
+                    ' ' + relations[i + 1].word
+                indices_to_delete.append(i)
+
+        delete_indices(relations, indices_to_delete)
+
+
 class FixAdjectiveRepetition(Transformation):
 
     """Handles adjective repetition as intensifier (e.g., she was gone a long
@@ -433,6 +450,7 @@ all_transformations = [RemovePunctuation(),
                        JoinPhrasalModifiers(),
                        JoinDoublePrepositions(),
                        JoinExpletives(),
+                       JoinThereModifiers(),
                        FixAdjectiveRepetition(),
                        FixAdverbRepetition(),
                        FixReflexivePronouns(),
