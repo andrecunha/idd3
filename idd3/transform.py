@@ -218,6 +218,26 @@ class JoinFirstOfAll(Transformation):
                 delete_indices(relations, [i + 1, i + 2])
 
 
+class JoinNotEven(Transformation):
+
+    """Handles 'not even', joining it in a single node."""
+
+    def transform(self, relations):
+        indices_to_delete = []
+
+        for i in range(1, len(relations)):
+            if relations[i].word.lower() == 'not'\
+                    and relations[i].tag == 'RB'\
+                    and relations[i].head == i + 1\
+                    and relations[i + 1].word == 'even'\
+                    and relations[i + 1].tag == 'RB':
+                relations[i + 1].word = relations[i].word +\
+                    ' ' + relations[i + 1].word
+                indices_to_delete.append(i)
+
+        delete_indices(relations, indices_to_delete)
+
+
 class JoinMultiWordExpressions(Transformation):
     """Joins multi-word expressions in a single node. """
 
@@ -446,6 +466,7 @@ all_transformations = [RemovePunctuation(),
                        JoinANumberOf(),
                        JoinOneDay(),
                        JoinFirstOfAll(),
+                       JoinNotEven(),
                        JoinMultiWordExpressions(),
                        JoinPhrasalModifiers(),
                        JoinDoublePrepositions(),
