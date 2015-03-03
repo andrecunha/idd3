@@ -37,6 +37,6 @@ setup(
         "Programming Language :: Python :: 3.4",
     ],
     install_requires = ['nltk >= 3.0.0',
-                        'prettytable >= 0.7.2'],
+                        ],
     extras_require = ['termcolor >= 1.1.0', ]
 )

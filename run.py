@@ -22,7 +22,6 @@ import nltk
 from sys import argv
 from subprocess import call
 from collections import defaultdict
-from prettytable import PrettyTable
 
 import logging
 logging.basicConfig(level=logging.INFO)
@@ -85,16 +84,10 @@ def process_graphs(sents, graphs):
 
 
 def print_stats(stats):
-    t = PrettyTable(['Kind', '#'])
-    t.align['Kind'] = 'r'
-    t.align['#'] = 'r'
-    t.padding_width = 1
-
-    for kind, n in stats.items():
-        t.add_row([kind, n])
-
     print('Stats:')
-    print(t)
+    print('Kind\t#\t')
+    for kind, n in stats.items():
+        print('{0}\t{1}'.format(kind, n))
 
 
 def main():
