@@ -47,14 +47,45 @@ except ImportError:
 # Stanford parser
 
 # Change this variable to the path on your system
-stanford_path = os.path.expanduser('~') + \
-    "/Develop/stanford_tools/stanford-parser"
-stanford_run_cmd = 'java -mx1024m -cp ' + stanford_path + \
-    '/*: edu.stanford.nlp.parser.lexparser.LexicalizedParser ' + \
-    '-outputFormat penn edu/stanford/nlp/models/lexparser/englishPCFG.ser.gz'
-stanford_convert_tree_cmd = 'java -mx1024m -cp ' + stanford_path + \
-    '/*: edu.stanford.nlp.trees.EnglishGrammaticalStructure ' + \
-    '-conllx -basic -treeFile'
+corenlp_path = os.path.expanduser('~') + \
+    "/Develop/stanford_tools/corenlp"
+stanford_run_cmd = ['java', '-mx1024m', '-cp', corenlp_path + '/*:',
+                    'edu.stanford.nlp.pipeline.StanfordCoreNLP',
+                    '-annotators', 'tokenize,ssplit,pos,depparse',
+                    '-depparse.model', './data/nndep.model.txt.gz',
+                    '-outputFormat', 'conll',
+                    '-outputDirectory', '/tmp/', '-file', '-']
+
+
+def load_mapping_file(path):
+    mapping = {}
+    with open(path, 'r') as mapping_file:
+        for line in mapping_file.readlines():
+            tags = line.strip().split('\t')
+            mapping[tags[0]] = tags[1]
+
+    return mapping
+
+
+def normalize_file(infilename, pos_mapping):
+    with open('/tmp/{0}.conll'.format(infilename), 'r') as infile, \
+            open('/tmp/{0}.norm.conll'.format(infilename), 'w') as outfile:
+        for line in infile.readlines():
+            if not line or line.isspace():
+                outfile.write(line)
+            else:
+                entries = [entry.strip() for entry in line.split('\t')]
+                outfile.write('\t'.join([entries[0],
+                                         entries[1],
+                                         entries[2],
+                                         pos_mapping[entries[3]],
+                                         entries[3],
+                                         entries[4],
+                                         entries[5],
+                                         entries[6],
+                                         '_',
+                                         '_',
+                                         ]) + '\n')
 
 
 def get_sentence(graph):
@@ -101,6 +132,9 @@ def main():
         print('Usage: python', argv[0], '<input file>')
         return
 
+    pos_mapping = load_mapping_file('data/ENGLISH-fine-to-universal.full.map')
+    print(pos_mapping)
+
     if argv[1].endswith('.conll'):
         graphs = nltk.parse.dependencygraph.DependencyGraph.load(argv[1])
     else:
@@ -109,14 +143,12 @@ def main():
 
         # graphs = parser.tagged_parse_sents(tagged_sents)
 
-        with open('/tmp/tmp.tree', mode='w') as tmp_file,\
-                open('/tmp/output.conll', mode='w') as conll_file:
-            call((stanford_run_cmd + ' ' + argv[1]).split(' '), stdout=tmp_file)
-            call((stanford_convert_tree_cmd + ' /tmp/tmp.tree').split(' '),
-                 stdout=conll_file)
+        stanford_run_cmd[-1] = argv[1]
+        call(stanford_run_cmd)
+        normalize_file(argv[1], pos_mapping)
 
         graphs = nltk.parse.dependencygraph.DependencyGraph.load(
-            '/tmp/output.conll')
+            '/tmp/{0}.norm.conll'.format(argv[1]))
 
     stats = process_graphs(graphs)
     print_stats(stats)
