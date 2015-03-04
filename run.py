@@ -57,7 +57,13 @@ stanford_convert_tree_cmd = 'java -mx1024m -cp ' + stanford_path + \
     '-conllx -basic -treeFile'
 
 
-def process_graphs(sents, graphs):
+def get_sentence(graph):
+    """Turns a graph into a list of words.
+    """
+    return ' '.join([node['word'] for node in graph.nodelist if node['word']])
+
+
+def process_graphs(graphs):
     engine = Engine(rules.all_rulesets, transform.all_transformations)
     stats = defaultdict(int)
 
@@ -68,7 +74,7 @@ def process_graphs(sents, graphs):
             relations.append(Relation(**relation))
 
         print(colored('Sentence %d:' % (index + 1), 'white', attrs=['bold']))
-        print('\t' + sents[index])
+        print('\t' + get_sentence(graphs[index]))
 
         print(colored('Propositions:', 'white', attrs=['bold']))
         try:
@@ -96,14 +102,6 @@ def main():
         return
 
     if argv[1].endswith('.conll'):
-        sents_file = argv[1][:-6] + '.txt'
-    else:
-        sents_file = argv[1]
-
-    with open(sents_file) as infile:
-        sents = infile.readlines()
-
-    if argv[1].endswith('.conll'):
         graphs = nltk.parse.dependencygraph.DependencyGraph.load(argv[1])
     else:
         # tagged_sents = [nltk.pos_tag(nltk.word_tokenize(sent))
@@ -111,16 +109,16 @@ def main():
 
         # graphs = parser.tagged_parse_sents(tagged_sents)
 
-        with open('/tmp/tmp.tree', mode='w') as tmp_file:
+        with open('/tmp/tmp.tree', mode='w') as tmp_file,\
+                open('/tmp/output.conll', mode='w') as conll_file:
             call((stanford_run_cmd + ' ' + argv[1]).split(' '), stdout=tmp_file)
-        with open('/tmp/output.conll', mode='w') as conll_file:
             call((stanford_convert_tree_cmd + ' /tmp/tmp.tree').split(' '),
                  stdout=conll_file)
 
         graphs = nltk.parse.dependencygraph.DependencyGraph.load(
             '/tmp/output.conll')
 
-    stats = process_graphs(sents, graphs)
+    stats = process_graphs(graphs)
     print_stats(stats)
 
 
