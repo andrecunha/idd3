@@ -19,14 +19,14 @@ You might want to install IDD3 inside a virtualenv.
 How to run the example file
 ---------------------------
 
-IDD3 ships with a `run.py` file, that illustrates how the library can be accessed. This file can be used to easily analyze sentences and see the system's output. You can use this file to analyze either a raw sentence, or its dependency tree, stored in a CoNLL file. In order to analyze raw sentences, follow these steps:
+IDD3 ships with a `run.py` file, that illustrates how the library can be accessed. This file can be used to easily analyze sentences and see the system's output. You can use this file to analyze either a raw sentence, or its dependency tree, stored in a CoNLL-X file. In order to analyze raw sentences, follow these steps:
 
 1. `run.py` uses the Stanford Parser to extract the dependency tree. Download the latest version of it at http://nlp.stanford.edu/software/lex-parser.shtml#Download, and extract it where you want.
 2. Change the variable `stanford_path` in `run.py` to point to the path where you extracted the parser in the previous step (the default value is `~/Develop/stanford_tools/`).
 3. Place the sentences you want to analyze in a file, let's say `input.txt`, one sentence per line.
 4. Run IDD3 as `python run.py input.txt`
 
-If you have a CoNLL-X file, say `input.conll`, that already has the dependency trees for the sentences you want IDD3 to analyze, you can just run `python run.py input.conll`.
+If you have a CoNLL-X file, say `input.conll`, that already has the dependency trees for the sentences you want IDD3 to analyze, you can just run `python run.py input.conll`, with no need to configure the Stanford Parser.
 
 References
 ----------
