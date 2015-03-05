@@ -85,7 +85,6 @@ all_rulesets = [TopRuleset(),
                 CompmodJoinRuleset(),
                 DetRuleset(),
                 AdpmodRuleset(),
-                QuantmodRuleset(),
                 NumRuleset(),
                 WhatRuleset(),
                 CompmodRuleset()]

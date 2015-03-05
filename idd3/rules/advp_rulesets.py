@@ -57,6 +57,11 @@ class AdverbialPhraseRuleset(Ruleset):
             engine.analyze(relations, prep_index, context + [index])
 
     def extract(self, relations, index, context, engine, info={}):
+        if 'num' in info:
+            # Advmod modifying number. Treat as quantmod.
+            engine.emit((info['num'], relations[index].word), 'M')
+            return (relations[index].word)
+
         self.process_npadvmod(relations, index, context, engine, info)
 
         self.process_advmods(relations, index, context, engine, info)

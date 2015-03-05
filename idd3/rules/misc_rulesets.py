@@ -253,34 +253,14 @@ class NumRuleset(Ruleset):
 
         this_number = ' '.join(words)
 
-        # Process quantmods
-        quantmod_indices = Relation.get_children_with_dep('quantmod',
-                                                          relations, index)
-        for q in quantmod_indices:
+        # Process advmods
+        advmod_indices = Relation.get_children_with_dep('advmod',
+                                                        relations, index)
+        for q in advmod_indices:
             engine.analyze(relations, q, context + [index],
                            {'num': this_number})
 
         return this_number
-
-
-class QuantmodRuleset(Ruleset):
-
-    """A ruleset that processes the 'quantmod' relation."""
-
-    rel = 'quantmod'
-
-    def extract(self, relations, index, context, engine, info):
-        """extract(relations, index, context, engine, info) -> None
-
-        Quantifier phrase modifiers always generate propositions.
-
-        Examples:
-
-            * About 100
-                quantmod(100, about)
-                -> emit((100, about))
-        """
-        engine.emit((info['num'], relations[index].word), 'M')
 
 
 class WhatRuleset(NounPhraseRuleset, AdjectivalPhraseRuleset):
