@@ -133,7 +133,6 @@ def main():
         return
 
     pos_mapping = load_mapping_file('data/ENGLISH-fine-to-universal.full.map')
-    print(pos_mapping)
 
     if argv[1].endswith('.conll'):
         graphs = nltk.parse.dependencygraph.DependencyGraph.load(argv[1])
@@ -145,10 +144,10 @@ def main():
 
         stanford_run_cmd[-1] = argv[1]
         call(stanford_run_cmd)
-        normalize_file(argv[1], pos_mapping)
+        normalize_file(os.path.basename(argv[1]), pos_mapping)
 
         graphs = nltk.parse.dependencygraph.DependencyGraph.load(
-            '/tmp/{0}.norm.conll'.format(argv[1]))
+            '/tmp/{0}.norm.conll'.format(os.path.basename(argv[1])))
 
     stats = process_graphs(graphs)
     print_stats(stats)
