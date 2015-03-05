@@ -342,7 +342,7 @@ class VerbPhraseRuleset(Ruleset):
 
         prop_ids = []
 
-        if relation.tag == 'VBG' and relation.rel not in ('null', 'root',
+        if relation.tag == 'VBG' and relation.rel not in ('null', 'ROOT',
                                                           'conj', 'vmod'):
             if not dobjs:
                     prop_id = engine.emit((verb,), 'P')
@@ -482,7 +482,7 @@ class VerbPhraseRuleset(Ruleset):
 
         # Emit propositions.
         prop_ids = []
-        if relations[index].rel in ('xcomp', 'ccomp', 'pcomp', 'csubj'):
+        if relations[index].rel in ('xcomp', 'ccomp', 'adpcomp', 'csubj'):
             if relations[index].tag == 'VBG':
                 if comps != []:
                     prop_ids = self.emit_propositions(verb, subjs, comps,
