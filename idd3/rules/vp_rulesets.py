@@ -142,8 +142,9 @@ class VerbPhraseRuleset(Ruleset):
 
         """TODO: Docstring for process_iobj."""
 
-        # prep + pobj
-        prep_indices = Relation.get_children_with_dep('prep', relations, index)
+        # adpmod + adpobj
+        prep_indices = Relation.get_children_with_dep('adpmod', relations,
+                                                      index)
         for prep_index in prep_indices:
             engine.analyze(relations, prep_index, context + [index])
 
@@ -205,14 +206,14 @@ class VerbPhraseRuleset(Ruleset):
 
         """TODO: Docstring for process_pp_when_be_is_root."""
 
-        prep_indices = Relation.get_children_with_dep('prep', relations,
+        prep_indices = Relation.get_children_with_dep('adpmod', relations,
                                                       index)
         if prep_indices == []:
             return []
 
         if subjs['return_list'][0].lower() == 'it':
             prep_index = prep_indices[0]
-            pobj_index = Relation.get_children_with_dep('pobj', relations,
+            pobj_index = Relation.get_children_with_dep('adpobj', relations,
                                                         prep_index)[0]
 
             pobj_return_value = engine.analyze(relations, pobj_index, context +
@@ -566,10 +567,10 @@ class VerbPhraseRuleset(Ruleset):
         VerbPhraseRuleset.process_discourse_markers(relations, index, context,
                                                     engine, info)
 
-        if relations[index].word in be_forms:
-            return_dict = self.handle_be_as_root(relations, index, context,
-                                                 engine, info)
-        elif relations[index].tag in ('VBZ', 'VBD', 'VBN', 'VB', 'VBG', 'VBP'):
+        # if relations[index].word in be_forms:
+        #     return_dict = self.handle_be_as_root(relations, index, context,
+        #                                          engine, info)
+        if relations[index].tag in ('VBZ', 'VBD', 'VBN', 'VB', 'VBG', 'VBP'):
             return_dict = self.handle_action_verb(relations, index, context,
                                                   engine, info)
         elif relations[index].tag in ('NN', 'NNS', 'NNP', 'NNPS', 'CD', 'WP',
@@ -608,7 +609,7 @@ class RootRuleset(VerbPhraseRuleset):
 
     """A ruleset that processes the 'ROOT' relation."""
 
-    rel = 'root'
+    rel = 'ROOT'
 
 
 class XcompRuleset(VerbPhraseRuleset):
@@ -625,11 +626,11 @@ class CcompRuleset(VerbPhraseRuleset):
     rel = 'ccomp'
 
 
-class PcompRuleset(VerbPhraseRuleset):
+class AdpcompRuleset(VerbPhraseRuleset):
 
-    """A ruleset that processes the 'pcomp' relation."""
+    """A ruleset that processes the 'adpcomp' relation."""
 
-    rel = 'pcomp'
+    rel = 'adpcomp'
 
 
 class CsubjRuleset(VerbPhraseRuleset):

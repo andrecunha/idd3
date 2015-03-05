@@ -56,7 +56,7 @@ class RemovePunctuation(Transformation):
     def transform(self, relations):
         indices_to_remove = []
         for i, relation in enumerate(relations):
-            if relation.rel == 'punct':
+            if relation.rel == 'p':
                 indices_to_remove.append(i)
         delete_indices(relations, indices_to_remove)
 
@@ -267,7 +267,7 @@ class JoinPhrasalModifiers(Transformation):
 
     def transform(self, relations):
         for index, relation in enumerate(relations):
-            if relation.rel in ('null', 'root', 'xcomp', 'rcmod')\
+            if relation.rel in ('null', 'ROOT', 'xcomp', 'rcmod')\
                     and relation.tag in ('VBZ', 'VBD', 'VBP', 'VB')\
                     and relation.word in self.verb_forms:
                 xcomp_indices = Relation.get_children_with_dep('xcomp',
@@ -443,16 +443,17 @@ class FixXcompAttributions(Transformation):
                                                      .address)
 
 
-class TransformNnJoin(Transformation):
+class TransformCompmodJoin(Transformation):
 
-    """Transforms NN into NN-join if both words start with capital letters."""
+    """Transforms compmod into compmod-join if both words start with capital
+        letters."""
 
     def transform(self, relations):
         for relation in relations:
-            if relation.rel == 'nn':
+            if relation.rel == 'compmod':
                 if relation.word[0].isupper()\
                         and relations[relation.head].word[0].isupper():
-                    relation.rel = 'nn-join'
+                    relation.rel = 'compmod-join'
 
 
 all_transformations = [RemovePunctuation(),
@@ -476,4 +477,4 @@ all_transformations = [RemovePunctuation(),
                        FixAdverbRepetition(),
                        FixReflexivePronouns(),
                        FixXcompAttributions(),
-                       TransformNnJoin()]
+                       TransformCompmodJoin()]

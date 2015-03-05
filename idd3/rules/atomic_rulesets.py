@@ -70,11 +70,11 @@ class ComplmRuleset(AtomicRuleset):
     rel = 'complm'
 
 
-class PossessiveRuleset(AtomicRuleset):
+class AdpRuleset(AtomicRuleset):
 
-    """A ruleset that processes the 'possessive' relation."""
+    """A ruleset that processes the 'adp' relation."""
 
-    rel = 'possessive'
+    rel = 'adp'
 
 
 class NumberRuleset(AtomicRuleset):

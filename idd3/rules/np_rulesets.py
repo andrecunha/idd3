@@ -57,8 +57,8 @@ class NounPhraseRuleset(Ruleset):
 
         """TODO: Docstring for process_noun_modifiers."""
 
-        nnjoin_indices = Relation.get_children_with_dep('nn-join', relations,
-                                                        index)
+        nnjoin_indices = Relation.get_children_with_dep('compmod-join',
+                                                        relations, index)
         nns = [engine.analyze(relations, i, context + [index])
                for i in nnjoin_indices]
 
@@ -93,12 +93,13 @@ class NounPhraseRuleset(Ruleset):
         return conjs
 
     @staticmethod
-    def process_preps(relations, index, context, engine, info={}):
+    def process_adpmods(relations, index, context, engine, info={}):
 
-        """TODO: Docstring for process_preps."""
+        """TODO: Docstring for process_adpmods."""
 
         # VP modifiers
-        prep_indices = Relation.get_children_with_dep('prep', relations, index)
+        prep_indices = Relation.get_children_with_dep('adpmod', relations,
+                                                      index)
         for i in prep_indices:
             engine.analyze(relations, i, context + [index])
 
@@ -110,7 +111,7 @@ class NounPhraseRuleset(Ruleset):
         # ADJP modifiers
         amod_indices = Relation.get_children_with_dep('amod', relations, index)
         num_indices = Relation.get_children_with_dep('num', relations, index)
-        nn_indices = Relation.get_children_with_dep('nn', relations, index)
+        nn_indices = Relation.get_children_with_dep('compmod', relations, index)
 
         mods_indices = sorted(amod_indices + num_indices + nn_indices)
         mods = []
@@ -293,7 +294,7 @@ class NounPhraseRuleset(Ruleset):
         conjs = NounPhraseRuleset.process_conjs(relations, index, context,
                                                 engine, info)
 
-        NounPhraseRuleset.process_preps(relations, index, context, engine, info)
+        NounPhraseRuleset.process_adpmods(relations, index, context, engine, info)
 
         mods = NounPhraseRuleset.process_modifiers(relations, index,
                                                    context, engine, info)
@@ -438,11 +439,11 @@ class DobjRuleset(NounPhraseRuleset):
             return d['return_list']
 
 
-class PobjRuleset(NounPhraseRuleset):
+class AdpobjRuleset(NounPhraseRuleset):
 
-    """A ruleset that processes the 'pobj' relation."""
+    """A ruleset that processes the 'adpobj' relation."""
 
-    rel = 'pobj'
+    rel = 'adpobj'
 
 
 class IobjRuleset(NounPhraseRuleset):
@@ -512,7 +513,7 @@ class PossRuleset(NounPhraseRuleset):
             if d['ids_for_preconj'] == []:
                 this = d['return_list']
 
-                possessive_index = Relation.get_children_with_dep('possessive',
+                possessive_index = Relation.get_children_with_dep('adp',
                                                                   relations,
                                                                   index)[0]
                 engine.analyze(relations, possessive_index, context + [index])
@@ -548,7 +549,7 @@ class NpadvmodRuleset(Ruleset):
         """
         det_indices = Relation.get_children_with_dep('det', relations, index)
         poss_indices = Relation.get_children_with_dep('poss', relations, index)
-        nn_indices = Relation.get_children_with_dep('nn', relations, index)
+        nn_indices = Relation.get_children_with_dep('compmod', relations, index)
         prep_indices = Relation.get_children_with_dep('prep', relations, index)
         amod_indices = Relation.get_children_with_dep('amod', relations, index)
         num_indices = Relation.get_children_with_dep('num', relations, index)
@@ -610,3 +611,10 @@ class ApposRuleset(NounPhraseRuleset):
         for subj in info['subj']['return_list']:
             for noun in this:
                 engine.emit(('(is)', subj, noun), 'P')
+
+
+class AttrRuleset(NounPhraseRuleset):
+
+    """A ruleset that processes the 'attr' relation."""
+
+    rel = 'attr'

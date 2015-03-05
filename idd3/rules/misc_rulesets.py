@@ -71,11 +71,11 @@ class ConjRuleset(NounPhraseRuleset, VerbPhraseRuleset):
             return d
 
 
-class NnJoinRuleset(Ruleset):
+class CompmodJoinRuleset(Ruleset):
 
-    """A ruleset that processes the 'nn-join' relation."""
+    """A ruleset that processes the 'compmod-join' relation."""
 
-    rel = 'nn-join'
+    rel = 'compmod-join'
 
     def extract(self, relations, index, context, engine, info={}):
         """extract(relations, index, context, engine, info) -> str | list(str)
@@ -147,11 +147,11 @@ class DetRuleset(Ruleset):
             return None
 
 
-class PrepRuleset(Ruleset):
+class AdpmodRuleset(Ruleset):
 
-    """A ruleset that processes the 'prep' relation."""
+    """A ruleset that processes the 'adpmod' relation."""
 
-    rel = 'prep'
+    rel = 'adpmod'
 
     def extract(self, relations, index, context, engine, info={}):
         """extract(relations, index, context, engine, info) -> None
@@ -178,8 +178,8 @@ class PrepRuleset(Ruleset):
 
             * TODO: insert example with PCOMP.
         """
-        # pobj
-        pobj_index = Relation.get_children_with_dep('pobj', relations, index)
+        # adpobj
+        pobj_index = Relation.get_children_with_dep('adpobj', relations, index)
         if pobj_index != []:
             pobjs = engine.analyze(relations, pobj_index[0], context + [index])
 
@@ -195,8 +195,9 @@ class PrepRuleset(Ruleset):
                 proposition = tuple([pobjs['preconj']] + indices)
                 engine.emit(proposition, 'C')
 
-        # pcomp
-        pcomp_index = Relation.get_children_with_dep('pcomp', relations, index)
+        # adpcomp
+        pcomp_index = Relation.get_children_with_dep('adpcomp', relations,
+                                                     index)
         if pcomp_index != []:
             pcomp = engine.analyze(relations, pcomp_index[0],
                                    context + [index])['return_value']
@@ -304,11 +305,11 @@ class WhatRuleset(NounPhraseRuleset, AdjectivalPhraseRuleset):
             engine.emit((relations[index].word,), 'WHAT')
 
 
-class NnRuleset(Ruleset):
+class CompmodRuleset(Ruleset):
 
-    """A ruleset that processes the 'nn' relation."""
+    """A ruleset that processes the 'compmod' relation."""
 
-    rel = 'nn'
+    rel = 'compmod'
 
     def extract(self, relations, index, context, engine, info={}):
         cc_indices = Relation.get_children_with_dep('cc', relations, index)

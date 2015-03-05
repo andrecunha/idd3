@@ -151,34 +151,34 @@
 5	.	_	.	.	_	2	p	_	_
 
 1	The	_	DET	DT	_	2	det	_	_
-2	cat	_	NOUN	NN	_	4	nsubj	_	_
-3	is	_	VERB	VBZ	_	4	cop	_	_
-4	fluffy	_	ADJ	JJ	_	0	ROOT	_	_
-5	.	_	.	.	_	4	p	_	_
+2	cat	_	NOUN	NN	_	3	nsubj	_	_
+3	is	_	VERB	VBZ	_	0	ROOT	_	_
+4	fluffy	_	ADJ	JJ	_	3	acomp	_	_
+5	.	_	.	.	_	3	p	_	_
 
 1	The	_	DET	DT	_	2	det	_	_
-2	cat	_	NOUN	NN	_	6	nsubj	_	_
-3	would	_	VERB	MD	_	6	aux	_	_
-4	have	_	VERB	VB	_	6	aux	_	_
-5	been	_	VERB	VBN	_	6	cop	_	_
-6	fluffy	_	ADJ	JJ	_	0	ROOT	_	_
-5	.	_	.	.	_	4	p	_	_
+2	cat	_	NOUN	NN	_	5	nsubj	_	_
+3	would	_	VERB	MD	_	5	aux	_	_
+4	have	_	VERB	VB	_	5	aux	_	_
+5	been	_	VERB	VBN	_	0	ROOT	_	_
+6	fluffy	_	ADJ	JJ	_	5	acomp	_	_
+7	.	_	.	.	_	5	p	_	_
 
 1	I	_	PRON	PRP	_	2	nsubj	_	_
 2	think	_	VERB	VBP	_	0	ROOT	_	_
-3	that	_	ADP	IN	_	7	mark	_	_
+3	that	_	ADP	IN	_	6	mark	_	_
 4	the	_	DET	DT	_	5	det	_	_
-5	cat	_	NOUN	NN	_	7	nsubj	_	_
-6	is	_	VERB	VBZ	_	7	cop	_	_
-7	fluffy	_	ADJ	JJ	_	2	ccomp	_	_
+5	cat	_	NOUN	NN	_	6	nsubj	_	_
+6	is	_	VERB	VBZ	_	2	ccomp	_	_
+7	fluffy	_	ADJ	JJ	_	6	acomp	_	_
 8	.	_	.	.	_	2	p	_	_
 
 1	I	_	PRON	PRP	_	2	nsubj	_	_
 2	think	_	VERB	VBP	_	0	ROOT	_	_
 3	the	_	DET	DT	_	4	det	_	_
-4	cat	_	NOUN	NN	_	6	nsubj	_	_
-5	is	_	VERB	VBZ	_	6	cop	_	_
-6	fluffy	_	ADJ	JJ	_	2	ccomp	_	_
+4	cat	_	NOUN	NN	_	5	nsubj	_	_
+5	is	_	VERB	VBZ	_	2	ccomp	_	_
+6	fluffy	_	ADJ	JJ	_	5	acomp	_	_
 7	.	_	.	.	_	2	p	_	_
 
 1	The	_	DET	DT	_	3	det	_	_
@@ -189,10 +189,10 @@
 6	.	_	.	.	_	5	p	_	_
 
 1	The	_	DET	DT	_	2	det	_	_
-2	cat	_	NOUN	NN	_	4	nsubj	_	_
-3	is	_	VERB	VBZ	_	4	cop	_	_
-4	fluffy	_	ADJ	JJ	_	0	ROOT	_	_
-5	.	_	.	.	_	4	p	_	_
+2	cat	_	NOUN	NN	_	3	nsubj	_	_
+3	is	_	VERB	VBZ	_	0	ROOT	_	_
+4	fluffy	_	ADJ	JJ	_	3	acomp	_	_
+5	.	_	.	.	_	3	p	_	_
 
 1	Ironically	_	ADV	RB	_	4	advmod	_	_
 2	,	_	.	,	_	4	p	_	_
@@ -225,18 +225,18 @@
 
 1	John	_	NOUN	NNP	_	3	poss	_	_
 2	's	_	PRT	POS	_	1	adp	_	_
-3	house	_	NOUN	NN	_	5	nsubj	_	_
-4	is	_	VERB	VBZ	_	5	cop	_	_
-5	big	_	ADJ	JJ	_	0	ROOT	_	_
-6	.	_	.	.	_	5	p	_	_
+3	house	_	NOUN	NN	_	4	nsubj	_	_
+4	is	_	VERB	VBZ	_	0	ROOT	_	_
+5	big	_	ADJ	JJ	_	4	acomp	_	_
+6	.	_	.	.	_	4	p	_	_
 
 1	The	_	DET	DT	_	2	det	_	_
-2	house	_	NOUN	NN	_	6	nsubj	_	_
+2	house	_	NOUN	NN	_	5	nsubj	_	_
 3	of	_	ADP	IN	_	2	adpmod	_	_
 4	John	_	NOUN	NNP	_	3	adpobj	_	_
-5	is	_	VERB	VBZ	_	6	cop	_	_
-6	big	_	ADJ	JJ	_	0	ROOT	_	_
-7	.	_	.	.	_	6	p	_	_
+5	is	_	VERB	VBZ	_	0	ROOT	_	_
+6	big	_	ADJ	JJ	_	5	acomp	_	_
+7	.	_	.	.	_	5	p	_	_
 
 1	I	_	PRON	PRP	_	2	nsubj	_	_
 2	worked	_	VERB	VBD	_	0	ROOT	_	_
