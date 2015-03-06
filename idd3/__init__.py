@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # IDD3 - Propositional Idea Density from Dependency Trees
 # Copyright (C) 2014  Andre Luiz Verucci da Cunha
 #
