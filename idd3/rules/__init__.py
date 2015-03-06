@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 # IDD3 - Propositional Idea Density from Dependency Trees
-# Copyright (C) 2014  Andre Luiz Verucci da Cunha
+# Copyright (C) 2014-2015  Andre Luiz Verucci da Cunha
 #
 # This program is free software: you can redistribute it and/or modify it
 # under the terms of the GNU General Public License as published by the Free
