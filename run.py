@@ -25,6 +25,7 @@ from collections import defaultdict
 
 import logging
 logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 import os
 _, columns = os.popen('stty size', 'r').read().split()
@@ -113,8 +114,9 @@ def process_graphs(graphs):
             for i, prop in enumerate(engine.props):
                 print(str(i + 1) + ' ' + str(prop))
                 stats[prop.kind] += 1
-        except Exception:
-            pass
+        except Exception as e:
+            logger.error('{0} in engine.analyze: {1}'.format(
+                e.__class__.__name__, e))
 
     print('-' * int(columns))
     return stats

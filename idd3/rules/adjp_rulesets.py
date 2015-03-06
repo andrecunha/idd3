@@ -26,7 +26,7 @@ class AdjectivalPhraseRuleset(Ruleset):
     @staticmethod
     def process_advmods(relations, index, context, engine, info={}):
 
-        """TODO: Docstring for process_advmods."""
+        """Process adverbial modifiers (e.g., very difficult)."""
 
         advmod_indices = Relation.get_children_with_dep('advmod', relations,
                                                         index)
@@ -39,7 +39,7 @@ class AdjectivalPhraseRuleset(Ruleset):
     @staticmethod
     def process_xcomp(relations, index, context, engine, info={}):
 
-        """TODO: Docstring for process_xcomp."""
+        """Process reduced clausal modifiers (e.g., hard to imagine)."""
 
         xcomp_indices = Relation.get_children_with_dep('xcomp', relations,
                                                        index)
@@ -50,11 +50,12 @@ class AdjectivalPhraseRuleset(Ruleset):
             engine.analyze(relations, i, context + [index], info)
 
     @staticmethod
-    def process_preps(relations, index, context, engine, info):
+    def process_adpmods(relations, index, context, engine, info):
 
-        """TODO: Docstring for process_preps."""
+        """Process adpositional modifiers (e.g., angry with you)."""
 
-        prep_indices = Relation.get_children_with_dep('prep', relations, index)
+        prep_indices = Relation.get_children_with_dep('adpmod', relations,
+                                                      index)
         for prep_index in prep_indices:
             engine.analyze(relations, prep_index, context + [index])
 
@@ -65,8 +66,8 @@ class AdjectivalPhraseRuleset(Ruleset):
         AdjectivalPhraseRuleset.process_xcomp(relations, index,
                                               context, engine, info)
 
-        AdjectivalPhraseRuleset.process_preps(relations, index,
-                                              context, engine, info)
+        AdjectivalPhraseRuleset.process_adpmods(relations, index,
+                                                context, engine, info)
 
         # TODO: Add cc/conj handling.
         this = [relations[index].word]

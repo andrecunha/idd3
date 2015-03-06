@@ -229,8 +229,7 @@ class NumRuleset(Ruleset):
                 -> emit((200, about)) # by calling QuantmodRuleset
                 -> return "200"
         """
-        number_indices = Relation.get_children_with_dep('number',
-                                                        relations, index)
+        number_indices = Relation.get_children_with_dep('num', relations, index)
         cc_indices = Relation.get_children_with_dep('cc',
                                                     relations, index)
         conj_indices = Relation.get_children_with_dep('conj',

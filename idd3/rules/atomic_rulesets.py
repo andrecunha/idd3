@@ -17,6 +17,10 @@
 
 from __future__ import print_function, unicode_literals, division
 from idd3 import Ruleset
+import logging
+
+
+logger = logging.getLogger(__name__)
 
 
 class AtomicRuleset(Ruleset):
@@ -69,6 +73,13 @@ class ComplmRuleset(AtomicRuleset):
 
     rel = 'complm'
 
+    def extract(self, relations, index, context, engine, info={}):
+        logger.warning('The "complm" relation is not present in the Universal'
+                       ' Dependencies, and is thus deprecated. It was replaced'
+                       ' by "mark".')
+        return super(ComplmRuleset, self).extract(relations, index, context,
+                                                  engine, info)
+
 
 class AdpRuleset(AtomicRuleset):
 
@@ -83,8 +94,16 @@ class NumberRuleset(AtomicRuleset):
 
     rel = 'number'
 
+    def extract(self, relations, index, context, engine, info={}):
+        logger.warning('The "number" relation is not present in the Universal'
+                       ' Dependencies, and is thus deprecated. It was replaced'
+                       ' by "num".')
+        return super(NumberRuleset, self).extract(relations, index, context,
+                                                  engine, info)
+
 
 class PreconjRuleset(AtomicRuleset):
+    # TODO: Became 'cc'.
 
     """A ruleset that processes the 'preconj' relation."""
 
@@ -99,6 +118,7 @@ class MarkRuleset(AtomicRuleset):
 
 
 class PredetRuleset(AtomicRuleset):
+    # TODO: Became 'det'.
 
     """A ruleset that processes the 'predet' relation."""
 

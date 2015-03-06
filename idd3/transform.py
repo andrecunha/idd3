@@ -148,7 +148,8 @@ class JoinACoupleOf(Transformation):
                     and relations[i + 1].word == 'couple'\
                     and relations[i + 2].word == 'of':
 
-                k = Relation.get_children_with_dep('pobj', relations, i + 2)[0]
+                k = Relation.get_children_with_dep('adpobj', relations,
+                                                   i + 2)[0]
 
                 relations[i].head = k
                 relations[i].word = 'a couple of'
@@ -175,7 +176,8 @@ class JoinANumberOf(Transformation):
                     and relations[i + 1].word == 'number'\
                     and relations[i + 2].word == 'of':
 
-                k = Relation.get_children_with_dep('pobj', relations, i + 2)[0]
+                k = Relation.get_children_with_dep('adpobj', relations,
+                                                   i + 2)[0]
 
                 relations[i].head = k
                 relations[i].word = 'a number of'
@@ -196,7 +198,7 @@ class JoinOneDay(Transformation):
 
     def transform(self, relations):
         for i, relation in enumerate(relations):
-            if relation.word == 'day' and relation.rel == 'tmod'\
+            if relation.word == 'day' and relation.rel == 'nmod'\
                     and i - 1 >= 0 and relations[i - 1].word.lower() == 'one':
                 relation.word = relations[i - 1].word + ' ' + relation.word
                 delete_indices(relations, [i - 1])
@@ -350,6 +352,7 @@ class JoinThereModifiers(Transformation):
 
         for i in range(1, len(relations)):
             if relations[i].word.lower() in ('up', 'down', 'right')\
+                    and i + 1 < len(relations)\
                     and relations[i + 1].word == 'there':
                 relations[i + 1].word = relations[i].word +\
                     ' ' + relations[i + 1].word
@@ -421,6 +424,8 @@ class FixXcompAttributions(Transformation):
 
     """Turns xcomp relations with no cop children to 'what'."""
 
+# TODO: check if this is still applicable.
+
     def transform(self, relations):
         for index, relation in enumerate(relations):
             if relation.rel == 'xcomp'\
@@ -456,6 +461,19 @@ class TransformCompmodJoin(Transformation):
                     relation.rel = 'compmod-join'
 
 
+class TransformCcIntoPreconj(Transformation):
+
+    """Transforms cc back to preconj, when it's the case."""
+
+    def transform(self, relations):
+        for i in range(len(relations)):
+            cc_indices = Relation.get_children_with_dep('cc', relations, i)
+            conj_indices = Relation.get_children_with_dep('conj', relations, i)
+
+            if cc_indices and not conj_indices:
+                relations[cc_indices[0]].rel = 'preconj'
+
+
 all_transformations = [RemovePunctuation(),
                        RemoveParataxisFillers(),
                        RemoveUtteranceInitialConjunction(),
@@ -477,4 +495,6 @@ all_transformations = [RemovePunctuation(),
                        FixAdverbRepetition(),
                        FixReflexivePronouns(),
                        FixXcompAttributions(),
-                       TransformCompmodJoin()]
+                       TransformCompmodJoin(),
+                       TransformCcIntoPreconj(),
+                       ]
