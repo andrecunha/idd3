@@ -215,6 +215,7 @@
 5	soldier	_	NOUN	NN	_	7	poss	_	_
 6	's	_	PRT	POS	_	5	adp	_	_
 7	house	_	NOUN	NN	_	3	adpobj	_	_
+8	.	_	.	.	_	2	p	_	_
 
 1	We	_	PRON	PRP	_	2	nsubj	_	_
 2	went	_	VERB	VBD	_	0	ROOT	_	_
@@ -320,28 +321,29 @@
 6	tall	_	ADJ	JJ	_	0	ROOT	_	_
 7	.	_	.	.	_	6	p	_	_
 
-1	She	_	PRON	PRP	_	3	nsubj	_	_
-2	is	_	VERB	VBZ	_	3	cop	_	_
-3	tall	_	ADJ	JJ	_	0	ROOT	_	_
-4	.	_	.	.	_	3	p	_	_
+1	She	_	PRON	PRP	_	2	nsubj	_	_
+2	is	_	VERB	VBZ	_	0	ROOT	_	_
+3	tall	_	ADJ	JJ	_	2	acomp	_	_
+4	.	_	.	.	_	2	p	_	_
 
-1	She	_	PRON	PRP	_	5	nsubj	_	_
-2	is	_	VERB	VBZ	_	5	cop	_	_
+1	She	_	PRON	PRP	_	2	nsubj	_	_
+2	is	_	VERB	VBZ	_	0	ROOT	_	_
 3	5	_	NUM	CD	_	4	num	_	_
 4	years	_	NOUN	NNS	_	5	nmod	_	_
-5	old	_	ADJ	JJ	_	0	ROOT	_	_
-6	.	_	.	.	_	5	p	_	_
+5	old	_	ADJ	JJ	_	2	acomp	_	_
+6	.	_	.	.	_	2	p	_	_
 
-1	She	_	PRON	PRP	_	3	nsubj	_	_
-2	is	_	VERB	VBZ	_	3	cop	_	_
-3	5	_	NUM	CD	_	0	ROOT	_	_
-4	.	_	.	.	_	3	p	_	_
+1	She	_	PRON	PRP	_	2	nsubj	_	_
+2	is	_	VERB	VBZ	_	0	ROOT	_	_
+3	5	_	NUM	CD	_	2	attr	_	_
+4	.	_	.	.	_	2	p	_	_
 
 1	It	_	PRON	PRP	_	2	nsubj	_	_
 2	was	_	VERB	VBD	_	0	ROOT	_	_
 3	80	_	NUM	CD	_	4	num	_	_
 4	years	_	NOUN	NNS	_	5	nmod	_	_
 5	ago	_	ADV	RB	_	2	advmod	_	_
+6	.	_	.	.	_	2	p	_	_
 
 1	Wednesday	_	ADV	RB	_	4	advmod	_	_
 2	I	_	PRON	PRP	_	4	nsubj	_	_
@@ -371,16 +373,16 @@
 3	there	_	ADV	RB	_	2	advmod	_	_
 4	.	_	.	.	_	2	p	_	_
 
-1	It	_	PRON	PRP	_	3	nsubj	_	_
-2	was	_	VERB	VBD	_	3	cop	_	_
-3	1948	_	NUM	CD	_	0	ROOT	_	_
-4	.	_	.	.	_	3	p	_	_
+1	It	_	PRON	PRP	_	2	nsubj	_	_
+2	was	_	VERB	VBD	_	0	ROOT	_	_
+3	1948	_	NUM	CD	_	2	attr	_	_
+4	.	_	.	.	_	2	p	_	_
 
-1	I	_	PRON	PRP	_	4	nsubj	_	_
-2	was	_	VERB	VBD	_	4	cop	_	_
+1	I	_	PRON	PRP	_	2	nsubj	_	_
+2	was	_	VERB	VBD	_	0	ROOT	_	_
 3	so	_	ADV	RB	_	4	advmod	_	_
-4	excited	_	ADJ	JJ	_	0	ROOT	_	_
-5	.	_	.	.	_	4	p	_	_
+4	excited	_	ADJ	JJ	_	2	acomp	_	_
+5	.	_	.	.	_	2	p	_	_
 
 1	Really	_	ADV	RB	_	5	advmod	_	_
 2	,	_	.	,	_	5	p	_	_
@@ -401,21 +403,21 @@
 2	mean	_	VERB	VBP	_	0	ROOT	_	_
 3	,	_	.	,	_	2	p	_	_
 4	these	_	DET	DT	_	5	det	_	_
-5	people	_	NOUN	NNS	_	7	nsubj	_	_
-6	were	_	VERB	VBD	_	7	cop	_	_
-7	prosperous	_	ADJ	JJ	_	2	ccomp	_	_
+5	people	_	NOUN	NNS	_	6	nsubj	_	_
+6	were	_	VERB	VBD	_	2	ccomp	_	_
+7	prosperous	_	ADJ	JJ	_	6	acomp	_	_
 8	.	_	.	.	_	2	p	_	_
 
-1	And	_	CONJ	CC	_	4	cc	_	_
-2	that	_	DET	DT	_	4	nsubj	_	_
-3	was	_	VERB	VBD	_	4	cop	_	_
-4	nice	_	ADJ	JJ	_	0	ROOT	_	_
-5	,	_	.	,	_	7	p	_	_
+1	And	_	CONJ	CC	_	3	cc	_	_
+2	that	_	DET	DT	_	3	nsubj	_	_
+3	was	_	VERB	VBD	_	0	ROOT	_	_
+4	nice	_	ADJ	JJ	_	3	acomp	_	_
+5	,	_	.	,	_	3	p	_	_
 6	I	_	PRON	PRP	_	7	nsubj	_	_
 7	mean	_	VERB	VBP	_	10	parataxis	_	_
 8	,	_	.	,	_	7	p	_	_
 9	to	_	PRT	TO	_	10	aux	_	_
-10	have	_	VERB	VB	_	4	xcomp	_	_
+10	have	_	VERB	VB	_	3	xcomp	_	_
 11	a	_	DET	DT	_	12	det	_	_
 12	home	_	NOUN	NN	_	10	dobj	_	_
 13	to	_	PRT	TO	_	14	aux	_	_
@@ -433,19 +435,19 @@
 7	time	_	NOUN	NN	_	3	nmod	_	_
 8	.	_	.	.	_	3	p	_	_
 
-1	He	_	PRON	PRP	_	5	nsubj	_	_
-2	is	_	VERB	VBZ	_	5	cop	_	_
-3	very	_	ADV	RB	_	5	advmod	_	_
+1	He	_	PRON	PRP	_	2	nsubj	_	_
+2	is	_	VERB	VBZ	_	0	ROOT	_	_
+3	very	_	ADV	RB	_	4	advmod	_	_
 4	very	_	ADV	RB	_	5	advmod	_	_
-5	sick	_	ADJ	JJ	_	0	ROOT	_	_
-6	.	_	.	.	_	5	p	_	_
+5	sick	_	ADJ	JJ	_	2	acomp	_	_
+6	.	_	.	.	_	2	p	_	_
 
 1	The	_	DET	DT	_	2	det	_	_
-2	town	_	NOUN	NN	_	5	nsubj	_	_
+2	town	_	NOUN	NN	_	4	nsubj	_	_
 3	itself	_	PRON	PRP	_	2	amod	_	_
-4	was	_	VERB	VBD	_	5	cop	_	_
-5	beautiful	_	ADJ	JJ	_	0	ROOT	_	_
-6	.	_	.	.	_	5	p	_	_
+4	was	_	VERB	VBD	_	0	ROOT	_	_
+5	beautiful	_	ADJ	JJ	_	4	acomp	_	_
+6	.	_	.	.	_	4	p	_	_
 
 1	She	_	PRON	PRP	_	2	nsubj	_	_
 2	bought	_	VERB	VBD	_	0	ROOT	_	_
