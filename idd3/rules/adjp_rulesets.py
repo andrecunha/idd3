@@ -37,6 +37,18 @@ class AdjectivalPhraseRuleset(Ruleset):
         return advmods
 
     @staticmethod
+    def process_nmods(relations, index, context, engine, info={}):
+
+        """Process nominal modifiers (e.g., 5 years old)."""
+
+        advmod_indices = Relation.get_children_with_dep('nmod', relations,
+                                                        index)
+        nmods = [engine.analyze(relations, i, context + [index])
+                 for i in advmod_indices]
+
+        return nmods
+
+    @staticmethod
     def process_xcomp(relations, index, context, engine, info={}):
 
         """Process reduced clausal modifiers (e.g., hard to imagine)."""
@@ -63,6 +75,9 @@ class AdjectivalPhraseRuleset(Ruleset):
         advmods = AdjectivalPhraseRuleset.process_advmods(relations, index,
                                                           context, engine, info)
 
+        nmods = AdjectivalPhraseRuleset.process_nmods(relations, index,
+                                                      context, engine, info)
+
         AdjectivalPhraseRuleset.process_xcomp(relations, index,
                                               context, engine, info)
 
@@ -72,7 +87,7 @@ class AdjectivalPhraseRuleset(Ruleset):
         # TODO: Add cc/conj handling.
         this = [relations[index].word]
 
-        for advmod in advmods:
+        for advmod in advmods + nmods:
             for word in this:
                 engine.emit((word, advmod), 'M')
 
