@@ -508,9 +508,11 @@ class PossRuleset(NounPhraseRuleset):
                 -> emit((friend, John's))
                 -> return None
         """
-        if relations[index].tag == 'PRP$':
+        # if relations[index].tag == 'PRP$':
+        if relations[index].ctag == 'PRON':
             return relations[index].word
-        elif relations[index].tag in ('NN', 'NNS', 'NNP'):
+        # elif relations[index].tag in ('NN', 'NNS', 'NNP'):
+        elif relations[index].ctag == 'NOUN':
             d = NounPhraseRuleset.extract(self, relations, index, context,
                                           engine)
 
@@ -529,7 +531,7 @@ class PossRuleset(NounPhraseRuleset):
                 # TODO: handle multiple items.
                 return None
         else:
-            print('WARNING: poss cannot handle', relations[index].tag, 'yet')
+            logger.warning('poss cannot handle %s yet', relations[index].ctag)
 
 
 class NmodRuleset(Ruleset):

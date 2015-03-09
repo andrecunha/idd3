@@ -45,7 +45,10 @@ class Relation(object):
             self.head = None
         self.rel = kwargs['rel']
         self.tag = kwargs['tag']
+        self.ctag = kwargs['ctag']
         self.word = kwargs['word']
+        self.lemma = kwargs['lemma']
+        self.feats = kwargs['feats']
 
     @staticmethod
     def get_children_with_dep(rel, relations, index):

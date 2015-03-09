@@ -269,12 +269,14 @@ class WhatRuleset(NounPhraseRuleset, AdjectivalPhraseRuleset):
     rel = 'what'
 
     def extract(self, relations, index, context, engine, info={}):
-        if relations[index].tag in ('NN', 'NNS', 'NNP', 'NNPS'):
+        # if relations[index].tag in ('NN', 'NNS', 'NNP', 'NNPS'):
+        if relations[index].ctag == 'NOUN':
             this = NounPhraseRuleset.extract(self, relations, index, context,
                                              engine, info)
             for noun in this['return_list']:
                 engine.emit((noun,), 'WHAT')
-        elif relations[index].tag == 'JJ':
+        # elif relations[index].tag == 'JJ':
+        elif relations[index].ctag == 'ADJ':
             this = AdjectivalPhraseRuleset.extract(self, relations, index,
                                                    context, engine, info)
             for adj in this:

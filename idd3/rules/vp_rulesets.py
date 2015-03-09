@@ -363,6 +363,8 @@ class VerbPhraseRuleset(Ruleset):
 
         prop_ids = []
 
+        # Cannot use ctag here, since we need to know if the verb is in the
+        # gerund (the use of the -ing ending is equally English-specific).
         if relation.tag == 'VBG' and relation.rel not in ('null', 'ROOT',
                                                           'conj', 'vmod'):
             if not dobjs:
@@ -591,18 +593,21 @@ class VerbPhraseRuleset(Ruleset):
         # if relations[index].word in be_forms:
         #     return_dict = self.handle_be_as_root(relations, index, context,
         #                                          engine, info)
-        if relations[index].tag in ('VBZ', 'VBD', 'VBN', 'VB', 'VBG', 'VBP'):
+        # if relations[index].tag in ('VBZ', 'VBD', 'VBN', 'VB', 'VBG', 'VBP'):
+        if relations[index].ctag == 'VERB':
             return_dict = self.handle_action_verb(relations, index, context,
                                                   engine, info)
-        elif relations[index].tag in ('NN', 'NNS', 'NNP', 'NNPS', 'CD', 'WP',
-                                      'PRP'):
+        # elif relations[index].tag in ('NN', 'NNS', 'NNP', 'NNPS', 'CD', 'WP',
+        #                               'PRP'):
+        elif relations[index].ctag in ('NOUN', 'NUM', 'PRON'):
             return_dict = self.handle_cop_with_np(relations, index, context,
                                                   engine, info)
-        elif relations[index].tag in ('JJ'):
+        # elif relations[index].tag in ('JJ'):
+        elif relations[index].ctag == 'ADJ':
             return_dict = self.handle_cop_with_adjp(relations, index, context,
                                                     engine, info)
         else:
-            logger.fatal('VP cannot handle %s yet.', relations[index].tag)
+            logger.fatal('VP cannot handle %s yet.', relations[index].ctag)
             return_dict = None
 
         # Process adverbial clauses.
