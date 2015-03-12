@@ -258,35 +258,9 @@ class NounPhraseRuleset(Ruleset):
 
         return return_list, ids_for_preconj
 
-    def handle_np_with_of_phrase(relations, index, context, engine, info={}):
-
-        """Handle noun phrases that start with 'of' phrases, such as
-            'some of'."""
-
-        prep_index = Relation.get_children_with_dep('adpmod', relations,
-                                                    index)[0]
-        pobj_index = Relation.get_children_with_dep('adpobj', relations,
-                                                    prep_index)[0]
-
-        pobj_return_value = engine.analyze(relations, pobj_index, context +
-                                           [index, prep_index])
-
-        for noun in pobj_return_value['return_list']:
-            engine.emit((noun, relations[index].word + ' ' +
-                         relations[prep_index].word), 'M')
-
-        engine.mark_processed(relations, prep_index)
-
-        return pobj_return_value
-
     def extract(self, relations, index, context, engine, info={}):
         # TODO: use references to self here.
-        if relations[index].word.lower() in ('some', 'kind') and\
-                relations[relations[index].deps[0]].rel == 'adpmod':
-            return NounPhraseRuleset.handle_np_with_of_phrase(relations, index,
-                                                              context, engine,
-                                                              info)
-
+        
         det = NounPhraseRuleset.process_determiners(relations, index, context,
                                                     engine, info)
 

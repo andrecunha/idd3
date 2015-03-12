@@ -15,9 +15,83 @@
 # You should have received a copy of the GNU General Public License along with
 # this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from __future__ import print_function, unicode_literals, division
+
 from idd3.base import Config
 from idd3.rules.en import transform
-from idd3.rules import universal
+
+# Atomic rulesets.
+from idd3.rules.universal.atomic_rulesets import *
+
+# Atomic emitting rulesets.
+from idd3.rules.universal.atomic_emitting_rulesets import *
+
+# Noun-Phrase rulesets.
+from idd3.rules.universal.np_rulesets import *
+from idd3.rules.en.np_rulesets import *
+
+# Verb-Phrase rulesets.
+from idd3.rules.universal.vp_rulesets import *
+
+# Adjectival-Phrase rulesets
+from idd3.rules.universal.adjp_rulesets import *
+
+# Adverbial-Phrase rulesets
+from idd3.rules.universal.advp_rulesets import *
+
+# Uncategorized rulesets.
+from idd3.rules.universal.misc_rulesets import *
+
+all_rulesets = [TopRuleset(),
+                # Atomic rulesets.
+                PrtRuleset(),
+                AuxRuleset(),
+                AuxpassRuleset(),
+                CcRuleset(),
+                CopRuleset(),
+                ComplmRuleset(),
+                AdpRuleset(),
+                NumberRuleset(),
+                PreconjRuleset(),
+                MarkRuleset(),
+                PredetRuleset(),
+                # Atomic emitting rulesets.
+                NegRuleset(),
+                DiscourseRuleset(),
+                # Noun-Phrase rulesets.
+                NsubjRuleset(),
+                NsubjpassRuleset(),
+                DobjRuleset(),
+                AdpobjRuleset(),
+                IobjRuleset(),
+                PossRuleset(),
+                NmodRuleset(),
+                TmodRuleset(),
+                ApposRuleset(),
+                AttrRuleset(),
+                # Verb-Phrase rulesets.
+                RootRuleset(),
+                XcompRuleset(),
+                CcompRuleset(),
+                AdpcompRuleset(),
+                CsubjRuleset(),
+                VmodRuleset(),
+                AdvclRuleset(),
+                RcmodRuleset(),
+                ParataxisRuleset(),
+                # Adjectival-Phrase rulesets
+                AcompRuleset(),
+                AmodRuleset(),
+                # Adverbial-Phrase rulesets
+                AdvmodRuleset(),
+                # Uncategorized rulesets.
+                ConjRuleset(),
+                CompmodJoinRuleset(),
+                DetRuleset(),
+                AdpmodRuleset(),
+                NumRuleset(),
+                WhatRuleset(),
+                CompmodRuleset()]
 
 config = Config()
 
@@ -28,4 +102,3 @@ GERUND_TAGS = ('VBG')
 config.from_object(__name__)
 
 all_transformations = transform.all_transformations
-all_rulesets = universal.all_rulesets
