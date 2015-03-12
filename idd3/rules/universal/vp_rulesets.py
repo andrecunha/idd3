@@ -16,7 +16,7 @@
 # this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from __future__ import print_function, unicode_literals, division
-from idd3 import Relation, Ruleset
+from idd3 import Relation, Ruleset, config
 from idd3.rules.universal.adjp_rulesets import AdjectivalPhraseRuleset
 from idd3.rules.universal.np_rulesets import NounPhraseRuleset
 import logging
@@ -64,7 +64,7 @@ class VerbPhraseRuleset(Ruleset):
                     'rcmod_wdt': None}
 
         # Resolve relative pronouns in subordinate clauses.
-        if subj['return_list'][0] in ('that', 'which', 'who')\
+        if subj['return_list'][0] in config['RELATIVE_PRONOUNS']\
                 and 'subj' in info:
             subj['return_list'][0] += '(={0})'.format(
                 info['subj']['return_list'][0])
@@ -506,7 +506,7 @@ class VerbPhraseRuleset(Ruleset):
         # Emit propositions.
         prop_ids = []
         if relations[index].rel in ('xcomp', 'ccomp', 'adpcomp', 'csubj'):
-            if relations[index].tag == 'VBG':
+            if relations[index].tag in config['GERUND_TAGS']:
                 if comps != []:
                     prop_ids = self.emit_propositions(verb, subjs, comps,
                                                       engine, relations[index])

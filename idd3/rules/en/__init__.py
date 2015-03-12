@@ -15,31 +15,17 @@
 # You should have received a copy of the GNU General Public License along with
 # this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from idd3.base import *
-
+from idd3.base import Config
+from idd3.rules.en import transform
+from idd3.rules import universal
 
 config = Config()
-all_transformations = []
-all_rulesets = []
 
+NON_EMITTED_DETS = ('the', 'a', 'an', 'this', 'these', 'that', 'those')
+RELATIVE_PRONOUNS = ('that', 'which', 'who')
+GERUND_TAGS = ('VBG')
 
-def use_language(module):
-    """Configure idd3's global variables (config, all_transformations,
-        and all_rulesets) using those from module.
-    """
-    global config, all_transformations, all_rulesets
+config.from_object(__name__)
 
-    for key, value in module.config.items():
-        config[key] = value
-
-    while len(all_transformations):
-        del all_transformations[0]
-    all_transformations.extend(module.all_transformations)
-
-    while len(all_rulesets):
-        del all_rulesets[0]
-    all_rulesets.extend(module.all_rulesets)
-
-
-from idd3 import rules
-from idd3 import transform
+all_transformations = transform.all_transformations
+all_rulesets = universal.all_rulesets

@@ -15,31 +15,6 @@
 # You should have received a copy of the GNU General Public License along with
 # this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from idd3.base import *
+from idd3.transform import delete_indices, RemovePunctuation
 
-
-config = Config()
-all_transformations = []
-all_rulesets = []
-
-
-def use_language(module):
-    """Configure idd3's global variables (config, all_transformations,
-        and all_rulesets) using those from module.
-    """
-    global config, all_transformations, all_rulesets
-
-    for key, value in module.config.items():
-        config[key] = value
-
-    while len(all_transformations):
-        del all_transformations[0]
-    all_transformations.extend(module.all_transformations)
-
-    while len(all_rulesets):
-        del all_rulesets[0]
-    all_rulesets.extend(module.all_rulesets)
-
-
-from idd3 import rules
-from idd3 import transform
+all_transformations = [RemovePunctuation(), ]

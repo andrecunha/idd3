@@ -17,7 +17,9 @@
 
 from __future__ import print_function, unicode_literals, division
 
-from idd3 import Relation, Engine, rules, transform
+import idd3
+from idd3 import Relation, Engine
+from idd3.rules import en, pt
 import nltk
 from sys import argv
 from collections import defaultdict
@@ -61,7 +63,7 @@ def get_sentence(graph):
 
 
 def process_graphs(graphs):
-    engine = Engine(rules.universal.all_rulesets, transform.all_transformations)
+    engine = Engine(idd3.all_rulesets, idd3.all_transformations)
     stats = defaultdict(int)
 
     for index in range(len(graphs) - 1):
@@ -95,6 +97,8 @@ def print_stats(stats):
 
 
 def main():
+    idd3.use_language(pt)
+
     if len(argv) < 2:
         print('Usage: python', argv[0], '<input file>')
         return

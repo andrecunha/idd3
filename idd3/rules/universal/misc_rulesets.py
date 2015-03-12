@@ -16,7 +16,7 @@
 # this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from __future__ import print_function, unicode_literals, division
-from idd3 import Relation, Ruleset
+from idd3 import Relation, Ruleset, config
 from idd3.rules.universal.np_rulesets import NounPhraseRuleset
 from idd3.rules.universal.vp_rulesets import VerbPhraseRuleset
 from idd3.rules.universal.adjp_rulesets import AdjectivalPhraseRuleset
@@ -118,8 +118,6 @@ class DetRuleset(Ruleset):
 
     rel = 'det'
 
-    non_emitted_dets = ('the', 'a', 'an', 'this', 'these', 'that', 'those')
-
     def extract(self, relations, index, context, engine, info={}):
         """extract(relations, index, context, engine, info) -> str | None
 
@@ -138,7 +136,7 @@ class DetRuleset(Ruleset):
                 -> emit((apple, some))
                 -> return None
         """
-        if relations[index].word.lower() in self.non_emitted_dets:
+        if relations[index].word.lower() in config['NON_EMITTED_DETS']:
             return relations[index].word
         else:
             # TODO: maybe get the subject from info.

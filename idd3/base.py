@@ -16,6 +16,7 @@
 # this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from __future__ import print_function, unicode_literals, division
+from importlib import import_module
 
 import logging
 logger = logging.getLogger(__name__)
@@ -239,3 +240,19 @@ class Engine(object):
     @staticmethod
     def get_unprocessed_relations(relations):
         return [relation for relation in relations if not relation.processed]
+
+
+class Config(dict):
+
+    """A class for storing configuration parameters. """
+
+    def from_object(self, module_name):
+        """Load a configuration from a module name.
+
+        :module_name: The name of the module where the parameters are defined.
+        """
+        m = import_module(module_name)
+
+        for var in dir(m):
+            if var.isupper():
+                self[var] = getattr(m, var)
