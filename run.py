@@ -19,7 +19,7 @@ from __future__ import print_function, unicode_literals, division
 
 import idd3
 from idd3 import Relation, Engine
-from idd3.rules import en, pt
+from idd3.rules import en
 import nltk
 from sys import argv
 from collections import defaultdict
@@ -97,7 +97,7 @@ def print_stats(stats):
 
 
 def main():
-    idd3.use_language(pt)
+    idd3.use_language(en)
 
     if len(argv) < 2:
         print('Usage: python', argv[0], '<input file>')
