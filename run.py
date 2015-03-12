@@ -61,7 +61,7 @@ def get_sentence(graph):
 
 
 def process_graphs(graphs):
-    engine = Engine(rules.all_rulesets, transform.all_transformations)
+    engine = Engine(rules.universal.all_rulesets, transform.all_transformations)
     stats = defaultdict(int)
 
     for index in range(len(graphs) - 1):

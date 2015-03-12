@@ -17,8 +17,8 @@
 
 from __future__ import print_function, unicode_literals, division
 from idd3 import Relation, Ruleset
-from idd3.rules.adjp_rulesets import AdjectivalPhraseRuleset
-from idd3.rules.np_rulesets import NounPhraseRuleset
+from idd3.rules.universal.adjp_rulesets import AdjectivalPhraseRuleset
+from idd3.rules.universal.np_rulesets import NounPhraseRuleset
 import logging
 
 
