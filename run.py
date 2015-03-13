@@ -34,7 +34,6 @@ _, columns = os.popen('stty size', 'r').read().split()
 
 try:
     from termcolor import colored
-    raise ImportError
 except ImportError:
     def colored(string, color, attrs):
         return string
