@@ -91,6 +91,11 @@ class StanfordParser(object):
     """An interface for the Stanford Parser with default Stanford
         Dependencies."""
 
+    # Note: the normalization functions used here (get_normalized_word,
+    # get_normalized_label, and get_normalized_tag) are adaptations made from
+    # the normalize.java file that ships with the standard English version
+    # of the Universal Dependencies treebank.
+
     def __init__(self, stanford_path, pos_mapping_file_path):
         self.stanford_path = stanford_path
         self.pos_mapping = load_mapping_file(pos_mapping_file_path)
