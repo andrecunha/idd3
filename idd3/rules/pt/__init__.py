@@ -21,7 +21,6 @@ from idd3.rules import universal
 
 config = Config()
 
-NON_EMITTED_DETS = ('the', 'a', 'an', 'this', 'these', 'that', 'those')
 NON_EMITTED_DETS = ('o', 'a', 'os', 'as', 'um', 'uma', 'uns', 'umas',
                     'este', 'esta', 'estes', 'estas',
                     'esse', 'essa', 'esses', 'essas',
