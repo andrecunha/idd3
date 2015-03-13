@@ -19,11 +19,11 @@ from __future__ import print_function, unicode_literals, division
 
 import idd3
 from idd3 import Relation, Engine
-from idd3.rules import en
+from idd3.rules import en, pt
 import nltk
 from sys import argv
 from collections import defaultdict
-from parsers import StanfordUnivDepParser
+from parsers import StanfordUnivDepParser, StanfordParser
 
 import logging
 logging.basicConfig(level=logging.INFO)
@@ -40,20 +40,19 @@ except ImportError:
         return string
 
 
-# MaltParser
+# Stanford NN dependency parser, trained using the normalized Penn Treebank.
 
-# parser = nltk.parse.MaltParser(
-#     working_dir="/home/andre/Develop/malt/maltparser-1.8",
-#     mco="engmalt.linear-1.7",
-#     additional_java_args=['-Xmx512m'])
-
-# Stanford parser
-
-# Change these variable to the path on your system
+# Change these variables to the path on your system
 corenlp_path = os.path.expanduser('~') + \
     "/Develop/stanford_tools/corenlp"
 model_path = 'data/nndep.model.txt.gz'
 pos_mapping_file = 'data/ENGLISH-fine-to-universal.full.map'
+
+# Traditional Stanford Parser with normalized output
+
+# Change this variable to the path on your system
+stanford_path = os.path.expanduser('~') + \
+    "/Develop/stanford_tools/stanford-parser"
 
 
 def get_sentence(graph):
@@ -66,7 +65,7 @@ def process_graphs(graphs):
     engine = Engine(idd3.all_rulesets, idd3.all_transformations)
     stats = defaultdict(int)
 
-    for index in range(len(graphs) - 1):
+    for index in range(len(graphs)):
         print('-' * int(columns))
         relations = []
         for relation in graphs[index].nodelist:
@@ -106,13 +105,12 @@ def main():
     if argv[1].endswith('.conll'):
         graphs = nltk.parse.dependencygraph.DependencyGraph.load(argv[1])
     else:
-        # tagged_sents = [nltk.pos_tag(nltk.word_tokenize(sent))
-        #                 for sent in sents]
-
-        # graphs = parser.tagged_parse_sents(tagged_sents)
-
         parser = StanfordUnivDepParser(corenlp_path, model_path,
                                        pos_mapping_file)
+
+        # Uncomment for normalized Stanford Parser.
+        # parser = StanfordParser(stanford_path, pos_mapping_file)
+
         graphs = parser.parse_raw_file(argv[1])
 
     stats = process_graphs(graphs)
