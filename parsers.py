@@ -41,7 +41,7 @@ class StanfordUnivDepParser(object):
         self.model_path = model_path
         self.pos_mapping = load_mapping_file(pos_mapping_file_path)
 
-    def normalize_file(self, pos_mapping):
+    def normalize_file(self):
         with open(self.conll_file_path, 'r') as infile, \
                 open(self.norm_file_path, 'w') as outfile:
             for line in infile.readlines():
@@ -52,7 +52,7 @@ class StanfordUnivDepParser(object):
                     outfile.write('\t'.join([entries[0],
                                              entries[1],
                                              entries[2],
-                                             pos_mapping[entries[3]],
+                                             self.pos_mapping[entries[3]],
                                              entries[3],
                                              entries[4],
                                              entries[5],
@@ -75,7 +75,7 @@ class StanfordUnivDepParser(object):
 
         call(stanford_run_cmd)
 
-        self.normalize_file(self.pos_mapping)
+        self.normalize_file()
 
         graphs = nltk.parse.dependencygraph.DependencyGraph.load(
             self.norm_file_path)
