@@ -15,6 +15,16 @@
 # You should have received a copy of the GNU General Public License along with
 # this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from idd3.transform import delete_indices, RemovePunctuation
+from idd3.transform import delete_indices, Tranformation, RemovePunctuation
 
-all_transformations = [RemovePunctuation(), ]
+
+class RemoveUtteranceInitialConjunction(Transformation):
+    """Removes commonly used utterance-initial conjuntions (e, aí)."""
+
+    def transform(self, relations):
+        if relations[1].word.lower() in ('e', 'aí', 'ai'):
+            delete_indices(relations, [1])
+
+
+all_transformations = [RemoveUtteranceInitialConjunction()
+                       RemovePunctuation(), ]
