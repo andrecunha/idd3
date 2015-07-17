@@ -23,7 +23,7 @@ from idd3.rules import en, pt
 import nltk
 from sys import argv
 from collections import defaultdict
-from parsers import StanfordUnivDepParser, StanfordParser
+from idd3.parsers import StanfordUnivDepParser, StanfordParser
 
 import logging
 logging.basicConfig(level=logging.INFO)
@@ -57,7 +57,8 @@ stanford_path = os.path.expanduser('~') + \
 def get_sentence(graph):
     """Turns a graph into a list of words.
     """
-    return ' '.join([node['word'] for node in graph.nodelist if node['word']])
+    return ' '.join([node['word']
+                     for node in graph.nodes.values() if node['word']])
 
 
 def process_graphs(graphs):
@@ -67,7 +68,7 @@ def process_graphs(graphs):
     for index in range(len(graphs)):
         print('-' * int(columns))
         relations = []
-        for relation in graphs[index].nodelist:
+        for relation in graphs[index].nodes.values():
             relations.append(Relation(**relation))
 
         print(colored('Sentence %d:' % (index + 1), 'white', attrs=['bold']))
@@ -95,7 +96,7 @@ def print_stats(stats):
 
 
 def main():
-    idd3.use_language(en)
+    idd3.use_language(pt)
 
     if len(argv) < 2:
         print('Usage: python', argv[0], '<input file>')

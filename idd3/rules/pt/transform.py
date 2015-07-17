@@ -15,7 +15,8 @@
 # You should have received a copy of the GNU General Public License along with
 # this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from idd3.transform import delete_indices, Tranformation, RemovePunctuation
+from idd3.base import Transformation
+from idd3.transform import delete_indices, RemovePunctuation
 
 
 class RemoveUtteranceInitialConjunction(Transformation):
@@ -26,5 +27,5 @@ class RemoveUtteranceInitialConjunction(Transformation):
             delete_indices(relations, [1])
 
 
-all_transformations = [RemoveUtteranceInitialConjunction()
+all_transformations = [RemoveUtteranceInitialConjunction(),
                        RemovePunctuation(), ]
