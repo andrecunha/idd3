@@ -24,7 +24,7 @@ import idd3
 import nltk
 
 import logging
-logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=logging.INFO)
 
 
 def test():
@@ -33,7 +33,7 @@ def test():
 
     up_to_index = len(expected)
 
-    graphs = nltk.parse.dependencygraph.DependencyGraph.load('corpus.conll')
+    graphs = nltk.parse.dependencygraph.DependencyGraph.load('corpus.norm.conll')
 
     engine = idd3.Engine(idd3.rules.all_rulesets,
                          idd3.transform.all_transformations)

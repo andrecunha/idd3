@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 # IDD3 - Propositional Idea Density from Dependency Trees
-# Copyright (C) 2014  Andre Luiz Verucci da Cunha
+# Copyright (C) 2014-2015  Andre Luiz Verucci da Cunha
 #
 # This program is free software: you can redistribute it and/or modify it
 # under the terms of the GNU General Public License as published by the Free
@@ -24,11 +24,11 @@ class AdverbialPhraseRuleset(Ruleset):
     """A base class for ADVP-like dependency substructures."""
 
     @staticmethod
-    def process_npadvmod(relations, index, context, engine, info={}):
+    def process_nmod(relations, index, context, engine, info={}):
 
-        """TODO: Docstring for process_npadvmod."""
+        """Process noun phrases as adverbial modifiers."""
 
-        npadvmod_indices = Relation.get_children_with_dep('npadvmod',
+        npadvmod_indices = Relation.get_children_with_dep('nmod',
                                                           relations, index)
         if npadvmod_indices != []:
             npadvmod = engine.analyze(relations, npadvmod_indices[0],
@@ -38,7 +38,7 @@ class AdverbialPhraseRuleset(Ruleset):
     @staticmethod
     def process_advmods(relations, index, context, engine, info={}):
 
-        """TODO: Docstring for process_advmods."""
+        """Process adverbial modifiers (e.g., very slowly)."""
 
         advmod_indices = Relation.get_children_with_dep('advmod',
                                                         relations, index)
@@ -48,20 +48,26 @@ class AdverbialPhraseRuleset(Ruleset):
             engine.emit((relations[index].word, advmod), 'M')
 
     @staticmethod
-    def process_preps(relations, index, context, engine, info):
+    def process_adpmods(relations, index, context, engine, info):
 
-        """TODO: Docstring for process_preps."""
+        """Process adpositional modifiers."""
 
-        prep_indices = Relation.get_children_with_dep('prep', relations, index)
+        prep_indices = Relation.get_children_with_dep('adpmod', relations,
+                                                      index)
         for prep_index in prep_indices:
             engine.analyze(relations, prep_index, context + [index])
 
     def extract(self, relations, index, context, engine, info={}):
-        self.process_npadvmod(relations, index, context, engine, info)
+        if 'num' in info:
+            # Advmod modifying number. Treat as quantmod.
+            engine.emit((info['num'], relations[index].word), 'M')
+            return (relations[index].word)
+
+        self.process_nmod(relations, index, context, engine, info)
 
         self.process_advmods(relations, index, context, engine, info)
 
-        self.process_preps(relations, index, context, engine, info)
+        self.process_adpmods(relations, index, context, engine, info)
 
         if 'no_emit' not in info:
             engine.emit((relations[index].word,), 'M')

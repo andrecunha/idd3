@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 # IDD3 - Propositional Idea Density from Dependency Trees
-# Copyright (C) 2014  Andre Luiz Verucci da Cunha
+# Copyright (C) 2014-2015  Andre Luiz Verucci da Cunha
 #
 # This program is free software: you can redistribute it and/or modify it
 # under the terms of the GNU General Public License as published by the Free
@@ -16,6 +16,7 @@
 # this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from __future__ import print_function, unicode_literals, division
+from importlib import import_module
 
 import logging
 logger = logging.getLogger(__name__)
@@ -45,7 +46,10 @@ class Relation(object):
             self.head = None
         self.rel = kwargs['rel']
         self.tag = kwargs['tag']
+        self.ctag = kwargs['ctag']
         self.word = kwargs['word']
+        self.lemma = kwargs['lemma']
+        self.feats = kwargs['feats']
 
     @staticmethod
     def get_children_with_dep(rel, relations, index):
@@ -236,3 +240,19 @@ class Engine(object):
     @staticmethod
     def get_unprocessed_relations(relations):
         return [relation for relation in relations if not relation.processed]
+
+
+class Config(dict):
+
+    """A class for storing configuration parameters. """
+
+    def from_object(self, module_name):
+        """Load a configuration from a module name.
+
+        :module_name: The name of the module where the parameters are defined.
+        """
+        m = import_module(module_name)
+
+        for var in dir(m):
+            if var.isupper():
+                self[var] = getattr(m, var)

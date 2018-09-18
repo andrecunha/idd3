@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 # IDD3 - Propositional Idea Density from Dependency Trees
-# Copyright (C) 2014  Andre Luiz Verucci da Cunha
+# Copyright (C) 2014-2015  Andre Luiz Verucci da Cunha
 #
 # This program is free software: you can redistribute it and/or modify it
 # under the terms of the GNU General Public License as published by the Free
@@ -16,10 +16,10 @@
 # this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from __future__ import print_function, unicode_literals, division
-from idd3 import Relation, Ruleset
-from idd3.rules.np_rulesets import NounPhraseRuleset
-from idd3.rules.vp_rulesets import VerbPhraseRuleset
-from idd3.rules.adjp_rulesets import AdjectivalPhraseRuleset
+from idd3 import Relation, Ruleset, config
+from idd3.rules.universal.np_rulesets import NounPhraseRuleset
+from idd3.rules.universal.vp_rulesets import VerbPhraseRuleset
+from idd3.rules.universal.adjp_rulesets import AdjectivalPhraseRuleset
 
 import logging
 logger = logging.getLogger(__name__)
@@ -71,11 +71,11 @@ class ConjRuleset(NounPhraseRuleset, VerbPhraseRuleset):
             return d
 
 
-class NnJoinRuleset(Ruleset):
+class CompmodJoinRuleset(Ruleset):
 
-    """A ruleset that processes the 'nn-join' relation."""
+    """A ruleset that processes the 'compmod-join' relation."""
 
-    rel = 'nn-join'
+    rel = 'compmod-join'
 
     def extract(self, relations, index, context, engine, info={}):
         """extract(relations, index, context, engine, info) -> str | list(str)
@@ -118,8 +118,6 @@ class DetRuleset(Ruleset):
 
     rel = 'det'
 
-    non_emitted_dets = ('the', 'a', 'an', 'this', 'these', 'that', 'those')
-
     def extract(self, relations, index, context, engine, info={}):
         """extract(relations, index, context, engine, info) -> str | None
 
@@ -138,7 +136,7 @@ class DetRuleset(Ruleset):
                 -> emit((apple, some))
                 -> return None
         """
-        if relations[index].word.lower() in self.non_emitted_dets:
+        if relations[index].word.lower() in config['NON_EMITTED_DETS']:
             return relations[index].word
         else:
             # TODO: maybe get the subject from info.
@@ -147,11 +145,11 @@ class DetRuleset(Ruleset):
             return None
 
 
-class PrepRuleset(Ruleset):
+class AdpmodRuleset(Ruleset):
 
-    """A ruleset that processes the 'prep' relation."""
+    """A ruleset that processes the 'adpmod' relation."""
 
-    rel = 'prep'
+    rel = 'adpmod'
 
     def extract(self, relations, index, context, engine, info={}):
         """extract(relations, index, context, engine, info) -> None
@@ -178,8 +176,8 @@ class PrepRuleset(Ruleset):
 
             * TODO: insert example with PCOMP.
         """
-        # pobj
-        pobj_index = Relation.get_children_with_dep('pobj', relations, index)
+        # adpobj
+        pobj_index = Relation.get_children_with_dep('adpobj', relations, index)
         if pobj_index != []:
             pobjs = engine.analyze(relations, pobj_index[0], context + [index])
 
@@ -195,8 +193,9 @@ class PrepRuleset(Ruleset):
                 proposition = tuple([pobjs['preconj']] + indices)
                 engine.emit(proposition, 'C')
 
-        # pcomp
-        pcomp_index = Relation.get_children_with_dep('pcomp', relations, index)
+        # adpcomp
+        pcomp_index = Relation.get_children_with_dep('adpcomp', relations,
+                                                     index)
         if pcomp_index != []:
             pcomp = engine.analyze(relations, pcomp_index[0],
                                    context + [index])['return_value']
@@ -228,8 +227,7 @@ class NumRuleset(Ruleset):
                 -> emit((200, about)) # by calling QuantmodRuleset
                 -> return "200"
         """
-        number_indices = Relation.get_children_with_dep('number',
-                                                        relations, index)
+        number_indices = Relation.get_children_with_dep('num', relations, index)
         cc_indices = Relation.get_children_with_dep('cc',
                                                     relations, index)
         conj_indices = Relation.get_children_with_dep('conj',
@@ -252,34 +250,14 @@ class NumRuleset(Ruleset):
 
         this_number = ' '.join(words)
 
-        # Process quantmods
-        quantmod_indices = Relation.get_children_with_dep('quantmod',
-                                                          relations, index)
-        for q in quantmod_indices:
+        # Process advmods
+        advmod_indices = Relation.get_children_with_dep('advmod',
+                                                        relations, index)
+        for q in advmod_indices:
             engine.analyze(relations, q, context + [index],
                            {'num': this_number})
 
         return this_number
-
-
-class QuantmodRuleset(Ruleset):
-
-    """A ruleset that processes the 'quantmod' relation."""
-
-    rel = 'quantmod'
-
-    def extract(self, relations, index, context, engine, info):
-        """extract(relations, index, context, engine, info) -> None
-
-        Quantifier phrase modifiers always generate propositions.
-
-        Examples:
-
-            * About 100
-                quantmod(100, about)
-                -> emit((100, about))
-        """
-        engine.emit((info['num'], relations[index].word), 'M')
 
 
 class WhatRuleset(NounPhraseRuleset, AdjectivalPhraseRuleset):
@@ -289,12 +267,14 @@ class WhatRuleset(NounPhraseRuleset, AdjectivalPhraseRuleset):
     rel = 'what'
 
     def extract(self, relations, index, context, engine, info={}):
-        if relations[index].tag in ('NN', 'NNS', 'NNP', 'NNPS'):
+        # if relations[index].tag in ('NN', 'NNS', 'NNP', 'NNPS'):
+        if relations[index].ctag == 'NOUN':
             this = NounPhraseRuleset.extract(self, relations, index, context,
                                              engine, info)
             for noun in this['return_list']:
                 engine.emit((noun,), 'WHAT')
-        elif relations[index].tag == 'JJ':
+        # elif relations[index].tag == 'JJ':
+        elif relations[index].ctag == 'ADJ':
             this = AdjectivalPhraseRuleset.extract(self, relations, index,
                                                    context, engine, info)
             for adj in this:
@@ -304,11 +284,11 @@ class WhatRuleset(NounPhraseRuleset, AdjectivalPhraseRuleset):
             engine.emit((relations[index].word,), 'WHAT')
 
 
-class NnRuleset(Ruleset):
+class CompmodRuleset(Ruleset):
 
-    """A ruleset that processes the 'nn' relation."""
+    """A ruleset that processes the 'compmod' relation."""
 
-    rel = 'nn'
+    rel = 'compmod'
 
     def extract(self, relations, index, context, engine, info={}):
         cc_indices = Relation.get_children_with_dep('cc', relations, index)

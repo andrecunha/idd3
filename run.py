@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 # IDD3 - Propositional Idea Density from Dependency Trees
-# Copyright (C) 2014  Andre Luiz Verucci da Cunha
+# Copyright (C) 2014-2015  Andre Luiz Verucci da Cunha
 #
 # This program is free software: you can redistribute it and/or modify it
 # under the terms of the GNU General Public License as published by the Free
@@ -17,60 +17,58 @@
 
 from __future__ import print_function, unicode_literals, division
 
-from idd3 import Relation, Engine, rules, transform
+import idd3
+from idd3 import Relation, Engine
+from idd3.rules import en, pt
 import nltk
 from sys import argv
-from subprocess import call
 from collections import defaultdict
+from idd3.parsers import StanfordUnivDepParser, StanfordParser
 
 import logging
 logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 import os
 _, columns = os.popen('stty size', 'r').read().split()
 
 try:
     from termcolor import colored
-    raise ImportError
 except ImportError:
     def colored(string, color, attrs):
         return string
 
 
-# MaltParser
+# Stanford NN dependency parser, trained using the normalized Penn Treebank.
 
-# parser = nltk.parse.MaltParser(
-#     working_dir="/home/andre/Develop/malt/maltparser-1.8",
-#     mco="engmalt.linear-1.7",
-#     additional_java_args=['-Xmx512m'])
+# Change these variables to the path on your system
+corenlp_path = os.path.expanduser('~') + \
+    "/Develop/stanford_tools/corenlp"
+model_path = 'data/nndep.model.txt.gz'
+pos_mapping_file = 'data/ENGLISH-fine-to-universal.full.map'
 
-# Stanford parser
+# Traditional Stanford Parser with normalized output
 
 # Change this variable to the path on your system
 stanford_path = os.path.expanduser('~') + \
     "/Develop/stanford_tools/stanford-parser"
-stanford_run_cmd = 'java -mx1024m -cp ' + stanford_path + \
-    '/*: edu.stanford.nlp.parser.lexparser.LexicalizedParser ' + \
-    '-outputFormat penn edu/stanford/nlp/models/lexparser/englishPCFG.ser.gz'
-stanford_convert_tree_cmd = 'java -mx1024m -cp ' + stanford_path + \
-    '/*: edu.stanford.nlp.trees.EnglishGrammaticalStructure ' + \
-    '-conllx -basic -treeFile'
 
 
 def get_sentence(graph):
     """Turns a graph into a list of words.
     """
-    return ' '.join([node['word'] for node in graph.nodelist if node['word']])
+    return ' '.join([node['word']
+                     for node in graph.nodes.values() if node['word']])
 
 
 def process_graphs(graphs):
-    engine = Engine(rules.all_rulesets, transform.all_transformations)
+    engine = Engine(idd3.all_rulesets, idd3.all_transformations)
     stats = defaultdict(int)
 
-    for index in range(len(graphs) - 1):
+    for index in range(len(graphs)):
         print('-' * int(columns))
         relations = []
-        for relation in graphs[index].nodelist:
+        for relation in graphs[index].nodes.values():
             relations.append(Relation(**relation))
 
         print(colored('Sentence %d:' % (index + 1), 'white', attrs=['bold']))
@@ -82,8 +80,9 @@ def process_graphs(graphs):
             for i, prop in enumerate(engine.props):
                 print(str(i + 1) + ' ' + str(prop))
                 stats[prop.kind] += 1
-        except Exception:
-            pass
+        except Exception as e:
+            logger.error('{0} in engine.analyze: {1}'.format(
+                e.__class__.__name__, e))
 
     print('-' * int(columns))
     return stats
@@ -97,6 +96,8 @@ def print_stats(stats):
 
 
 def main():
+    idd3.use_language(pt)
+
     if len(argv) < 2:
         print('Usage: python', argv[0], '<input file>')
         return
@@ -104,19 +105,13 @@ def main():
     if argv[1].endswith('.conll'):
         graphs = nltk.parse.dependencygraph.DependencyGraph.load(argv[1])
     else:
-        # tagged_sents = [nltk.pos_tag(nltk.word_tokenize(sent))
-        #                 for sent in sents]
+        parser = StanfordUnivDepParser(corenlp_path, model_path,
+                                       pos_mapping_file)
 
-        # graphs = parser.tagged_parse_sents(tagged_sents)
+        # Uncomment for normalized Stanford Parser.
+        # parser = StanfordParser(stanford_path, pos_mapping_file)
 
-        with open('/tmp/tmp.tree', mode='w') as tmp_file,\
-                open('/tmp/output.conll', mode='w') as conll_file:
-            call((stanford_run_cmd + ' ' + argv[1]).split(' '), stdout=tmp_file)
-            call((stanford_convert_tree_cmd + ' /tmp/tmp.tree').split(' '),
-                 stdout=conll_file)
-
-        graphs = nltk.parse.dependencygraph.DependencyGraph.load(
-            '/tmp/output.conll')
+        graphs = parser.parse_raw_file(argv[1])
 
     stats = process_graphs(graphs)
     print_stats(stats)

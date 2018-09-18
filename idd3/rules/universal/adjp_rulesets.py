@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 # IDD3 - Propositional Idea Density from Dependency Trees
-# Copyright (C) 2014  Andre Luiz Verucci da Cunha
+# Copyright (C) 2014-2015  Andre Luiz Verucci da Cunha
 #
 # This program is free software: you can redistribute it and/or modify it
 # under the terms of the GNU General Public License as published by the Free
@@ -26,7 +26,7 @@ class AdjectivalPhraseRuleset(Ruleset):
     @staticmethod
     def process_advmods(relations, index, context, engine, info={}):
 
-        """TODO: Docstring for process_advmods."""
+        """Process adverbial modifiers (e.g., very difficult)."""
 
         advmod_indices = Relation.get_children_with_dep('advmod', relations,
                                                         index)
@@ -37,9 +37,21 @@ class AdjectivalPhraseRuleset(Ruleset):
         return advmods
 
     @staticmethod
+    def process_nmods(relations, index, context, engine, info={}):
+
+        """Process nominal modifiers (e.g., 5 years old)."""
+
+        advmod_indices = Relation.get_children_with_dep('nmod', relations,
+                                                        index)
+        nmods = [engine.analyze(relations, i, context + [index])
+                 for i in advmod_indices]
+
+        return nmods
+
+    @staticmethod
     def process_xcomp(relations, index, context, engine, info={}):
 
-        """TODO: Docstring for process_xcomp."""
+        """Process reduced clausal modifiers (e.g., hard to imagine)."""
 
         xcomp_indices = Relation.get_children_with_dep('xcomp', relations,
                                                        index)
@@ -50,11 +62,12 @@ class AdjectivalPhraseRuleset(Ruleset):
             engine.analyze(relations, i, context + [index], info)
 
     @staticmethod
-    def process_preps(relations, index, context, engine, info):
+    def process_adpmods(relations, index, context, engine, info):
 
-        """TODO: Docstring for process_preps."""
+        """Process adpositional modifiers (e.g., angry with you)."""
 
-        prep_indices = Relation.get_children_with_dep('prep', relations, index)
+        prep_indices = Relation.get_children_with_dep('adpmod', relations,
+                                                      index)
         for prep_index in prep_indices:
             engine.analyze(relations, prep_index, context + [index])
 
@@ -62,16 +75,19 @@ class AdjectivalPhraseRuleset(Ruleset):
         advmods = AdjectivalPhraseRuleset.process_advmods(relations, index,
                                                           context, engine, info)
 
+        nmods = AdjectivalPhraseRuleset.process_nmods(relations, index,
+                                                      context, engine, info)
+
         AdjectivalPhraseRuleset.process_xcomp(relations, index,
                                               context, engine, info)
 
-        AdjectivalPhraseRuleset.process_preps(relations, index,
-                                              context, engine, info)
+        AdjectivalPhraseRuleset.process_adpmods(relations, index,
+                                                context, engine, info)
 
         # TODO: Add cc/conj handling.
         this = [relations[index].word]
 
-        for advmod in advmods:
+        for advmod in advmods + nmods:
             for word in this:
                 engine.emit((word, advmod), 'M')
 

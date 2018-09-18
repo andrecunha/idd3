@@ -1,7 +1,25 @@
 # -*- coding: utf-8 -*-
+# IDD3 - Propositional Idea Density from Dependency Trees
+# Copyright (C) 2014-2015  Andre Luiz Verucci da Cunha
+#
+# This program is free software: you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by the Free
+# Software Foundation, either version 3 of the License, or (at your option)
+# any later version.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+# FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+# more details.
+#
+# You should have received a copy of the GNU General Public License along with
+# this program.  If not, see <http://www.gnu.org/licenses/>.
+
 from __future__ import print_function, unicode_literals, division
 import pprint
-from idd3 import Relation, Engine, rules, transform
+import idd3
+from idd3 import Relation, Engine
+from idd3.rules import en
 import nltk
 from sys import argv
 
@@ -16,10 +34,12 @@ except ImportError:
 
 
 def demo():
+    idd3.use_language(en)
+
     graphs = nltk.parse.dependencygraph.DependencyGraph.load(argv[1])
     index = int(argv[2]) - 1
 
-    engine = Engine(rules.all_rulesets, transform.all_transformations)
+    engine = Engine(idd3.all_rulesets, idd3.all_transformations)
 
     relations = []
     for relation in graphs[index].nodelist:

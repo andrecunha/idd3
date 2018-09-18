@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 # IDD3 - Propositional Idea Density from Dependency Trees
-# Copyright (C) 2014  Andre Luiz Verucci da Cunha
+# Copyright (C) 2014-2015  Andre Luiz Verucci da Cunha
 #
 # This program is free software: you can redistribute it and/or modify it
 # under the terms of the GNU General Public License as published by the Free
@@ -16,9 +16,9 @@
 # this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from __future__ import print_function, unicode_literals, division
-from idd3 import Relation, Ruleset
-from idd3.rules.adjp_rulesets import AdjectivalPhraseRuleset
-from idd3.rules.np_rulesets import NounPhraseRuleset
+from idd3 import Relation, Ruleset, config
+from idd3.rules.universal.adjp_rulesets import AdjectivalPhraseRuleset
+from idd3.rules.universal.np_rulesets import NounPhraseRuleset
 import logging
 
 
@@ -34,7 +34,7 @@ class VerbPhraseRuleset(Ruleset):
     @staticmethod
     def process_subj(relations, index, context, engine, info):
 
-        """TODO: Docstring for process_subj."""
+        """Process the subject of the verb phrase."""
 
         # nsubj
         subj_index = Relation.get_children_with_dep('nsubj', relations, index)
@@ -64,7 +64,7 @@ class VerbPhraseRuleset(Ruleset):
                     'rcmod_wdt': None}
 
         # Resolve relative pronouns in subordinate clauses.
-        if subj['return_list'][0] in ('that', 'which', 'who')\
+        if subj['return_list'][0] in config['RELATIVE_PRONOUNS']\
                 and 'subj' in info:
             subj['return_list'][0] += '(={0})'.format(
                 info['subj']['return_list'][0])
@@ -74,9 +74,8 @@ class VerbPhraseRuleset(Ruleset):
     @staticmethod
     def process_auxs(relations, index, context, engine, info):
 
-        """TODO: Docstring for process_auxs."""
+        """Process auxiliaries and modals."""
 
-        # TODO: add support for multiple auxiliaries.
         aux_index = Relation.get_children_with_dep('aux', relations, index)
         auxpass_index = Relation.get_children_with_dep('auxpass', relations,
                                                        index)
@@ -92,7 +91,7 @@ class VerbPhraseRuleset(Ruleset):
     @staticmethod
     def process_prt(relations, index, context, engine, info):
 
-        """TODO: Docstring for process_prt."""
+        """Process phrasal verb particles."""
 
         prt_index = Relation.get_children_with_dep('prt', relations, index)
         if prt_index == []:
@@ -105,20 +104,26 @@ class VerbPhraseRuleset(Ruleset):
     @staticmethod
     def process_comps(relations, index, context, engine, info):
 
-        """TODO: Docstring for process_comps."""
+        """Process complements (direct objects, open clausal complements,
+            adjectival complements, and subject predicates)."""
 
         dobj_index = Relation.get_children_with_dep('dobj', relations, index)
         xcomp_index = Relation.get_children_with_dep('xcomp', relations, index)
         acomp_index = Relation.get_children_with_dep('acomp', relations, index)
+        attr_index = Relation.get_children_with_dep('attr', relations, index)
 
-        comps_indices = sorted(dobj_index + xcomp_index + acomp_index)
+        comps_indices = sorted(dobj_index + xcomp_index + acomp_index +
+                               attr_index)
         _comps = [engine.analyze(relations, i, context + [index], info)
                   for i in comps_indices]
 
         comps = []
         for comp in _comps:
             if isinstance(comp, dict):
-                comp = comp['return_value']
+                if 'return_value' in comp:  # xcomp
+                    comp = comp['return_value']
+                else:  # attr
+                    comp = comp['return_list']
 
             if isinstance(comp, list):
                 comps.extend(comp)
@@ -131,7 +136,7 @@ class VerbPhraseRuleset(Ruleset):
     @staticmethod
     def process_ccomp(relations, index, context, engine, info):
 
-        """TODO: Docstring for process_ccomp."""
+        """Process clausal complements."""
 
         ccomp_index = Relation.get_children_with_dep('ccomp', relations, index)
         if ccomp_index != []:
@@ -140,10 +145,11 @@ class VerbPhraseRuleset(Ruleset):
     @staticmethod
     def process_iobj(relations, index, context, engine, info):
 
-        """TODO: Docstring for process_iobj."""
+        """Process the indirect object."""
 
-        # prep + pobj
-        prep_indices = Relation.get_children_with_dep('prep', relations, index)
+        # adpmod + adpobj
+        prep_indices = Relation.get_children_with_dep('adpmod', relations,
+                                                      index)
         for prep_index in prep_indices:
             engine.analyze(relations, prep_index, context + [index])
 
@@ -155,7 +161,7 @@ class VerbPhraseRuleset(Ruleset):
     @staticmethod
     def process_advs(relations, index, context, engine, info):
 
-        """TODO: Docstring for process_advs."""
+        """Process adverbial modifiers (advmod, tmod - DEPRECATED, and neg)."""
 
         # advmod
         advmod_indices = Relation.get_children_with_dep('advmod', relations,
@@ -176,7 +182,8 @@ class VerbPhraseRuleset(Ruleset):
     @staticmethod
     def process_ignorables(relations, index, context, engine, info):
 
-        """TODO: Docstring for process_ignorables."""
+        """Process elements that can be ignored (complm - DEPRECATED,
+            and mark)."""
 
         # complm
         complm_indices = Relation.get_children_with_dep('complm', relations,
@@ -184,14 +191,19 @@ class VerbPhraseRuleset(Ruleset):
         for i in complm_indices:
             engine.analyze(relations, i, context + [index])
 
+        # TODO: check if this makes sense.
+        # mark
+        mark_indices = Relation.get_children_with_dep('mark', relations, index)
+        for i in mark_indices:
+            engine.analyze(relations, i, context + [index])
+
     @staticmethod
-    def process_npadvmod(relations, index, context, engine, info):
+    def process_nmods(relations, index, context, engine, info):
 
-        """TODO: Docstring for process_npadvmod."""
+        """Process noun phrase modifiers."""
 
-        # npadvmod
-        npadvmod_indices = Relation.get_children_with_dep('npadvmod',
-                                                          relations,
+        # nmod
+        npadvmod_indices = Relation.get_children_with_dep('nmod', relations,
                                                           index)
         mods = [engine.analyze(relations, i, context + [index])
                 for i in npadvmod_indices]
@@ -202,17 +214,18 @@ class VerbPhraseRuleset(Ruleset):
     @staticmethod
     def process_pp_when_be_is_root(relations, index, context, engine, info,
                                    subjs):
+        # TODO: Maybe unnecessary.
 
-        """TODO: Docstring for process_pp_when_be_is_root."""
+        """Process prepositional phrases when be is root."""
 
-        prep_indices = Relation.get_children_with_dep('prep', relations,
+        prep_indices = Relation.get_children_with_dep('adpmod', relations,
                                                       index)
         if prep_indices == []:
             return []
 
         if subjs['return_list'][0].lower() == 'it':
             prep_index = prep_indices[0]
-            pobj_index = Relation.get_children_with_dep('pobj', relations,
+            pobj_index = Relation.get_children_with_dep('adpobj', relations,
                                                         prep_index)[0]
 
             pobj_return_value = engine.analyze(relations, pobj_index, context +
@@ -234,7 +247,7 @@ class VerbPhraseRuleset(Ruleset):
     def process_advmod_when_be_is_root(relations, index, context, engine, info,
                                        subjs):
 
-        """TODO: Docstring for process_advmod_when_be_is_root."""
+        """Process adverbial modifiers when be is root."""
 
         advmod_indices = Relation.get_children_with_dep('advmod', relations,
                                                         index)
@@ -254,7 +267,7 @@ class VerbPhraseRuleset(Ruleset):
     @staticmethod
     def process_discourse_markers(relations, index, context, engine, info):
 
-        """TODO: Docstring for process_discourse_markers."""
+        """Process discourse markers."""
 
         discourse_indices = Relation.get_children_with_dep('discourse',
                                                            relations, index)
@@ -264,6 +277,9 @@ class VerbPhraseRuleset(Ruleset):
 
     @staticmethod
     def process_advcl(relations, index, context, engine, info, prop_ids):
+
+        """Process adverbial clauses."""
+
         advcl_indices = Relation.get_children_with_dep('advcl',
                                                        relations, index)
 
@@ -277,6 +293,9 @@ class VerbPhraseRuleset(Ruleset):
     @staticmethod
     def process_conjs(relations, index, context, engine, info, subjs, auxs,
                       prop_ids):
+
+        """Process cc/conj."""
+
         conj_indices = Relation.get_children_with_dep('conj', relations,
                                                       index)
 
@@ -309,6 +328,9 @@ class VerbPhraseRuleset(Ruleset):
 
     @staticmethod
     def process_parataxes(relations, index, context, engine, info):
+
+        """Process parataxical verb phrases."""
+
         parataxis_indices = Relation.get_children_with_dep('parataxis',
                                                            relations, index)
 
@@ -328,7 +350,7 @@ class VerbPhraseRuleset(Ruleset):
     @staticmethod
     def process_vmods(relations, index, context, engine, info):
 
-        """Processes children with label 'vmod'."""
+        """Processes reduced non-finite verbal modifiers."""
 
         vmod_indices = Relation.get_children_with_dep('vmod', relations, index)
 
@@ -337,11 +359,13 @@ class VerbPhraseRuleset(Ruleset):
 
     def emit_propositions(self, verb, subjs, dobjs, engine, relation):
 
-        """TODO: Docstring for emit_propositions."""
+        """Emit propositions for action verbs."""
 
         prop_ids = []
 
-        if relation.tag == 'VBG' and relation.rel not in ('null', 'root',
+        # Cannot use ctag here, since we need to know if the verb is in the
+        # gerund (the use of the -ing ending is equally English-specific).
+        if relation.tag == 'VBG' and relation.rel not in ('null', 'ROOT',
                                                           'conj', 'vmod'):
             if not dobjs:
                     prop_id = engine.emit((verb,), 'P')
@@ -417,7 +441,7 @@ class VerbPhraseRuleset(Ruleset):
 
         mods = prep_mods + advmods
 
-        self.process_ignorables(relations, index, context, engine, info)
+        # self.process_ignorables(relations, index, context, engine, info)
 
         self.process_vmods(relations, index, context, engine, info)
 
@@ -470,7 +494,7 @@ class VerbPhraseRuleset(Ruleset):
 
         self.process_advs(relations, index, context, engine, info)
 
-        self.process_ignorables(relations, index, context, engine, info)
+        # self.process_ignorables(relations, index, context, engine, info)
 
         self.process_whats(relations, index, context, engine, {})
 
@@ -481,8 +505,8 @@ class VerbPhraseRuleset(Ruleset):
 
         # Emit propositions.
         prop_ids = []
-        if relations[index].rel in ('xcomp', 'ccomp', 'pcomp', 'csubj'):
-            if relations[index].tag == 'VBG':
+        if relations[index].rel in ('xcomp', 'ccomp', 'adpcomp', 'csubj'):
+            if relations[index].tag in config['GERUND_TAGS']:
                 if comps != []:
                     prop_ids = self.emit_propositions(verb, subjs, comps,
                                                       engine, relations[index])
@@ -532,7 +556,7 @@ class VerbPhraseRuleset(Ruleset):
 
     def handle_cop_with_adjp(self, relations, index, context, engine, info):
 
-        """Handle copular verbs with ADJP complements."""
+        """Handle copular verbs with AdjP complements."""
 
         subjs = self.process_subj(relations, index, context, engine, info)
 
@@ -545,7 +569,7 @@ class VerbPhraseRuleset(Ruleset):
 
         self.process_ignorables(relations, index, context, engine, info)
 
-        self.process_npadvmod(relations, index, context, engine, info)
+        self.process_nmods(relations, index, context, engine, info)
 
         this = AdjectivalPhraseRuleset.extract(self, relations, index, context,
                                                engine, info)
@@ -566,21 +590,24 @@ class VerbPhraseRuleset(Ruleset):
         VerbPhraseRuleset.process_discourse_markers(relations, index, context,
                                                     engine, info)
 
-        if relations[index].word in be_forms:
-            return_dict = self.handle_be_as_root(relations, index, context,
-                                                 engine, info)
-        elif relations[index].tag in ('VBZ', 'VBD', 'VBN', 'VB', 'VBG', 'VBP'):
+        # if relations[index].word in be_forms:
+        #     return_dict = self.handle_be_as_root(relations, index, context,
+        #                                          engine, info)
+        # if relations[index].tag in ('VBZ', 'VBD', 'VBN', 'VB', 'VBG', 'VBP'):
+        if relations[index].ctag == 'VERB':
             return_dict = self.handle_action_verb(relations, index, context,
                                                   engine, info)
-        elif relations[index].tag in ('NN', 'NNS', 'NNP', 'NNPS', 'CD', 'WP',
-                                      'PRP'):
+        # elif relations[index].tag in ('NN', 'NNS', 'NNP', 'NNPS', 'CD', 'WP',
+        #                               'PRP'):
+        elif relations[index].ctag in ('NOUN', 'NUM', 'PRON'):
             return_dict = self.handle_cop_with_np(relations, index, context,
                                                   engine, info)
-        elif relations[index].tag in ('JJ'):
+        # elif relations[index].tag in ('JJ'):
+        elif relations[index].ctag == 'ADJ':
             return_dict = self.handle_cop_with_adjp(relations, index, context,
                                                     engine, info)
         else:
-            print('VP: cannot handle', relations[index].tag, 'yet.')
+            logger.fatal('VP cannot handle %s yet.', relations[index].ctag)
             return_dict = None
 
         # Process adverbial clauses.
@@ -596,6 +623,9 @@ class VerbPhraseRuleset(Ruleset):
         VerbPhraseRuleset.process_parataxes(relations, index, context, engine,
                                             info)
 
+        # Process ignorable elements.
+        self.process_ignorables(relations, index, context, engine, info)
+
         return_dict['subjs'] = self.subjs
 
         # Process rcmods.
@@ -608,7 +638,7 @@ class RootRuleset(VerbPhraseRuleset):
 
     """A ruleset that processes the 'ROOT' relation."""
 
-    rel = 'root'
+    rel = 'ROOT'
 
 
 class XcompRuleset(VerbPhraseRuleset):
@@ -625,11 +655,11 @@ class CcompRuleset(VerbPhraseRuleset):
     rel = 'ccomp'
 
 
-class PcompRuleset(VerbPhraseRuleset):
+class AdpcompRuleset(VerbPhraseRuleset):
 
-    """A ruleset that processes the 'pcomp' relation."""
+    """A ruleset that processes the 'adpcomp' relation."""
 
-    rel = 'pcomp'
+    rel = 'adpcomp'
 
 
 class CsubjRuleset(VerbPhraseRuleset):
